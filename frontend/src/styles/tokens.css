@@ -1,0 +1,115 @@
+/* Circuit Coach design tokens.
+   Palette: blueprint paper + amber "live wire" accent. Teal = understood, rust = needs a human.
+   All text/background pairs below meet WCAG AA (4.5:1) at body size. */
+:root {
+  --bg: #eef2f4;
+  --surface: #ffffff;
+  --surface-2: #f5f7f9;
+  --surface-3: #e8edf1;
+  --ink: #0f1b2b;
+  --ink-2: #33424f;
+  --muted: #56667a;
+  --line: #d3dce3;
+  --line-strong: #3e5c76;
+  --grid: rgba(62, 92, 118, 0.07);
+
+  --amber: #f2b01e;
+  --on-amber: #231800;
+  --amber-soft: #fff3d1;
+  --amber-ink: #7a5200;
+
+  --teal: #1f6f68;
+  --on-teal: #ffffff;
+  --teal-soft: #dcf1ed;
+  --teal-ink: #17574f;
+
+  --rust: #b4441f;
+  --on-rust: #ffffff;
+  --rust-soft: #fbe6de;
+  --rust-ink: #8f3316;
+
+  --blue: #2c5d8a;
+  --blue-soft: #e2ecf6;
+
+  --wire: #33506b;
+  --wire-live: #e19a00;
+
+  --shadow-1: 0 1px 2px rgba(15, 27, 43, 0.06), 0 1px 1px rgba(15, 27, 43, 0.04);
+  --shadow-2: 0 10px 30px rgba(15, 27, 43, 0.12), 0 2px 6px rgba(15, 27, 43, 0.06);
+  --focus: 0 0 0 3px #ffffff, 0 0 0 6px #2c5d8a;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 26px;
+
+  --font-body: "IBM Plex Sans", "IBM Plex Sans Devanagari", system-ui, sans-serif;
+  --font-head: "Space Grotesk", "IBM Plex Sans Devanagari", system-ui, sans-serif;
+  --font-deva: "IBM Plex Sans Devanagari", "IBM Plex Sans", system-ui, sans-serif;
+
+  --tap: 52px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1420;
+    --surface: #111f2f;
+    --surface-2: #15263a;
+    --surface-3: #1b2f45;
+    --ink: #e7ecef;
+    --ink-2: #c3cfda;
+    --muted: #97a9ba;
+    --line: #253b52;
+    --line-strong: #5a7c9b;
+    --grid: rgba(122, 164, 196, 0.06);
+    --amber-soft: #3a2c0a;
+    --amber-ink: #f6c95a;
+    --teal: #3aa597;
+    --on-teal: #03201c;
+    --teal-soft: #0f2e2a;
+    --teal-ink: #7fd6ca;
+    --rust: #e27a55;
+    --on-rust: #2a0d03;
+    --rust-soft: #361910;
+    --rust-ink: #f3a88c;
+    --blue: #86b5e0;
+    --blue-soft: #16304a;
+    --wire: #8fb0cc;
+    --wire-live: #f2b01e;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.45);
+    --focus: 0 0 0 3px #0b1420, 0 0 0 6px #86b5e0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1420;
+  --surface: #111f2f;
+  --surface-2: #15263a;
+  --surface-3: #1b2f45;
+  --ink: #e7ecef;
+  --ink-2: #c3cfda;
+  --muted: #97a9ba;
+  --line: #253b52;
+  --line-strong: #5a7c9b;
+  --grid: rgba(122, 164, 196, 0.06);
+  --amber-soft: #3a2c0a;
+  --amber-ink: #f6c95a;
+  --teal: #3aa597;
+  --on-teal: #03201c;
+  --teal-soft: #0f2e2a;
+  --teal-ink: #7fd6ca;
+  --rust: #e27a55;
+  --on-rust: #2a0d03;
+  --rust-soft: #361910;
+  --rust-ink: #f3a88c;
+  --blue: #86b5e0;
+  --blue-soft: #16304a;
+  --wire: #8fb0cc;
+  --wire-live: #f2b01e;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --focus: 0 0 0 3px #0b1420, 0 0 0 6px #86b5e0;
+  color-scheme: dark;
+}
