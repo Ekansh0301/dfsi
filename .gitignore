@@ -1,0 +1,9 @@
+# Only the app and the README are tracked. Course and sprint documents stay local.
+*.pdf
+/docs/
+/index.html
+
+node_modules/
+dist/
+.DS_Store
+*.log

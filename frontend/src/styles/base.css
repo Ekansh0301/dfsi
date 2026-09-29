@@ -1,0 +1,306 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+:lang(hi) {
+  font-family: var(--font-deva);
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-head);
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+:lang(hi) h1,
+:lang(hi) h2,
+:lang(hi) h3 {
+  font-family: var(--font-deva);
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+a {
+  color: var(--blue);
+}
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: var(--r-sm);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: var(--r-md);
+  border: 1.5px solid transparent;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    transform 0.08s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+  user-select: none;
+}
+:lang(hi) .btn {
+  font-family: var(--font-deva);
+  font-weight: 600;
+}
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn-block {
+  width: 100%;
+}
+.btn-lg {
+  min-height: var(--tap);
+  font-size: 1.06rem;
+  padding: 14px 20px;
+  border-radius: 14px;
+}
+.btn-split {
+  justify-content: space-between;
+  text-align: left;
+}
+.btn-primary {
+  background: var(--amber);
+  color: var(--on-amber);
+  box-shadow: 0 2px 0 rgba(122, 82, 0, 0.35);
+}
+.btn-primary:hover {
+  background: #f5bb3a;
+}
+.btn-success {
+  background: var(--teal);
+  color: var(--on-teal);
+}
+.btn-danger-outline {
+  background: transparent;
+  color: var(--rust-ink);
+  border-color: var(--rust);
+}
+.btn-danger-outline:hover {
+  background: var(--rust-soft);
+}
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.btn-secondary:hover {
+  background: var(--surface-2);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-2);
+  border-color: transparent;
+  font-weight: 600;
+}
+.btn-ghost:hover {
+  background: var(--surface-3);
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 0.88rem;
+  border-radius: 10px;
+}
+.btn .hint {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.86rem;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.icon-btn:hover {
+  background: var(--surface-2);
+}
+
+/* ── Chips & tags ──────────────────────────────────────── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: var(--amber-soft);
+  color: var(--amber-ink);
+}
+.tag-teal {
+  background: var(--teal-soft);
+  color: var(--teal-ink);
+}
+.tag-rust {
+  background: var(--rust-soft);
+  color: var(--rust-ink);
+}
+.tag-blue {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.tag-plain {
+  background: var(--surface-3);
+  color: var(--ink-2);
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid var(--surface-3);
+  border-top-color: var(--amber);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.28s ease both;
+}
+.rise-2 {
+  animation: rise 0.28s ease 0.06s both;
+}
+.rise-3 {
+  animation: rise 0.28s ease 0.12s both;
+}
+
+/* ── Circuit figures ───────────────────────────────────── */
+.fig {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--wire);
+}
+.fig .part {
+  transition:
+    stroke 0.2s ease,
+    opacity 0.2s ease;
+}
+.fig.has-hl .part:not(.hl) {
+  opacity: 0.38;
+}
+.fig .hl {
+  color: var(--wire-live);
+  stroke: var(--wire-live);
+}
+.fig .hl .halo {
+  opacity: 1;
+}
+.fig .halo {
+  opacity: 0;
+  fill: var(--wire-live);
+  fill-opacity: 0.16;
+  stroke: none;
+  transition: opacity 0.2s ease;
+}
+.fig text {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  fill: currentColor;
+  stroke: none;
+}
+.fig .flow {
+  stroke: var(--wire-live);
+  stroke-dasharray: 3 14;
+  stroke-linecap: round;
+  animation: flow 0.9s linear infinite;
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -17;
+  }
+}
+.fig .glow {
+  fill: var(--wire-live);
+  fill-opacity: 0.35;
+}
