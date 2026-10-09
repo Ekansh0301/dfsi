@@ -6,7 +6,7 @@ interface Props {
   /** `true` closes every switch; an array closes only those switch parts (e.g. ["s1"]). */
   closed?: boolean | string[];
   highlight?: string[];
-  /** Show current flow and lit lamps for closed loops. Off for quiz figures, so the figure doesn't give the answer away. */
+  /** Show lit lamps for closed loops. Off for quiz figures, so the figure does not give the answer away. */
   live?: boolean;
   title?: string;
   className?: string;
@@ -90,7 +90,6 @@ export function Figure({ id, closed = false, highlight = [], live = true, title,
       </text>
     </P>
   );
-  const Flow = ({ d }: { d: string }) => (live ? <path className="flow" d={d} fill="none" strokeWidth={3} /> : null);
 
   let body: ReactNode;
   let viewBox = "0 0 320 180";
@@ -166,7 +165,6 @@ export function Figure({ id, closed = false, highlight = [], live = true, title,
             <line x1={280} y1={150} x2={40} y2={150} />
             <line x1={40} y1={150} x2={40} y2={96} />
           </P>
-          {on && <Flow d="M40 82 V30 H280 V150 H40 V96" />}
         </>
       );
       break;
@@ -190,7 +188,6 @@ export function Figure({ id, closed = false, highlight = [], live = true, title,
             <line x1={280} y1={150} x2={40} y2={150} />
             <line x1={40} y1={150} x2={40} y2={96} />
           </P>
-          {on && <Flow d="M40 82 V30 H280 V150 H40 V96" />}
         </>
       );
       break;
@@ -221,12 +218,6 @@ export function Figure({ id, closed = false, highlight = [], live = true, title,
             <line x1={280} y1={150} x2={40} y2={150} />
             <line x1={40} y1={150} x2={40} y2={96} />
           </P>
-          {on && (
-            <>
-              <Flow d="M40 82 V30 H190 V150 H40 V96" />
-              <Flow d="M190 30 H280 V150 H190" />
-            </>
-          )}
         </>
       );
       break;
@@ -259,8 +250,6 @@ export function Figure({ id, closed = false, highlight = [], live = true, title,
           </P>
           <Switch name="s2" x={130} y={100} label="S2" />
           <Lamp name="l2" x={230} y={100} label="L2" lx={-9} ly={44} lit={on2} />
-          {on1 && <Flow d="M40 92 V30 H280 V160 H40 V106" />}
-          {on2 && <Flow d="M100 30 V100 H280" />}
         </>
       );
       break;

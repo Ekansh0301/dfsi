@@ -7,7 +7,7 @@ import { ExperienceSelect, Placement, StartingPoint, TrackSelect, Welcome } from
 import { Messages, ProgressScreen } from "./Path";
 import { GotIt, HelpSent, Learn, Stuck } from "./Remedial";
 
-/** Learner PWA: mobile-first, one primary action per screen. */
+/** Learner app: mobile-first, one primary action per screen. */
 export function LearnerApp() {
   const me = useMe();
   const [experience, setExperience] = useState<LearnerState["experience"]>("some");

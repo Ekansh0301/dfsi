@@ -43,7 +43,6 @@ export type FigureId =
 
 export interface Option {
   text: L;
-  figure?: FigureId;
 }
 
 export interface Question {
@@ -59,7 +58,7 @@ export interface Question {
   why: L;
 }
 
-export type ContentKind = "walkthrough" | "video" | "practice";
+export type ContentKind = "walkthrough" | "practice";
 
 export interface ContentStep {
   text: L;
@@ -67,7 +66,7 @@ export interface ContentStep {
   figure?: FigureId;
   /** Which parts of the figure to highlight (`data-part` names inside the figure SVG). */
   highlight?: string[];
-  /** Draw switches closed (all, or the named ones) and animate current flow. */
+  /** Draw switches closed (all, or the named ones), which also lights the lamps. */
   closed?: boolean | string[];
   /** Practice steps: revealed after the learner tries. */
   answer?: L;
@@ -81,8 +80,6 @@ export interface ContentItem {
   minutes: number;
   figure?: FigureId;
   steps: ContentStep[];
-  /** Smaller file, available offline (cached with the app shell). */
-  offline: boolean;
 }
 
 /** Design Doc §5 input: one row of the response stream. */

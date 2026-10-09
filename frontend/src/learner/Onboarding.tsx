@@ -8,7 +8,7 @@ import { useT } from "../lib/i18n";
 import { useMe } from "../lib/store";
 import { useMarkScreen } from "../shell/screenStore";
 import { Quiz } from "./Quiz";
-import { AppBar, Listen, Screen } from "./ui";
+import { AppBar, Screen } from "./ui";
 
 export function Welcome() {
   useMarkScreen("welcome");
@@ -28,13 +28,12 @@ export function Welcome() {
         </button>
       }
     >
-      <div className="hero-illus rise" aria-hidden>
+      <div className="hero-illus" aria-hidden>
         <WelcomeArt />
       </div>
-      <h1 className="display rise-2">{t("welcome_title")}</h1>
-      <p className="lead rise-2">{t("welcome_body")}</p>
-      <Listen id="welcome" text={t("welcome_title") + " " + t("welcome_body")} />
-      <fieldset className="choice-group rise-3">
+      <h1 className="display">{t("welcome_title")}</h1>
+      <p className="lead">{t("welcome_body")}</p>
+      <fieldset className="choice-group">
         <legend className="label">{t("choose_lang")}</legend>
         <div className="lang-grid">
           {langs.map((l) => (
@@ -177,7 +176,6 @@ export function Placement({ experience }: { experience: LearnerState["experience
     return (
       <Screen bar={<AppBar right={<span />} />}>
         <div className="center-fill" role="status">
-          <div className="spinner" />
           <p className="lead">{t("finding_start")}</p>
         </div>
       </Screen>
@@ -197,10 +195,9 @@ export function Placement({ experience }: { experience: LearnerState["experience
         <p className="eyebrow">3 / 3</p>
         <h1 className="title">{t("placement_title")}</h1>
         <p className="lead">{t("placement_body")}</p>
-        <Listen id="placement" text={t("placement_title") + ". " + t("placement_body")} />
         <div className="placement-art" aria-hidden>
           {PLACEMENT.map((_, i) => (
-            <span key={i} style={{ animationDelay: `${i * 60}ms` }} />
+            <span key={i} />
           ))}
         </div>
       </Screen>
@@ -229,16 +226,15 @@ export function StartingPoint() {
         </button>
       }
     >
-      <div className="rec-card rise">
+      <div className="rec-card">
         <span className="tag">{t("rec_label")}</span>
         <p className="muted">{t("start_title")}</p>
         <h1 className="rec-title">
           {t("module_n", { n: m.number })} · {tx(m.title)}
         </h1>
         <p className="lead">{reason}</p>
-        <Listen id="start" text={`${t("start_title")} ${tx(m.title)}. ${reason}`} />
       </div>
-      <ol className="mini-path rise-2" aria-label={t("progress_title")}>
+      <ol className="mini-path" aria-label={t("progress_title")}>
         {MODULES.map((x) => (
           <li key={x.id} className={x.number < m.number ? "done" : x.id === m.id ? "now" : ""}>
             <span className="dot">{x.number < m.number ? <Check size={14} aria-hidden /> : x.number}</span>
@@ -266,7 +262,6 @@ function WelcomeArt() {
         <circle cx="130" cy="40" r="4" fill="var(--wire)" />
         <line x1="130" y1="40" x2="170" y2="40" />
         <circle cx="170" cy="40" r="4" fill="var(--wire)" />
-        <path className="welcome-flow" d="M40 110V40h240v70H40" stroke="var(--wire-live)" strokeDasharray="3 14" />
       </g>
       <circle cx="280" cy="75" r="26" fill="var(--amber)" opacity="0.28" />
       <circle cx="280" cy="75" r="17" fill="var(--surface)" stroke="var(--wire)" strokeWidth="3" />

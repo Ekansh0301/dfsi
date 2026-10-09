@@ -6,7 +6,7 @@ const ENTRIES = [
     to: "/learner",
     icon: Smartphone,
     title: "Learner app",
-    body: "Mobile-first PWA. Onboarding, quick checks, one recommendation, a remedial lesson, and help from a trainer.",
+    body: "Mobile-first. Onboarding, quick checks, one recommendation, a remedial lesson, and help from a trainer.",
   },
   {
     to: "/educator",
@@ -22,18 +22,17 @@ const CHANGES = [
   ["Working assessment", "Real questions with figures, one per screen. An “I'm not sure” option replaces guessing."],
   ["Live knowledge tracing", "A BKT engine runs in the browser behind the same API the Sprint 2 backend will serve."],
   ["Root cause, explained", "When a prerequisite is the real gap, the card says so. “Why this?” shows the chain."],
-  ["Hindi + read-aloud", "Every learner screen works in Hindi or English, and every text block can be heard."],
+  ["Hindi and English", "Every learner screen works in Hindi or English, and can be switched at any time."],
   ["Escalation that closes", "The learner says why they're stuck, gets a confirmation, and later sees the trainer's reply in Messages."],
   ["Explainable triage", "Queue priority is shown with its reasons, and shared gaps suggest a group recap."],
   ["True spaced re-check", "The check is interleaved into a later, unrelated module. A failure raises a repeat-gap flag for the trainer."],
-  ["Offline-aware content", "Lessons carry an offline badge and the app shell is cached for low-bandwidth use."],
 ];
 
 const PRINCIPLES = [
   ["One screen, one action", "Every learner screen has a single primary button. Secondary options stay quiet."],
   ["Diagnose, don't score", "Learners see plain-language gaps, never probabilities. Trainers see numbers with confidence."],
   ["Never a dead end", "“I'm still stuck” is always one tap away and always reaches a human."],
-  ["Low literacy first", "Large tap targets, icons with words, read-aloud, native-script language choice, optional typing."],
+  ["Low literacy first", "Large tap targets, icons with words, native-script language choice, optional typing."],
   ["Honest about the model", "Self-reports are verified later, and uncertainty is shown to the trainer, not hidden."],
 ];
 

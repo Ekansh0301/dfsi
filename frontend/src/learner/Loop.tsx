@@ -1,20 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
-import {
-  ArrowRight,
-  BookOpenCheck,
-  Check,
-  ChevronDown,
-  CircleCheckBig,
-  Clock3,
-  Hand,
-  MessageCircle,
-  Play,
-  Sparkles,
-  Trophy,
-  WifiOff,
-  X,
-} from "lucide-react";
+import { ArrowRight, BookOpenCheck, Check, ChevronDown, CircleCheckBig, Clock3, Hand, MessageCircle, Sparkles, Trophy, X } from "lucide-react";
 import { getDB, quizFor, submitQuiz, type Answer, type QuizResult } from "../api/mockServer";
 import type { ContentItem } from "../api/types";
 import { CONCEPTS, MODULES, QUESTIONS, moduleById } from "../data/curriculum";
@@ -24,7 +10,7 @@ import { useT } from "../lib/i18n";
 import { useDB, useMe } from "../lib/store";
 import { useMarkScreen } from "../shell/screenStore";
 import { Quiz } from "./Quiz";
-import { AppBar, Listen, Screen } from "./ui";
+import { AppBar, Screen } from "./ui";
 
 // ─── H · Home ────────────────────────────────────────────────────────────────
 export function Home() {
@@ -40,7 +26,7 @@ export function Home() {
 
   return (
     <Screen nav>
-      <div className="home-head rise">
+      <div className="home-head">
         <h1 className="title">{t("hello", { name: me.name.split(" ")[0] })}</h1>
         <p className="muted">
           {t("track_electrical")} · {t("module_n", { n: m.number })}
@@ -48,23 +34,23 @@ export function Home() {
       </div>
 
       {unread.length > 0 && (
-        <Link to="/learner/messages" className="banner banner-blue rise">
+        <Link to="/learner/messages" className="banner banner-blue">
           <MessageCircle size={20} aria-hidden />
           <span>{t("new_message", { trainer: unread[0].from })}</span>
           <span className="banner-cta">{t("read")} →</span>
         </Link>
       )}
 
-      <p className="label rise-2">{t("your_next_step")}</p>
+      <p className="label">{t("your_next_step")}</p>
       {rec ? (
         <RecSummary />
       ) : allDone ? (
-        <div className="next-card done rise-2">
+        <div className="next-card done">
           <Trophy size={32} aria-hidden />
           <h2>{t("all_done")}</h2>
         </div>
       ) : (
-        <div className="next-card rise-2">
+        <div className="next-card">
           <div className="nc-top">
             <span className="tag tag-plain">{t("module_n", { n: m.number })}</span>
             <span className="muted small">
@@ -81,7 +67,7 @@ export function Home() {
       )}
 
       {waiting && (
-        <div className="waiting-card rise-3" role="status">
+        <div className="waiting-card" role="status">
           <span className="wc-icon">
             <Hand size={20} aria-hidden />
           </span>
@@ -92,7 +78,7 @@ export function Home() {
         </div>
       )}
 
-      <Link to="/learner/progress" className="path-strip rise-3" aria-label={t("progress_title")}>
+      <Link to="/learner/progress" className="path-strip" aria-label={t("progress_title")}>
         <div className="ps-dots">
           {MODULES.map((x) => (
             <span key={x.id} className={me.completedModules.includes(x.id) ? "on" : x.id === me.currentModule ? "cur" : ""} />
@@ -113,7 +99,7 @@ function RecSummary() {
   const rec = me.recommendation!;
   const item = CONTENT[rec.recommended_content_id];
   return (
-    <div className="next-card rec rise-2">
+    <div className="next-card rec">
       <span className={"tag" + (rec.from_trainer ? " tag-blue" : "")}>{rec.from_trainer ? t("rec_from_trainer") : t("rec_label")}</span>
       <h2 className="nc-title">{tx(rec.diagnostic_text)}</h2>
       <Link to={`/learner/learn/${item.id}`} className="btn btn-primary btn-lg btn-block btn-split">
@@ -184,7 +170,6 @@ export function Results() {
     return (
       <Screen bar={<AppBar right={<span />} />}>
         <div className="center-fill" role="status">
-          <div className="spinner" />
           <p className="lead">{t("analysing")}</p>
         </div>
       </Screen>
@@ -214,7 +199,7 @@ export function Results() {
         )
       }
     >
-      <div className="result-hero rise">
+      <div className="result-hero">
         <div className={"result-badge" + (rec ? "" : " clean")} aria-hidden>
           {rec ? <Sparkles size={34} /> : <CircleCheckBig size={34} />}
         </div>
@@ -223,10 +208,9 @@ export function Results() {
         </span>
         <h1 className="title">{heading}</h1>
         <p className="lead">{body}</p>
-        <Listen id="results" text={heading + " " + body} />
       </div>
 
-      <div className="score-row rise-2" aria-label={t("results_score", { c: correct, t: scored.length })}>
+      <div className="score-row" aria-label={t("results_score", { c: correct, t: scored.length })}>
         <div className="score-dots">
           {scored.map((a) => (
             <span key={a.question_id} className={a.correct ? "ok" : "miss"}>
@@ -238,7 +222,7 @@ export function Results() {
       </div>
 
       {recheck && (
-        <div className={"banner rise-2 " + (recheck.passed ? "banner-teal" : "banner-rust")} role="status">
+        <div className={"banner " + (recheck.passed ? "banner-teal" : "banner-rust")} role="status">
           {recheck.passed ? <BookOpenCheck size={20} aria-hidden /> : <Clock3 size={20} aria-hidden />}
           <span>
             {recheck.passed
@@ -282,7 +266,6 @@ export function Results() {
 
 // ─── S3 · Recommendation card ────────────────────────────────────────────────
 export function KindIcon({ kind, size = 18 }: { kind: ContentItem["kind"]; size?: number }) {
-  if (kind === "video") return <Play size={size} aria-hidden />;
   if (kind === "practice") return <Hand size={size} aria-hidden />;
   return <BookOpenCheck size={size} aria-hidden />;
 }
@@ -318,7 +301,7 @@ export function Recommendation() {
         </button>
       }
     >
-      <article className="rec-card rise" aria-labelledby="rec-diag">
+      <article className="rec-card" aria-labelledby="rec-diag">
         <div className="rec-tags">
           <span className={"tag" + (rec.from_trainer ? " tag-blue" : "")}>{rec.from_trainer ? t("rec_from_trainer") : t("rec_label")}</span>
           {rec.repeat_gap && <span className="tag tag-rust">{t("repeat_gap")}</span>}
@@ -326,7 +309,6 @@ export function Recommendation() {
         <h1 id="rec-diag" className="rec-title">
           {tx(rec.diagnostic_text)}
         </h1>
-        <Listen id="rec" text={`${tx(rec.diagnostic_text)} ${tx(item.title)}, ${t("min", { m: item.minutes })}.`} />
 
         <div className="prescription">
           <span className={"rx-icon kind-" + item.kind}>
@@ -337,11 +319,6 @@ export function Recommendation() {
             <p className="small muted">
               {t(("kind_" + item.kind) as "kind_walkthrough")} · {t("min", { m: item.minutes })}
             </p>
-            {item.offline && (
-              <span className="offline-pill">
-                <WifiOff size={12} aria-hidden /> {t("offline_ok")}
-              </span>
-            )}
           </div>
         </div>
 

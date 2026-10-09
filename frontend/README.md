@@ -20,7 +20,7 @@ To deploy on Vercel, import the repo with Root Directory `frontend`, build comma
 
 | Path | Contents |
 |---|---|
-| `src/learner/` | Learner PWA screens (onboarding, quiz, results, recommendation, lesson, stuck/help, progress, messages) |
+| `src/learner/` | Learner app screens (onboarding, quiz, results, recommendation, lesson, stuck/help, progress, messages) |
 | `src/educator/` | Trainer console (triage queue, learner detail & resolution, resolved log) |
 | `src/shell/` | Prototype-only shell: overview, phone frame + design notes, side-by-side demo, flow map, demo scenarios |
 | `src/api/types.ts` | Data contract (Design Doc §5 shapes) shared with the future backend |
@@ -28,7 +28,7 @@ To deploy on Vercel, import the repo with Root Directory `frontend`, build comma
 | `src/engine/engine.ts` | Stand-in knowledge-tracing engine: BKT, root-cause search, single recommendation |
 | `src/data/` | Demo curriculum (concept DAG, modules, bilingual questions), remedial content, fictional seed data |
 | `src/components/` | Circuit `Figure` (SVG, highlightable parts) and trainer `ConceptMap` |
-| `src/lib/` | Store hook, i18n (English/Hindi), read-aloud |
+| `src/lib/` | Store hook, i18n (English/Hindi) |
 | `src/styles/` | Design tokens (light/dark) and component styles |
 
 ## Prototype conventions
