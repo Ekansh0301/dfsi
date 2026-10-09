@@ -701,3 +701,29 @@ button.fnode:hover {
     padding: 24px 16px 64px;
   }
 }
+
+.tb-engine {
+  flex: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tb-engine-api {
+  border-color: var(--teal);
+  color: var(--teal-ink);
+  background: var(--teal-soft);
+}
+.tb-engine-fallback {
+  border-color: var(--rust);
+  color: var(--rust-ink);
+  background: var(--rust-soft);
+}
+@media (max-width: 960px) {
+  .tb-engine {
+    display: none;
+  }
+}

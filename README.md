@@ -6,11 +6,12 @@ Identifying what a learner needs next: How might we infer a learner’s current 
 An adaptive micro-remediation layer for vocational learners. After every quick check it diagnoses the one concept that broke down, prescribes one short fix, and routes unresolved confusion to a trainer.
 Anchor NGOs: Barabari Collective, Nirmaan.
 
-This repository currently holds the **UI prototype** (`frontend/`). The knowledge-tracing engine runs in the browser behind a mock API with the same request and response shapes the backend service will implement.
+This repository holds the **UI prototype** (`frontend/`) and the **knowledge-tracing engine** (`backend/`). By default the prototype runs the engine in the browser; set `VITE_API_URL` to send the model steps to the backend service instead.
 
 | Path | What |
 |---|---|
 | [`frontend/`](frontend) | Clickable prototype (React + TypeScript + Vite): learner app, trainer console, side-by-side demo, flow map |
+| [`backend/`](backend) | Engine service (Python, FastAPI): Bayesian Knowledge Tracing baseline, made-up learner generator, evaluation on made-up and real (EdNet) data |
 
 ## Run locally
 

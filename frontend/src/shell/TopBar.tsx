@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ChevronDown, FastForward, RotateCcw, Wand2 } from "lucide-react";
+import { useEngineMode } from "../api/engineClient";
 import { fastForward } from "../api/mockServer";
 import { PRESETS, runPreset } from "./presets";
 
 export function TopBar() {
+  const engine = useEngineMode();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -48,6 +50,9 @@ export function TopBar() {
           </NavLink>
         ))}
       </nav>
+      <span className={"tb-engine tb-engine-" + engine} title="Where the knowledge-tracing steps run">
+        {engine === "local" ? "Engine: in browser" : engine === "api" ? "Engine: API" : "Engine: API unreachable, using browser"}
+      </span>
       <div className="tb-demo" ref={ref}>
         <button type="button" className="btn btn-secondary btn-sm" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>
           <Wand2 size={16} aria-hidden /> <span className="tb-demo-label">Demo scenarios</span> <ChevronDown size={16} aria-hidden />
