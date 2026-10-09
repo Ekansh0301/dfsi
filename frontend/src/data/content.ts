@@ -2,9 +2,7 @@ import type { ConceptId, ContentItem } from "../api/types";
 
 /**
  * Remedial content library (content-to-concept mapping, Design Doc §5 input).
- * Every item is bite-sized (≤ 4 min) and small enough to cache offline.
- * "video" items are narrated step sequences in this prototype; in the field they
- * would be short localized clips supplied by the NGO.
+ * Every item is bite-sized (4 minutes or less). In the field, short localized clips from the NGO would sit alongside these.
  */
 const ITEMS: ContentItem[] = [
   // ── Reading circuit diagrams ──────────────────────────────────────────
@@ -15,7 +13,6 @@ const ITEMS: ContentItem[] = [
     title: { en: "Reading circuit diagrams", hi: "सर्किट डायग्राम कैसे पढ़ें" },
     minutes: 3,
     figure: "circuit-simple",
-    offline: true,
     steps: [
       {
         text: {
@@ -61,7 +58,6 @@ const ITEMS: ContentItem[] = [
     kind: "practice",
     title: { en: "Trace 3 circuits", hi: "3 सर्किट ट्रेस करें" },
     minutes: 4,
-    offline: true,
     steps: [
       {
         figure: "circuit-series",
@@ -94,13 +90,12 @@ const ITEMS: ContentItem[] = [
     ],
   },
   {
-    id: "ct_diag_video",
+    id: "ct_diag_example",
     concept: "diagrams",
-    kind: "video",
-    title: { en: "Worked example, narrated", hi: "हल किया हुआ उदाहरण (आवाज़ के साथ)" },
+    kind: "walkthrough",
+    title: { en: "A worked example", hi: "हल किया हुआ उदाहरण" },
     minutes: 2,
     figure: "circuit-two-switch",
-    offline: false,
     steps: [
       {
         text: { en: "This board has one cell, two switches and two lamps.", hi: "इस बोर्ड पर एक सेल, दो स्विच और दो बल्ब हैं।" },
@@ -122,7 +117,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "The 4 symbols you need", hi: "4 ज़रूरी चिह्न" },
     minutes: 2,
-    offline: true,
     steps: [
       {
         figure: "sym-cell",
@@ -147,7 +141,6 @@ const ITEMS: ContentItem[] = [
     kind: "practice",
     title: { en: "Name that symbol", hi: "चिह्न पहचानें" },
     minutes: 2,
-    offline: true,
     steps: [
       { figure: "sym-lamp", text: { en: "What is this?", hi: "यह क्या है?" }, answer: { en: "A lamp.", hi: "बल्ब।" } },
       { figure: "sym-cell", text: { en: "Which side is +?", hi: "+ कौन-सी तरफ़ है?" }, answer: { en: "The long line.", hi: "लंबी लाइन।" } },
@@ -166,7 +159,6 @@ const ITEMS: ContentItem[] = [
     title: { en: "Where the switch goes", hi: "स्विच कहाँ लगता है" },
     minutes: 3,
     figure: "circuit-simple",
-    offline: true,
     steps: [
       {
         text: {
@@ -197,7 +189,6 @@ const ITEMS: ContentItem[] = [
     kind: "practice",
     title: { en: "Spot the wiring mistake", hi: "वायरिंग की गलती पकड़ें" },
     minutes: 3,
-    offline: true,
     steps: [
       {
         text: { en: "A switch is fitted in the neutral wire. Is that safe?", hi: "स्विच न्यूट्रल तार में लगा है। क्या यह सुरक्षित है?" },
@@ -219,7 +210,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "Series vs parallel", hi: "सीरीज़ बनाम पैरेलल" },
     minutes: 3,
-    offline: true,
     steps: [
       {
         figure: "circuit-series",
@@ -253,12 +243,11 @@ const ITEMS: ContentItem[] = [
     ],
   },
   {
-    id: "ct_sp_video",
+    id: "ct_sp_example",
     concept: "series_parallel",
-    kind: "video",
-    title: { en: "Two lamps, two ways (narrated)", hi: "दो बल्ब, दो तरीके (आवाज़ के साथ)" },
+    kind: "walkthrough",
+    title: { en: "Two lamps, two ways", hi: "दो बल्ब, दो तरीके" },
     minutes: 2,
-    offline: false,
     steps: [
       { figure: "circuit-series", text: { en: "Watch the current take a single path.", hi: "देखें, करंट एक ही रास्ते से जाता है।" }, closed: true },
       { figure: "circuit-parallel", text: { en: "Now it splits into two branches.", hi: "अब यह दो शाखाओं में बँट जाता है।" }, closed: true },
@@ -271,7 +260,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "Safe isolation in 4 steps", hi: "सुरक्षित आइसोलेशन के 4 कदम" },
     minutes: 2,
-    offline: true,
     steps: [
       { text: { en: "1. Switch off the MCB for that circuit.", hi: "1. उस सर्किट का MCB बंद करें।" } },
       { text: { en: "2. Lock it or tag it so nobody switches it back on.", hi: "2. उस पर ताला या टैग लगाएँ, ताकि कोई वापस चालू न करे।" } },
@@ -285,7 +273,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "V, A and Ω: the water-pipe idea", hi: "V, A और Ω: पानी के पाइप से समझें" },
     minutes: 2,
-    offline: true,
     steps: [
       { text: { en: "Voltage (V) is like water pressure: the push.", hi: "वोल्टेज (V) पानी के दबाव जैसा है: धक्का।" } },
       { text: { en: "Current (A) is like the flow of water.", hi: "करंट (A) पानी के बहाव जैसा है।" } },
@@ -298,7 +285,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "Ohm's law with one triangle", hi: "एक त्रिकोण से ओम का नियम" },
     minutes: 2,
-    offline: true,
     steps: [
       { text: { en: "V = I × R. Cover the one you want to find.", hi: "V = I × R। जो निकालना है, उसे ढकें।" } },
       { text: { en: "Cover I and you get I = V ÷ R.", hi: "I ढकें, तो मिलेगा I = V ÷ R।" } },
@@ -312,7 +298,6 @@ const ITEMS: ContentItem[] = [
     title: { en: "Pick the right dial setting", hi: "सही डायल सेटिंग चुनें" },
     minutes: 2,
     figure: "meter-dial",
-    offline: true,
     steps: [
       { text: { en: "V~ is for AC: sockets and mains.", hi: "V~ AC के लिए है: सॉकेट और मेन्स।" }, highlight: ["vac"] },
       { text: { en: "V⎓ is for DC: batteries and cells.", hi: "V⎓ DC के लिए है: बैटरी और सेल।" }, highlight: ["vdc"] },
@@ -331,7 +316,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "What MCBs and earthing protect", hi: "MCB और अर्थिंग किससे बचाते हैं" },
     minutes: 2,
-    offline: true,
     steps: [
       {
         text: {
@@ -353,7 +337,6 @@ const ITEMS: ContentItem[] = [
     kind: "walkthrough",
     title: { en: "Find a fault in 3 checks", hi: "3 जाँच में फॉल्ट ढूँढें" },
     minutes: 3,
-    offline: true,
     steps: [
       { text: { en: "1. Source: is there supply at the board?", hi: "1. सोर्स: बोर्ड पर सप्लाई है?" } },
       { text: { en: "2. Load: is the lamp or appliance good?", hi: "2. लोड: बल्ब या उपकरण ठीक है?" } },

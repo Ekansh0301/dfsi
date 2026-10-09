@@ -542,7 +542,6 @@
   color: var(--bg);
   font-weight: 600;
   box-shadow: var(--shadow-2);
-  animation: rise 0.25s ease both;
   z-index: 50;
 }
 

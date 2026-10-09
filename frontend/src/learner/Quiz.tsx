@@ -4,7 +4,7 @@ import type { Answer } from "../api/mockServer";
 import { QUESTIONS } from "../data/curriculum";
 import { Figure } from "../components/Figure";
 import { useT } from "../lib/i18n";
-import { AppBar, Listen, Progress, Screen } from "./ui";
+import { AppBar, Progress, Screen } from "./ui";
 
 /** Stable per-question option order, so the right answer isn't always in the same slot. */
 function order(qid: string, n: number) {
@@ -46,8 +46,6 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo }
     else setI(i + 1);
   };
 
-  const readText = tx(q.prompt) + ". " + opts.map((o, k) => `${"ABC"[k]}. ${tx(q.options[o].text)}`).join(". ");
-
   return (
     <Screen
       bar={<AppBar back={exitTo} title={<span className="bar-tag">{tag}</span>} />}
@@ -68,7 +66,7 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo }
       </div>
       <Progress value={i} total={questions.length} label={t("q_of", { i: i + 1, n: questions.length })} />
 
-      <section className="question rise" key={q.id} aria-live="polite">
+      <section className="question" key={q.id} aria-live="polite">
         {q.id === recheckId && (
           <span className="tag tag-blue">
             <History size={14} aria-hidden /> {t("from_earlier")}
@@ -76,7 +74,6 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo }
         )}
         <div className="q-head">
           <h2 className="q-prompt">{tx(q.prompt)}</h2>
-          <Listen id={"q-" + q.id} text={readText} compact />
         </div>
         {q.figure && (
           <div className="q-figure">
@@ -92,19 +89,13 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo }
                 type="button"
                 role="radio"
                 aria-checked={chosen === o}
-                className={"option" + (chosen === o ? " selected" : "") + (opt.figure ? " has-fig" : "")}
+                className={"option" + (chosen === o ? " selected" : "")}
                 onClick={() => pick(o)}
               >
                 <span className="opt-letter" aria-hidden>
                   {"ABC"[k]}
                 </span>
-                {opt.figure ? (
-                  <span className="opt-fig">
-                    <Figure id={opt.figure} title={`${"ABC"[k]}`} />
-                  </span>
-                ) : (
-                  <span className="opt-text">{tx(opt.text)}</span>
-                )}
+                <span className="opt-text">{tx(opt.text)}</span>
               </button>
             );
           })}

@@ -5,7 +5,7 @@ export const COHORT = "Electrician batch B · Sep 2026";
 export const EDUCATOR = { name: "Kavitha M.", role: "Trainer" };
 export const ACTIVE_ID = "asha";
 /** Bump when seed data or the DB shape changes, so stale browser data is replaced. */
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;
 
 const H = 3600_000;
 
@@ -132,8 +132,8 @@ export function seedDB(now: number): DB {
       timestamp: now - 50 * H,
       status: "resolved",
       resolution: {
-        tip: "Showed the two-lamp board in class. Try the narrated example again.",
-        assigned_content_id: "ct_sp_video",
+        tip: "Showed the two-lamp board in class. Try the worked example again.",
+        assigned_content_id: "ct_sp_example",
         resolved_by: EDUCATOR.name,
         at: now - 44 * H,
       },

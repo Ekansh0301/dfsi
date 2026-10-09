@@ -83,7 +83,6 @@
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-2);
-  animation: rise 0.16s ease both;
 }
 .menu-label {
   padding: 6px 10px;

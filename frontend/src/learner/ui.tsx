@@ -1,29 +1,9 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ArrowLeft, ChartNoAxesColumn, House, MessageCircle, Pause, Volume2 } from "lucide-react";
+import { ArrowLeft, ChartNoAxesColumn, House, MessageCircle } from "lucide-react";
 import { setLang } from "../api/mockServer";
-import { speak, speechSupported, stopSpeaking, useSpeaking } from "../lib/speech";
 import { useT } from "../lib/i18n";
 import { useDB, useMe } from "../lib/store";
-
-/** Read-aloud button. Every learner-facing block of text can be heard. */
-export function Listen({ id, text, compact = false }: { id: string; text: string; compact?: boolean }) {
-  const { t, lang } = useT();
-  const on = useSpeaking(id);
-  if (!speechSupported) return null;
-  return (
-    <button
-      type="button"
-      className={"listen" + (on ? " on" : "") + (compact ? " compact" : "")}
-      onClick={() => (on ? stopSpeaking() : speak(id, text, lang))}
-      aria-pressed={on}
-      aria-label={on ? t("stop") : t("listen")}
-    >
-      {on ? <Pause size={18} aria-hidden /> : <Volume2 size={18} aria-hidden />}
-      {!compact && <span>{on ? t("stop") : t("listen")}</span>}
-    </button>
-  );
-}
 
 export function LangToggle() {
   const { t, lang } = useT();

@@ -136,34 +136,6 @@
   gap: 12px;
 }
 
-/* Listen */
-.listen {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  min-height: 40px;
-  padding: 6px 14px 6px 10px;
-  border-radius: 999px;
-  border: 1.5px solid var(--line);
-  background: var(--surface);
-  color: var(--ink-2);
-  font-weight: 600;
-  font-size: 0.88rem;
-}
-.listen.compact {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  justify-content: center;
-  flex: none;
-}
-.listen.on {
-  border-color: var(--amber);
-  background: var(--amber-soft);
-  color: var(--amber-ink);
-}
-
 /* Choice cards (language, track, experience, stuck reason) */
 .choice {
   position: relative;
@@ -272,9 +244,6 @@
 .hero-illus {
   margin: 4px 0 0;
 }
-.welcome-flow {
-  animation: flow 1.2s linear infinite;
-}
 .placement-art {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -286,7 +255,6 @@
   border-radius: 12px;
   background: var(--surface);
   border: 1.5px dashed var(--line-strong);
-  animation: rise 0.4s ease both;
 }
 
 /* Progress segments */
@@ -383,10 +351,6 @@
 .option.selected .opt-letter {
   background: var(--amber);
   color: var(--on-amber);
-}
-.opt-fig {
-  flex: 1;
-  max-width: 180px;
 }
 .option.unsure {
   min-height: 52px;
@@ -687,10 +651,6 @@
   background: var(--teal-soft);
   color: var(--teal-ink);
 }
-.rx-icon.kind-video {
-  background: var(--amber-soft);
-  color: var(--amber-ink);
-}
 .rx-body {
   display: flex;
   flex-direction: column;
@@ -699,19 +659,6 @@
 }
 .rx-title {
   font-weight: 700;
-}
-.offline-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  width: fit-content;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--teal-soft);
-  color: var(--teal-ink);
-  font-size: 0.76rem;
-  font-weight: 600;
-  margin-top: 4px;
 }
 .why-box {
   margin-top: -6px;
@@ -783,9 +730,6 @@
   gap: 6px;
   flex-wrap: wrap;
 }
-.lesson-head .offline-pill {
-  margin-top: 0;
-}
 .lesson-stage {
   display: flex;
   flex-direction: column;
@@ -797,34 +741,6 @@
   border: 1.5px solid var(--line);
   border-radius: var(--r-lg);
   padding: 16px;
-}
-.lesson-figure.video {
-  background: #0f1b2b;
-  border-color: #0f1b2b;
-  --wire: #9cc1dd;
-  --surface: #0f1b2b;
-}
-.lesson-figure.video .fig {
-  color: #9cc1dd;
-}
-.lesson-figure.video {
-  padding-bottom: 76px;
-}
-.video-ctl {
-  position: absolute;
-  left: 14px;
-  bottom: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 20px 0 16px;
-  border-radius: 999px;
-  border: 0;
-  font-weight: 700;
-  background: var(--amber);
-  color: var(--on-amber);
-  box-shadow: var(--shadow-2);
 }
 .step-count {
   margin-bottom: -6px;

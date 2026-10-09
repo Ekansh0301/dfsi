@@ -114,8 +114,6 @@ export const MODULES: Module[] = [
 /** Placement quiz for cold-start onboarding (Secondary workflow B). Uses pool items, not module items. */
 export const PLACEMENT: string[] = ["q_x_saf4", "q_x_q3", "q_x_ohm2", "q_x_sym2", "q_x_wir2", "q_x_mm2"];
 
-const letters = (n: number) => ({ en: `Option ${"ABC"[n]}`, hi: `विकल्प ${"ABC"[n]}` });
-
 const Q: Question[] = [
   // ── Module 1 · Safety ────────────────────────────────────────────────
   {
@@ -203,13 +201,10 @@ const Q: Question[] = [
   {
     id: "q_w1",
     concepts: ["symbols"],
-    prompt: { en: "Which symbol shows a switch?", hi: "कौन-सा चिह्न स्विच दिखाता है?" },
-    options: [
-      { text: letters(0), figure: "sym-lamp" },
-      { text: letters(1), figure: "sym-switch" },
-      { text: letters(2), figure: "sym-resistor" },
-    ],
-    correct: 1,
+    figure: "sym-switch",
+    prompt: { en: "What does this symbol show?", hi: "यह चिह्न क्या दिखाता है?" },
+    options: [{ text: { en: "A switch", hi: "स्विच" } }, { text: { en: "A lamp", hi: "बल्ब" } }, { text: { en: "A resistor", hi: "रेज़िस्टर" } }],
+    correct: 0,
     why: { en: "A switch is drawn as a line with a gap that can close.", hi: "स्विच को गैप वाली लाइन से दिखाते हैं, जो बंद हो सकती है।" },
   },
   {
