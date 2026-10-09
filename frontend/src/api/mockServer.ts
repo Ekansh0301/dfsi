@@ -10,6 +10,7 @@
 import type { ConceptId, DB, Escalation, Lang, LearnerState, Recommendation, Resolution, StuckReason } from "./types";
 import { CONCEPTS, MODULES, PLACEMENT, QUESTIONS, moduleById } from "../data/curriculum";
 import { ACTIVE_ID, DB_VERSION, EDUCATOR, seedDB } from "../data/seed";
+import { remoteGotIt, remoteOnboarding, remoteQuizResult, type EngineEvent, type EngineState } from "./engineClient";
 import { BKT, WEAK, bktUpdate, diagnostic, learnStep, masteryOf, pickContent, recommend } from "../engine/engine";
 
 const KEY = "circuit-coach.db";
@@ -95,7 +96,7 @@ function record(d: DB, l: LearnerState, moduleId: string, a: Answer) {
   return correct;
 }
 
-function onboardSync(d: DB, experience: LearnerState["experience"], answers: Answer[]) {
+function onboardSync(d: DB, experience: LearnerState["experience"], answers: Answer[], remote?: { state: EngineState; start_module_id: string }) {
   const l = me(d);
   const prior = experience === "new" ? 0.12 : experience === "experienced" ? 0.45 : BKT.pInit + 0.05;
   for (const c of Object.keys(CONCEPTS) as ConceptId[]) l.mastery[c] = prior;
@@ -103,8 +104,15 @@ function onboardSync(d: DB, experience: LearnerState["experience"], answers: Ans
   l.onboarded = true;
   l.track = "electrical";
   l.experience = experience;
+  if (remote) {
+    l.mastery = remote.state.mastery;
+    l.observations = remote.state.observations;
+  }
   // Start at the first module with an unobserved or weak concept.
-  const start = MODULES.find((m) => m.concepts.some((c) => !l.observations[c] || masteryOf(l, c) < WEAK)) ?? MODULES[0];
+  const start =
+    (remote && MODULES.find((m) => m.id === remote.start_module_id)) ??
+    MODULES.find((m) => m.concepts.some((c) => !l.observations[c] || masteryOf(l, c) < WEAK)) ??
+    MODULES[0];
   l.completedModules = MODULES.filter((m) => m.number < start.number).map((m) => m.id);
   l.currentModule = start.id;
   return start.id;
@@ -129,7 +137,9 @@ export interface QuizResult {
   nextModule?: string;
 }
 
-function submitQuizSync(d: DB, moduleId: string, answers: Answer[]): QuizResult {
+type RemoteQuiz = Awaited<ReturnType<typeof remoteQuizResult>>;
+
+function submitQuizSync(d: DB, moduleId: string, answers: Answer[], remote?: RemoteQuiz): QuizResult {
   const l = me(d);
   const m = moduleById(moduleId);
   const t = now(d);
@@ -172,6 +182,12 @@ function submitQuizSync(d: DB, moduleId: string, answers: Answer[]): QuizResult 
   } else {
     rec = recommend(l, m.concepts, t);
   }
+  if (remote) {
+    // The engine service is the source of truth for the model: mastery, and what to recommend.
+    l.mastery = remote.state.mastery;
+    l.observations = remote.state.observations;
+    rec = remote.recommendation ? { ...remote.recommendation, strong_concept_id: remote.recommendation.strong_concept_id ?? undefined } : undefined;
+  }
   l.recommendation = rec;
   return { correct, total: m.quiz.length, recommendation: rec, recheck, nextModule: next?.id };
 }
@@ -182,12 +198,12 @@ function startContentSync(d: DB, contentId: string, concept: ConceptId) {
   if (!list.includes(contentId)) list.push(contentId);
 }
 
-function gotItSync(d: DB) {
+function gotItSync(d: DB, remote?: EngineState) {
   const l = me(d);
   const rec = l.recommendation;
   if (!rec) return;
   const c = rec.concept_id;
-  l.mastery[c] = learnStep(masteryOf(l, c));
+  l.mastery[c] = remote?.mastery[c] ?? learnStep(masteryOf(l, c));
   // Don't trust the self-report: schedule a spaced check on a question not seen yet.
   // Prefer an unseen item whose main concept is `c` and that no module quiz uses.
   const seen = new Set(l.responses.map((r) => r.question_id));
@@ -279,6 +295,14 @@ function resolveSync(d: DB, escId: string, r: Omit<Resolution, "resolved_by" | "
   }
 }
 
+/** What the engine service needs to know about the learner. */
+const engineState = (l: LearnerState): EngineState => ({ mastery: l.mastery, observations: l.observations, tried: l.tried });
+
+const toEvent = (a: Answer): EngineEvent => {
+  const q = QUESTIONS[a.question_id];
+  return { concept_tags: q.concepts, is_correct: a.chosen === q.correct, unsure: a.chosen === null };
+};
+
 // ─── Public API (one function per planned endpoint) ──────────────────────────
 
 /** PATCH /learners/{id} */
@@ -286,14 +310,30 @@ export const setLang = (lang: Lang) => mutate((d) => void (me(d).lang = lang));
 
 /** POST /learners/{id}/onboarding → { start_module_id } */
 export async function finishOnboarding(experience: LearnerState["experience"], answers: Answer[]) {
-  await latency(900);
-  return mutate((d) => onboardSync(d, experience, answers));
+  const remote = await remoteOnboarding(experience ?? "some", answers.map(toEvent));
+  if (!remote) await latency(900);
+  return mutate((d) => onboardSync(d, experience, answers, remote ?? undefined));
 }
 
 /** POST /responses (batch) → { correct, total, recommendation?, recheck? } */
 export async function submitQuiz(moduleId: string, answers: Answer[]) {
-  await latency(250);
-  return mutate((d) => submitQuizSync(d, moduleId, answers));
+  // A due spaced re-check answered wrongly makes this a "repeat gap".
+  const before = me(db);
+  const quizIds = moduleById(moduleId).quiz;
+  const failed = answers.find((a) => {
+    const rc = before.rechecks.find((r) => r.status === "scheduled" && r.question_id === a.question_id);
+    return !quizIds.includes(a.question_id) && rc && toEvent(a).is_correct === false;
+  });
+  const failedConcept = failed && before.rechecks.find((r) => r.question_id === failed.question_id)?.concept_id;
+  const remote = await remoteQuizResult({
+    state: engineState(before),
+    module_id: moduleId,
+    events: answers.map(toEvent),
+    recheck_concept: failedConcept || undefined,
+    now: now(),
+  });
+  if (!remote) await latency(250);
+  return mutate((d) => submitQuizSync(d, moduleId, answers, remote ?? undefined));
 }
 
 /** POST /content/{id}/start */
@@ -301,8 +341,10 @@ export const startContent = (contentId: string, concept: ConceptId) => mutate((d
 
 /** POST /feedback { type: "got_it" } → schedules a spaced re-check */
 export async function gotIt() {
-  await latency(300);
-  mutate(gotItSync);
+  const l = me(db);
+  const remote = l.recommendation ? await remoteGotIt(engineState(l), l.recommendation.concept_id) : null;
+  if (!remote) await latency(300);
+  mutate((d) => gotItSync(d, remote?.state));
 }
 
 /** POST /feedback { type: "stuck" } → Escalation event */

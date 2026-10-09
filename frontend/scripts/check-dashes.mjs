@@ -4,8 +4,21 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const BANNED = /[\u2014\u2013]/;
-const TARGETS = ["src", "public", "index.html", "package.json", "README.md", "../README.md"];
-const TEXT = /\.(tsx?|jsx?|mjs|css|html|md|json|svg|webmanifest|txt)$/;
+const TARGETS = [
+  "src",
+  "public",
+  "index.html",
+  "package.json",
+  "README.md",
+  "../README.md",
+  "../backend/README.md",
+  "../backend/pyproject.toml",
+  "../backend/circuit_coach",
+  "../backend/scripts",
+  "../backend/tests",
+  "../backend/results",
+];
+const TEXT = /\.(tsx?|jsx?|mjs|css|html|md|json|svg|webmanifest|txt|py|toml)$/;
 
 const files = [];
 const walk = (p) => {

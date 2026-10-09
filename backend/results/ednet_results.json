@@ -1,0 +1,53 @@
+{
+ "info": {
+  "students_kept": 14460,
+  "train_students": 11568,
+  "test_students": 2892,
+  "test_answers": 357756,
+  "concept_tags": 189
+ },
+ "results": {
+  "Global average": {
+   "n": 343296,
+   "auc": 0.5,
+   "accuracy": 0.6186760113721104,
+   "log_loss": 0.6647154962900841,
+   "rmse": 0.485715224166557
+  },
+  "Per-question accuracy": {
+   "n": 343296,
+   "auc": 0.7210339257850004,
+   "accuracy": 0.6876747762863534,
+   "log_loss": 0.5898937177380934,
+   "rmse": 0.4495458942270748
+  },
+  "Learner's running accuracy": {
+   "n": 343296,
+   "auc": 0.597910892269738,
+   "accuracy": 0.6148280201342282,
+   "log_loss": 0.6570257151343465,
+   "rmse": 0.48194948767101753
+  },
+  "BKT (hand-set parameters)": {
+   "n": 343296,
+   "auc": 0.569832228072118,
+   "accuracy": 0.5171105984340044,
+   "log_loss": 0.7673706074740828,
+   "rmse": 0.5303411881785601
+  },
+  "BKT (fitted, all tags)": {
+   "n": 343296,
+   "auc": 0.626699366566806,
+   "accuracy": 0.6251310822147651,
+   "log_loss": 0.6454676768315685,
+   "rmse": 0.4764624563907898
+  },
+  "BKT (fitted, first tag only)": {
+   "n": 343296,
+   "auc": 0.640674874589088,
+   "accuracy": 0.6468149934750187,
+   "log_loss": 0.6334599808336453,
+   "rmse": 0.4704223158046375
+  }
+ }
+}

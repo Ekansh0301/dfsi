@@ -12,6 +12,8 @@ npm run typecheck
 npm run format
 ```
 
+To use the engine service in `../backend` instead of the in-browser engine, copy `.env.example` to `.env.local` and set `VITE_API_URL`. The top bar shows which engine is answering, and the prototype falls back to the in-browser engine if the service is unreachable.
+
 To deploy on Vercel, import the repo with Root Directory `frontend`, build command `npm run build` and output directory `dist`. Routing is hash-based, so no rewrite rules are needed.
 
 `npm run build` first runs `npm run check:dashes`, which fails if an em dash or en dash appears in the site content or READMEs.
