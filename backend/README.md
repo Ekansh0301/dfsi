@@ -30,8 +30,14 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `circuit_coach/diagnosis_eval.py` | Does the engine find the right gap and the right lesson? |
 | `circuit_coach/ednet.py` | Loader for the real EdNet dataset |
 | `circuit_coach/fitted_params.json` | BKT parameters used by the service (fitted on made-up learners) |
-| `scripts/` | `run_synthetic.py`, `run_ednet.py`, `ablation_multitag.py` |
+| `scripts/` | `run_synthetic.py`, `run_ednet.py`, `ablation_multitag.py`, `export_openapi.py` |
 | `results/` | Evaluation output (Markdown tables and raw JSON) |
+| `docs/` | Architecture, API contract (`openapi.json`) and notes per component |
+
+## Docs
+
+- [Architecture and data flow](docs/architecture.md)
+- [API contract](docs/api_contract.md) and the generated [OpenAPI schema](docs/openapi.json)
 
 ## API
 
@@ -43,7 +49,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `POST /v1/quiz-result` | Update the model from a quick check, return one recommendation |
 | `POST /v1/got-it` | Apply a learning step after "Got it!" |
 
-Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing. Request and response fields follow `frontend/src/api/types.ts`.
+Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing. Request and response fields follow `frontend/src/api/types.ts`. The full schemas, with examples and error codes, are in [docs/api_contract.md](docs/api_contract.md). After changing a request or response model, run `python scripts/export_openapi.py`; `tests/test_contract.py` fails until the committed schema matches.
 
 ## Reproduce the evaluation
 
