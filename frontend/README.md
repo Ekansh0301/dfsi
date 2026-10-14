@@ -9,11 +9,14 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # static site in dist/ (relative paths, works on any static host)
 npm run typecheck
-npm test           # API mode and fallback tests (vitest)
+npm test           # unit, API mode and fallback tests (vitest)
+npm run test:e2e   # full journey against a running service, needs E2E_API_URL
 npm run format
 ```
 
 To use the engine service in `../backend` instead of the in-browser engine, copy `.env.example` to `.env.local` and set `VITE_API_URL`. The top bar shows which engine is answering, and the prototype falls back to the in-browser engine if the service is unreachable, returns an error or takes longer than 4 seconds. `src/api/__tests__/engineClient.test.ts` checks the requests sent in API mode, the use of the service's answers, and every fallback case.
+
+The full demo script and the test results are in [`../backend/docs/e2e_results.md`](../backend/docs/e2e_results.md).
 
 To deploy on Vercel, import the repo with Root Directory `frontend`, build command `npm run build` and output directory `dist`. Routing is hash-based, so no rewrite rules are needed.
 
