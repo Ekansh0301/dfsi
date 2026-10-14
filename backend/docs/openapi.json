@@ -1,0 +1,605 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Circuit Coach engine",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/concepts": {
+      "get": {
+        "summary": "Concepts",
+        "description": "The concept graph, modules and lessons the engine knows about.",
+        "operationId": "concepts_v1_concepts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/onboarding": {
+      "post": {
+        "summary": "Onboarding",
+        "description": "Seed a new learner's model from their stated experience and the placement quiz.",
+        "operationId": "onboarding_v1_onboarding_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quiz-result": {
+      "post": {
+        "summary": "Quiz Result",
+        "description": "Update the model from a finished quick check and return the single recommendation.\n\nWhen `recheck_concept` is set (a spaced re-check was failed) the recommendation is marked\nas a repeat gap and uses a lesson the learner has not tried.",
+        "operationId": "quiz_result_v1_quiz_result_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizResultRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizResultResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/got-it": {
+      "post": {
+        "summary": "Got It",
+        "description": "The learner said \"Got it!\": apply a learning step. Mastery is confirmed by a later re-check.",
+        "operationId": "got_it_v1_got_it_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GotItRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GotItResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConceptModel": {
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/TextModel"
+          },
+          "prereqs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Prereqs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "prereqs"
+        ],
+        "title": "ConceptModel"
+      },
+      "ConceptsResponse": {
+        "properties": {
+          "concepts": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConceptModel"
+            },
+            "type": "object",
+            "title": "Concepts"
+          },
+          "modules": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ModuleModel"
+            },
+            "type": "object",
+            "title": "Modules"
+          },
+          "content": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Content",
+            "description": "Lesson ids per concept, in recommendation order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concepts",
+          "modules",
+          "content"
+        ],
+        "title": "ConceptsResponse"
+      },
+      "EventModel": {
+        "properties": {
+          "concept_tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Concept Tags"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "unsure": {
+            "type": "boolean",
+            "title": "Unsure",
+            "description": "The learner chose \"I'm not sure\"",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_tags",
+          "is_correct"
+        ],
+        "title": "EventModel"
+      },
+      "GotItRequest": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "concept_id"
+        ],
+        "title": "GotItRequest"
+      },
+      "GotItResponse": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "title": "GotItResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "parameters": {
+            "type": "string",
+            "enum": [
+              "fitted",
+              "hand-set"
+            ],
+            "title": "Parameters"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "parameters"
+        ],
+        "title": "HealthResponse"
+      },
+      "ModuleModel": {
+        "properties": {
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "concepts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Concepts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "concepts"
+        ],
+        "title": "ModuleModel"
+      },
+      "OnboardingRequest": {
+        "properties": {
+          "experience": {
+            "type": "string",
+            "enum": [
+              "new",
+              "some",
+              "experienced"
+            ],
+            "title": "Experience"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventModel"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "experience"
+        ],
+        "title": "OnboardingRequest"
+      },
+      "OnboardingResponse": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "start_module_id": {
+            "type": "string",
+            "title": "Start Module Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "start_module_id"
+        ],
+        "title": "OnboardingResponse"
+      },
+      "QuizResultRequest": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "module_id": {
+            "type": "string",
+            "title": "Module Id"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventModel"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "recheck_concept": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recheck Concept",
+            "description": "Set when a spaced re-check was answered wrongly"
+          },
+          "now": {
+            "type": "integer",
+            "title": "Now",
+            "description": "Timestamp (ms) stored on the recommendation",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "module_id",
+          "events"
+        ],
+        "title": "QuizResultRequest"
+      },
+      "QuizResultResponse": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecommendationModel"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null when no gap was found"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "recommendation"
+        ],
+        "title": "QuizResultResponse"
+      },
+      "RecommendationModel": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id",
+            "description": "The concept to work on (the root cause)"
+          },
+          "observed_concept_id": {
+            "type": "string",
+            "title": "Observed Concept Id",
+            "description": "The weak concept the quick check showed"
+          },
+          "chain": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Chain",
+            "description": "Walk from the observed concept back to the root cause"
+          },
+          "strong_concept_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strong Concept Id",
+            "description": "A concept the learner did well on, for encouragement"
+          },
+          "diagnostic_text": {
+            "$ref": "#/components/schemas/TextModel"
+          },
+          "recommended_content_id": {
+            "type": "string",
+            "title": "Recommended Content Id",
+            "description": "The one lesson to take next"
+          },
+          "repeat_gap": {
+            "type": "boolean",
+            "title": "Repeat Gap",
+            "description": "True when a follow-up check after \"Got it!\" was failed"
+          },
+          "created_at": {
+            "type": "integer",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_id",
+          "observed_concept_id",
+          "chain",
+          "strong_concept_id",
+          "diagnostic_text",
+          "recommended_content_id",
+          "repeat_gap",
+          "created_at"
+        ],
+        "title": "RecommendationModel"
+      },
+      "StateModel": {
+        "properties": {
+          "mastery": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Mastery",
+            "description": "P(concept mastered), 0 to 1"
+          },
+          "observations": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Observations",
+            "description": "Answers seen per concept"
+          },
+          "tried": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Tried",
+            "description": "Lessons already tried per concept"
+          }
+        },
+        "type": "object",
+        "title": "StateModel"
+      },
+      "TextModel": {
+        "properties": {
+          "en": {
+            "type": "string",
+            "title": "En"
+          },
+          "hi": {
+            "type": "string",
+            "title": "Hi"
+          }
+        },
+        "type": "object",
+        "required": [
+          "en",
+          "hi"
+        ],
+        "title": "TextModel"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

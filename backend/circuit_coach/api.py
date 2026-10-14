@@ -77,9 +77,25 @@ class QuizResultRequest(BaseModel):
     now: int = Field(default=0, description="Timestamp (ms) stored on the recommendation")
 
 
+class TextModel(BaseModel):
+    en: str
+    hi: str
+
+
+class RecommendationModel(BaseModel):
+    concept_id: str = Field(description="The concept to work on (the root cause)")
+    observed_concept_id: str = Field(description="The weak concept the quick check showed")
+    chain: list[str] = Field(description="Walk from the observed concept back to the root cause")
+    strong_concept_id: str | None = Field(description="A concept the learner did well on, for encouragement")
+    diagnostic_text: TextModel
+    recommended_content_id: str = Field(description="The one lesson to take next")
+    repeat_gap: bool = Field(description="True when a follow-up check after \"Got it!\" was failed")
+    created_at: int
+
+
 class QuizResultResponse(BaseModel):
     state: StateModel
-    recommendation: dict | None
+    recommendation: RecommendationModel | None = Field(description="Null when no gap was found")
 
 
 class GotItRequest(BaseModel):
@@ -91,12 +107,34 @@ class GotItResponse(BaseModel):
     state: StateModel
 
 
-@app.get("/health")
+class HealthResponse(BaseModel):
+    status: Literal["ok"]
+    version: str
+    parameters: Literal["fitted", "hand-set"]
+
+
+class ConceptModel(BaseModel):
+    name: TextModel
+    prereqs: list[str]
+
+
+class ModuleModel(BaseModel):
+    number: int
+    concepts: list[str]
+
+
+class ConceptsResponse(BaseModel):
+    concepts: dict[str, ConceptModel]
+    modules: dict[str, ModuleModel]
+    content: dict[str, list[str]] = Field(description="Lesson ids per concept, in recommendation order")
+
+
+@app.get("/health", response_model=HealthResponse)
 def health() -> dict:
     return {"status": "ok", "version": __version__, "parameters": "fitted" if _PARAMS_FILE.exists() else "hand-set"}
 
 
-@app.get("/v1/concepts")
+@app.get("/v1/concepts", response_model=ConceptsResponse)
 def concepts() -> dict:
     """The concept graph, modules and lessons the engine knows about."""
     return {
