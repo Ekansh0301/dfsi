@@ -38,6 +38,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 
 - [Architecture and data flow](docs/architecture.md)
 - [API contract](docs/api_contract.md) and the generated [OpenAPI schema](docs/openapi.json)
+- [Knowledge tracing (BKT)](docs/bkt.md): update rules, "I'm not sure", multi-concept questions, EM fitting and what the tests check
 
 ## API
 
