@@ -88,11 +88,12 @@ def main() -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf8",
     )
 
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "synthetic_results.json").write_text(json.dumps(runs, indent=1) + "\n")
+    (ROOT / "results" / "synthetic_results.json").write_text(json.dumps(runs, indent=1) + "\n", encoding="utf8")
 
     lines = [f"# Baseline results on made-up learners", "", f"{args.seeds} runs, {args.learners} learners each (70% train, 30% test). Mean ± standard deviation across runs.", ""]
     lines += ["## 1. Predicting the next answer", "", "| Method | AUC | Accuracy | Log loss | RMSE |", "|---|---|---|---|---|"]
@@ -114,7 +115,7 @@ def main() -> None:
     lines += ["", "## 3. Fitted parameters (seed 0)", "", "| Concept | p_init | p_learn | p_slip | p_guess |", "|---|---|---|---|---|"]
     for c, d in runs[0]["fitted_params"].items():
         lines.append(f"| {c} | {d['p_init']:.2f} | {d['p_learn']:.2f} | {d['p_slip']:.2f} | {d['p_guess']:.2f} |")
-    (ROOT / "results" / "synthetic_results.md").write_text("\n".join(lines) + "\n")
+    (ROOT / "results" / "synthetic_results.md").write_text("\n".join(lines) + "\n", encoding="utf8")
     print("\n".join(lines))
     print(f"total {time.time() - t0:.0f}s")
 
