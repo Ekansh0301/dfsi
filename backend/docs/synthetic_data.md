@@ -56,6 +56,6 @@ Load it with `circuit_coach.dataset.load(path)`; it returns the learners (with a
 - every learner has answers and at least one assessment point;
 - every answer refers to a known item, carries that item's concepts, belongs to a known module, and is never both unsure and correct;
 - assessment points are in order, cover all 10 concepts, and assess exactly the concepts of their module;
-- the hidden states respect prerequisites: no more than 10% of (concept, assessment point) pairs are mastered with an unmastered prerequisite (it is about 3% by construction).
+- the hidden states respect prerequisites: no more than 10% of (concept, assessment point) pairs are mastered with an unmastered prerequisite (it is about 4% in the committed dataset).
 
 `dataset.verify_files(path)` checks the saved files against the manifest checksums. `generate_dataset.py` runs both before it finishes, and `tests/test_dataset.py` runs them on the committed dataset, so an edited or corrupted file fails the tests.
