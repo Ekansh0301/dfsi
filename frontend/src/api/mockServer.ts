@@ -430,7 +430,7 @@ export type Preset = "fresh" | "onboarded" | "gap" | "rootcause" | "escalated" |
 const PLACEMENT_GOOD: Answer[] = PLACEMENT.map((id) => ({ question_id: id, chosen: QUESTIONS[id].correct }));
 /** Module 3 with diagram questions wrong → "diagrams seem tricky" (Sprint 1 story). */
 const M3_DIAGRAM_GAP: Answer[] = [
-  { question_id: "q_w1", chosen: 1 },
+  { question_id: "q_w1", chosen: 0 },
   { question_id: "q_w2", chosen: 0 },
   { question_id: "q_w3", chosen: 1 },
   { question_id: "q_w4", chosen: 2 },

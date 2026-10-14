@@ -12,7 +12,8 @@
     "format": "prettier --write src index.html",
     "check:dashes": "node scripts/check-dashes.mjs",
     "prebuild": "node scripts/check-dashes.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "vitest run journey"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "^5.3.0",

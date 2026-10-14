@@ -42,6 +42,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 - [API contract](docs/api_contract.md) and the generated [OpenAPI schema](docs/openapi.json)
 - [Knowledge tracing (BKT)](docs/bkt.md): update rules, "I'm not sure", multi-concept questions, EM fitting and what the tests check
 - [Made-up learner generator](docs/synthetic_data.md): assumptions, files, split and validation
+- [End-to-end results and demo script](docs/e2e_results.md): repeat the demo, test results, API failure and fallback
 - [Evaluation and baselines](docs/evaluation.md): models, metrics, how to reproduce, results
 - [Diagnosis and recommendations](docs/diagnosis.md): gap threshold, prerequisite walk, lesson choice, repeat gaps
 
