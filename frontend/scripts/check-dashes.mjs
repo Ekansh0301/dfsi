@@ -17,6 +17,7 @@ const TARGETS = [
   "../backend/scripts",
   "../backend/tests",
   "../backend/results",
+  "../backend/docs",
 ];
 const TEXT = /\.(tsx?|jsx?|mjs|css|html|md|json|svg|webmanifest|txt|py|toml)$/;
 

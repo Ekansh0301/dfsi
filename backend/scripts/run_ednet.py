@@ -59,7 +59,7 @@ def main() -> None:
 
     info = {"students_kept": len(seqs), "train_students": len(train), "test_students": len(test), "test_answers": n_answers, "concept_tags": len(all_tags)}
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "ednet_results.json").write_text(json.dumps({"info": info, "results": results}, indent=1) + "\n")
+    (ROOT / "results" / "ednet_results.json").write_text(json.dumps({"info": info, "results": results}, indent=1) + "\n", encoding="utf8")
     lines = [
         "# Baseline check on real data (EdNet KT1)",
         "",
@@ -70,7 +70,7 @@ def main() -> None:
     ]
     for name, r in results.items():
         lines.append(f"| {name} | {r['auc']:.3f} | {r['accuracy']:.3f} | {r['log_loss']:.3f} | {r['rmse']:.3f} |")
-    (ROOT / "results" / "ednet_results.md").write_text("\n".join(lines) + "\n")
+    (ROOT / "results" / "ednet_results.md").write_text("\n".join(lines) + "\n", encoding="utf8")
     print("\n".join(lines))
 
 
