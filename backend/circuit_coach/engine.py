@@ -34,7 +34,7 @@ def load_params(path: Path | None = None) -> dict[str, BKTParams]:
     path = path or _PARAMS_FILE
     params = {c: bkt.HAND_SET for c in CONCEPTS}
     if path.exists():
-        raw = json.loads(path.read_text())
+        raw = json.loads(path.read_text(encoding="utf8"))
         for c, d in raw.get("concepts", {}).items():
             if c in params:
                 params[c] = BKTParams.from_dict(d)

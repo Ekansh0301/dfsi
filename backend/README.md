@@ -27,11 +27,25 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `circuit_coach/api.py` | FastAPI service (stateless: the caller sends the learner state) |
 | `circuit_coach/prediction.py` | Next-answer prediction: BKT against simple baselines |
 | `circuit_coach/simulate.py` | Made-up learners with hidden mastery |
+| `circuit_coach/dataset.py` | Save, load, split (70:30) and validate a made-up dataset |
 | `circuit_coach/diagnosis_eval.py` | Does the engine find the right gap and the right lesson? |
 | `circuit_coach/ednet.py` | Loader for the real EdNet dataset |
 | `circuit_coach/fitted_params.json` | BKT parameters used by the service (fitted on made-up learners) |
-| `scripts/` | `run_synthetic.py`, `run_ednet.py`, `ablation_multitag.py` |
+| `scripts/` | `run_synthetic.py`, `run_ednet.py`, `ablation_multitag.py`, `export_openapi.py`, `generate_dataset.py` |
 | `results/` | Evaluation output (Markdown tables and raw JSON) |
+| `datasets/` | Saved made-up dataset (seed 0, 500 learners) with ground truth |
+| `docs/` | Architecture, API contract (`openapi.json`) and notes per component |
+
+## Docs
+
+- [Technical design document (revised)](docs/Technical_Design_Doc.md): architecture, implementation, evaluation, baseline results, POC v0.1 status
+- [Architecture and data flow](docs/architecture.md)
+- [API contract](docs/api_contract.md) and the generated [OpenAPI schema](docs/openapi.json)
+- [Knowledge tracing (BKT)](docs/bkt.md): update rules, "I'm not sure", multi-concept questions, EM fitting and what the tests check
+- [Made-up learner generator](docs/synthetic_data.md): assumptions, files, split and validation
+- [End-to-end results and demo script](docs/e2e_results.md): repeat the demo, test results, API failure and fallback
+- [Evaluation and baselines](docs/evaluation.md): models, metrics, how to reproduce, results
+- [Diagnosis and recommendations](docs/diagnosis.md): gap threshold, prerequisite walk, lesson choice, repeat gaps
 
 ## API
 
@@ -43,7 +57,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `POST /v1/quiz-result` | Update the model from a quick check, return one recommendation |
 | `POST /v1/got-it` | Apply a learning step after "Got it!" |
 
-Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing. Request and response fields follow `frontend/src/api/types.ts`.
+Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing. Request and response fields follow `frontend/src/api/types.ts`. The full schemas, with examples and error codes, are in [docs/api_contract.md](docs/api_contract.md). After changing a request or response model, run `python scripts/export_openapi.py`; `tests/test_contract.py` fails until the committed schema matches.
 
 ## Reproduce the evaluation
 

@@ -47,7 +47,7 @@ def main() -> None:
         "Reading: when a question needs several concepts and is answered wrongly, plain BKT blames every tagged concept. That makes the model think learners often get a mastered concept wrong, so slip is overestimated.",
     ]
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "ablation_multitag.md").write_text("\n".join(lines) + "\n")
+    (ROOT / "results" / "ablation_multitag.md").write_text("\n".join(lines) + "\n", encoding="utf8")
     print("\n".join(lines))
 
 

@@ -20,14 +20,15 @@ function setMode(m: EngineMode) {
   mode = m;
   listeners.forEach((l) => l());
 }
+export const getEngineMode = () => mode;
 export const useEngineMode = () =>
   useSyncExternalStore(
     (fn) => {
       listeners.add(fn);
       return () => void listeners.delete(fn);
     },
-    () => mode,
-    () => mode,
+    getEngineMode,
+    getEngineMode,
   );
 
 export interface EngineState {

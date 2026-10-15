@@ -60,7 +60,7 @@ def main() -> None:
     ]
     for k, v in outcome.most_common():
         lines.append(f"| {k} | {v / total * 100:.1f}% |")
-    (ROOT / "results" / "failure_analysis.md").write_text("\n".join(lines) + "\n")
+    (ROOT / "results" / "failure_analysis.md").write_text("\n".join(lines) + "\n", encoding="utf8")
     print("\n".join(lines))
 
 

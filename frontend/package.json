@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src index.html",
     "check:dashes": "node scripts/check-dashes.mjs",
-    "prebuild": "node scripts/check-dashes.mjs"
+    "prebuild": "node scripts/check-dashes.mjs",
+    "test": "vitest run",
+    "test:e2e": "vitest run journey"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "^5.3.0",
@@ -28,6 +30,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "prettier": "^3.9.9",
     "typescript": "^7.0.2",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "vitest": "^5.0.4"
   }
 }

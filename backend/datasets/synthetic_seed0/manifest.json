@@ -1,0 +1,29 @@
+{
+  "generator": "circuit_coach.simulate",
+  "seed": 0,
+  "n_learners": 500,
+  "n_responses": 14935,
+  "split": {
+    "train": 350,
+    "test": 150,
+    "train_share": 0.7
+  },
+  "concepts": [
+    "safety",
+    "quantities",
+    "ohm",
+    "symbols",
+    "wiring",
+    "multimeter",
+    "series_parallel",
+    "diagrams",
+    "earthing",
+    "fault"
+  ],
+  "sha256": {
+    "items.csv": "641095df31d7c3e629add4468235e94c34c24e7a01d016729c469304ef18a691",
+    "learners.csv": "62cbe2218bf429e72e73782bc387436b4b86e670b5af5e5f2fc1ee8509dcb2ea",
+    "responses.csv": "590b5ddceedc081f1bc434723ee42ca728e40ebee11d7f5770c7166a3aad7bba",
+    "ground_truth.csv": "9bdd698878aed8abd2c8d731537c5d36aa9e5924f7d08a1e843efa44aa6300b3"
+  }
+}
