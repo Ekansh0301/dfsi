@@ -64,27 +64,27 @@ Candidate improvements: single-concept credit, question difficulty, a prerequisi
 
 ## 4. Hackathon 1 issues (T1 to T7)
 
-The pre-hackathon document submitted to the instructors lists seven issues. The plan is to solve each in its own subdirectory. **The layout is undecided; agree it as a team first** (options: a top-level `hackathon1/` folder, subfolders inside the existing directories, or moving code).
+Aman Srivastava completed all seven issues on 14 October 2026 (eight commits on the official repo, one per issue plus the revised design document). Each issue is documented in `backend/docs/` rather than in its own folder, with tests alongside.
 
-| Issue | Task | Priority | Where | State at handoff |
-|---|---|---|---|---|
-| T1 | System architecture and API contracts | P0 | `backend/` | Gap. The diagram is only in `handoff/arch.svg` and the design doc. The API contract exists only as code and README. Commit a diagram and the request and response schemas. |
-| T2 | BKT with tests | P0 | `backend/circuit_coach/` | Done: EM fitting, multi-concept, "I'm not sure", tests for updates and parameter recovery. Document and verify. |
-| T3 | Prerequisite diagnosis and recommendations | P0 | `backend/circuit_coach/` | Done: gap threshold 0.6, prerequisite walk, first untried lesson, repeat-gap. Document and verify. |
-| T4 | Connect React to FastAPI | P0 | `frontend/` | Built and hand-tested. Gap: no automated test for API mode and fallback. |
-| T5 | Made-up learner generator | P0 | `backend/` | Done. Gaps: no saved dataset files and no validation step. |
-| T6 | Evaluate models, compare baselines | P1 | `backend/` | Done, reports in `backend/results/`. |
-| T7 | End-to-end test and demo | P1 | `frontend/` and `backend/` | Not done. Run the full learner journey (onboarding, quiz, recommendation, follow-up, API failure, fallback), record the results, record the demo video. |
+| Issue | Covered by |
+|---|---|
+| T1 Architecture and API contracts | `backend/docs/architecture.md`, `api_contract.md`, `openapi.json`, `tests/test_contract.py` |
+| T2 BKT | `backend/docs/bkt.md`, `tests/test_bkt.py` |
+| T3 Prerequisite diagnosis and recommendations | `backend/docs/diagnosis.md`, `tests/test_diagnosis.py` |
+| T4 React and FastAPI integration | `frontend/src/api/__tests__/engineClient.test.ts` |
+| T5 Made-up learner generator | `backend/docs/synthetic_data.md`, `circuit_coach/dataset.py`, `backend/datasets/synthetic_seed0/` |
+| T6 Evaluation and baselines | `backend/docs/evaluation.md`, `tests/test_evaluation.py`, `backend/results/` |
+| T7 End-to-end test and demo | `backend/docs/e2e_results.md`, `frontend/src/api/__tests__/journey.e2e.test.ts` |
 
-Decisions already made: add persistence with SQLite first (written so PostgreSQL works by changing the connection URL); in each issue folder, document and verify what exists, then fill the gaps.
+The revised design document is `backend/docs/Technical_Design_Doc.md`. It also corrects the three errors in the submitted PDF (PostgreSQL claim, 36 answers per learner, 357,756 EdNet answers). `handoff/Technical_Design_Doc.pdf` is the earlier Sprint 2 version.
 
-**Corrections to the submitted document.** It contains three errors. Fix them in the revised technical design document:
+**Still open**
 
-1. It says PostgreSQL stores learner state. The service is currently stateless. This becomes true only once the SQLite work is added.
-2. It says about 36 answers per learner. The real mean is 29.5, so one run of 3,000 learners is about 88,600 answers.
-3. It gives 357,756 answers for EdNet. That is only the test portion. The full sample is 1,765,406 answers.
+- The demo video is not recorded. Steps are in `backend/docs/e2e_results.md`.
+- Server-side storage of learners is not built. The plan is SQLite first, PostgreSQL by changing the connection URL.
+- The improvement candidates in section 3 (single-concept credit, question difficulty, a prerequisite-aware model, more evidence before a lesson).
 
-The issues themselves live in the private team repository, so check the issue numbers there before linking any commit to them.
+Test counts at the last check: 86 backend tests, 17 frontend tests plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). If you have a `frontend/.env.local` with `VITE_API_URL`, move it aside before `npm test`, or one "without VITE_API_URL" test fails.
 
 ## 5. Demo scenarios (verified against the engine)
 
