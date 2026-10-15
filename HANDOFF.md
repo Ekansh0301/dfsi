@@ -86,6 +86,22 @@ The revised design document is `backend/docs/Technical_Design_Doc.md`. It also c
 
 Test counts at the last check: 86 backend tests, 17 frontend tests plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). If you have a `frontend/.env.local` with `VITE_API_URL`, move it aside before `npm test`, or one "without VITE_API_URL" test fails.
 
+## 4b. Sprint 3 plan (11 to 24 October, POC v0.2)
+
+Instructor feedback on Hackathon 1: good, and bring voice support back with a natural voice, not a robotic one. Work is assigned separately.
+
+1. **Credit for multi-concept questions.** Credit only the first tag, or split credit. Targets: fitted slip near the true 0.09 (0.25 now) and fewer recommendations of a concept the learner knew (31.6% now).
+2. **Question difficulty in the model.** Target: EdNet AUC at or above 0.721 (fitted BKT is 0.627).
+3. **Prerequisite-aware model.** Learning is slower while a prerequisite is missing. Target: more than 61.9% of hidden blockers found.
+4. **More evidence before recommending a lesson.** Target: false alarms below 31.9% with missed gaps not above 2.6%.
+5. **Voice support.** Pre-generated audio from a neural text-to-speech service, English and Hindi, for questions, lessons and recommendation sentences. Static files in `frontend/public/audio/`, a listen button that is hidden when a file is missing, and a script that regenerates audio when text changes. Pick the voice by ear from samples; check the service's licence. This is independent of items 1 to 4.
+6. **Server-side storage**, SQLite first. Small, do it last.
+7. Record the demo video.
+
+**Promotion rule.** Evaluate each model change against the baseline on the made-up and EdNet data. The improved model becomes the service default as POC v0.2 (24 October) only if it wins on both datasets, meets the targets above and all tests pass. Keep the baseline selectable by config for the final comparison and as a demo safety net. Freeze the model by 7 November (POC v0.9); Hackathon 2 is polish only.
+
+Later: Sprint 4 (25 Oct to 7 Nov) edge cases and the revised design document; Hackathon 2 (7 Nov) POC v1.0; Sprint 5 (8 to 14 Nov) NGO review, slides, poster, video, final documents; demo 14 Nov, defense 18 Nov, showcase 20 Nov.
+
 ## 5. Demo scenarios (verified against the engine)
 
 1. Direct gap: symbols and wiring right, both diagram questions wrong. Recommends the circuit diagrams lesson.
