@@ -13,9 +13,9 @@ Live prototype: https://dfsi.vercel.app/
 | Made-up learner generator with hidden mastery | `backend/circuit_coach/simulate.py` | Done |
 | Evaluation on made-up learners and on real EdNet data, failure analysis | `backend/scripts/`, results in `backend/results/` | Done |
 | Prototype connected to the engine, with fallback to the in-browser engine | `frontend/src/api/engineClient.ts`, `mockServer.ts` | Done, hand-tested |
-| Technical design document (Sprint 2) | `handoff/Technical_Design_Doc.pdf` and `.md` | Done |
+| Technical design document (revised after Hackathon 1) | `backend/docs/Technical_Design_Doc.md` | Done |
 
-Read `handoff/Technical_Design_Doc.pdf` first. It explains the design, the evaluation and the results in four pages.
+Read `backend/docs/Technical_Design_Doc.md` first. It explains the design, the evaluation and the results.
 
 ## 2. Run it
 
@@ -76,7 +76,7 @@ Aman Srivastava completed all seven issues on 14 October 2026 (eight commits on 
 | T6 Evaluation and baselines | `backend/docs/evaluation.md`, `tests/test_evaluation.py`, `backend/results/` |
 | T7 End-to-end test and demo | `backend/docs/e2e_results.md`, `frontend/src/api/__tests__/journey.e2e.test.ts` |
 
-The revised design document is `backend/docs/Technical_Design_Doc.md`. It also corrects the three errors in the submitted PDF (PostgreSQL claim, 36 answers per learner, 357,756 EdNet answers). `handoff/Technical_Design_Doc.pdf` is the earlier Sprint 2 version.
+The revised design document is `backend/docs/Technical_Design_Doc.md`. It also corrects the three errors in the submitted PDF (PostgreSQL claim, 36 answers per learner, 357,756 EdNet answers). `backend/docs/archive/Sprint2_Technical_Design_Doc.pdf` is the earlier Sprint 2 version.
 
 **Still open**
 
@@ -114,7 +114,7 @@ Use **Demo scenarios** in the top bar, then **Reset all demo data**.
 ## 6. Conventions
 
 - No em dashes or en dashes anywhere in the site content or READMEs. `npm run build` runs `npm run check:dashes` and fails if one appears.
-- Commits are made under your own name with a short plain message. Course PDFs and sprint documents are not committed (see `.gitignore`); `handoff/` is the exception.
+- Commits are made under your own name with a short plain message. Course PDFs and sprint documents are not committed (see `.gitignore`); the archived Sprint 2 design document in `backend/docs/archive/` is the exception.
 - The curriculum lives in two places that must match: `frontend/src/data/curriculum.ts` and `backend/circuit_coach/curriculum.py`. `backend/tests/test_parity.py` checks this.
 - Deploy: import the repository in Vercel with Root Directory `frontend`, build command `npm run build`, output directory `dist`.
 
