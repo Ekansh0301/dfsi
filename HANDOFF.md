@@ -86,6 +86,8 @@ The revised design document is `backend/docs/Technical_Design_Doc.md`. It also c
 
 Test counts at the last check: 86 backend tests, 17 frontend tests plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). If you have a `frontend/.env.local` with `VITE_API_URL`, move it aside before `npm test`, or one "without VITE_API_URL" test fails.
 
+The full plan from here to the final submission, with task IDs, files and acceptance criteria, is in `PLAN.md`. The summary below is the Sprint 3 part.
+
 ## 4b. Sprint 3 plan (11 to 24 October, POC v0.2)
 
 Instructor feedback on Hackathon 1: good, and bring voice support back with a natural voice, not a robotic one. Work is assigned separately.
