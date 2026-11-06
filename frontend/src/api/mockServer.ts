@@ -108,7 +108,7 @@ function record(d: DB, l: LearnerState, moduleId: string, a: Answer) {
     attempt_number: attempt,
     timestamp: now(d),
   });
-  for (const c of q.concepts) {
+  for (const c of new Set(q.concepts)) {
     l.mastery[c] = bktUpdate(masteryOf(l, c), correct, unsure, q.type);
     l.observations[c] = (l.observations[c] ?? 0) + 1;
   }
@@ -372,7 +372,7 @@ function markSync(d: DB, markId: string, score: number, comment: string, remote?
     attempt_number: l.responses.filter((r) => r.question_id === q.id).length + 1,
     timestamp: t,
   });
-  for (const c of q.concepts) {
+  for (const c of new Set(q.concepts)) {
     l.mastery[c] = bktUpdate(masteryOf(l, c), score >= 0.5, false, "short_answer", score);
     l.observations[c] = (l.observations[c] ?? 0) + 1;
   }

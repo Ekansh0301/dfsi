@@ -193,6 +193,7 @@ Request: `state`, `concept_tags`, `score` (the trainer's mark from 0 to 1), opti
 ### Choosing the model and storing learners
 
 - Every POST that changes the model accepts `?model=baseline` or `?model=improved` (default: the service's `CIRCUIT_COACH_MODEL`, `baseline` unless set). `GET /health` reports `model` and `models`.
+- With storage on, a POST may also carry `request_id`: sent again for the same learner, it returns the saved response and is not applied twice. A Barabari attempt uses its own attempt id. Without storage nothing is remembered, so the client must send each answer once.
 - With storage on (`CIRCUIT_COACH_DB`), every POST also accepts `learner_id`. An empty `state` then starts from the learner's saved state, and the result is saved. For `/v1/barabari/quiz-attempt` it defaults to the attempt's `student_id`.
 
 ## Errors
@@ -204,6 +205,19 @@ Request: `state`, `concept_tags`, `score` (the trainer's mark from 0 to 1), opti
 | 422 | Missing or badly typed field (FastAPI validation) | `{ "detail": [{ "type": "missing", "loc": ["body", "events"], "msg": "Field required" }] }` |
 
 The frontend treats any non-2xx status as "service unavailable" and falls back to the in-browser engine.
+
+### Edge cases (Sprint 4)
+
+| Input | Behaviour |
+|---|---|
+| Empty quick check (`events: []`) | State returned unchanged; no lesson unless an assessed concept already has answers and is weak |
+| A concept never answered | Never a gap, for both models |
+| All "I'm not sure" | Treated as wrong answers with no lucky guess: placement starts at module 1, a quick check recommends a lesson |
+| The same tag twice on one question | Counts once |
+| A concept with no prerequisites (safety) | Its own root cause; learns at the full rate |
+| Mastery outside 0 to 1, NaN or infinity; negative answer counts | 422 (never a 500) |
+| Unknown lesson ids in `tried` | Ignored |
+| A very large `attempt_number` | Accepted; the answer counts for almost nothing |
 
 ## Changing the contract
 

@@ -10,6 +10,9 @@ state and a log of every model step:
 The tables use only portable types (text, integers, JSON), so the same code runs on SQLite and
 PostgreSQL. A request that names a `learner_id` and sends an empty state starts from the stored
 state; a request that sends a state keeps working exactly as before.
+
+A request that carries a `request_id` (or a Barabari attempt, keyed by its attempt id) and is
+sent again for the same learner returns the saved response and is not applied twice.
 """
 
 from __future__ import annotations
@@ -43,6 +46,8 @@ model_steps = Table(
     Column("model", String(32), nullable=False),
     Column("request", JSON, nullable=False),
     Column("recommendation", JSON),
+    Column("request_key", String(160), index=True),  # request_id, or a Barabari attempt id
+    Column("response", JSON),
     Column("created_at", BigInteger, nullable=False),
 )
 
@@ -76,13 +81,40 @@ class Storage:
             if done.rowcount == 0:
                 c.execute(insert(learner_states).values(learner_id=learner_id, **values))
 
-    def log(self, learner_id: str, step: str, model: str, request: dict, recommendation: dict | None) -> None:
+    def log(
+        self,
+        learner_id: str,
+        step: str,
+        model: str,
+        request: dict,
+        recommendation: dict | None,
+        request_key: str | None = None,
+        response: dict | None = None,
+    ) -> None:
         with self.db.begin() as c:
             c.execute(
                 insert(model_steps).values(
-                    learner_id=learner_id, step=step, model=model, request=request, recommendation=recommendation, created_at=_now_ms()
+                    learner_id=learner_id,
+                    step=step,
+                    model=model,
+                    request=request,
+                    recommendation=recommendation,
+                    request_key=request_key,
+                    response=response,
+                    created_at=_now_ms(),
                 )
             )
+
+    def replay(self, learner_id: str, step: str, request_key: str) -> dict | None:
+        """The saved response of a request already applied, so a resent one is not applied twice."""
+        q = (
+            select(model_steps.c.response)
+            .where(model_steps.c.learner_id == learner_id, model_steps.c.step == step, model_steps.c.request_key == request_key)
+            .order_by(model_steps.c.id)
+        )
+        with self.db.connect() as c:
+            row = c.execute(q).first()
+        return None if row is None else row[0]
 
     def history(self, learner_id: str) -> list[dict]:
         with self.db.connect() as c:

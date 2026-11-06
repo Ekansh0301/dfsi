@@ -55,8 +55,8 @@ class ModelOptions:
     item_difficulty      shift slip and guess per question by its estimated difficulty (S3-3).
     prereq_learn_factor  learning speed while an observed prerequisite looks unmastered, as a
                          share of the normal rate; 1 switches it off (S3-5).
-    min_evidence         answers on a concept needed before it can trigger a lesson; 0 keeps the
-                         baseline, which can flag a concept it has not observed (S3-6).
+    min_evidence         answers on a concept needed before it can trigger a lesson (S3-6). Every
+                         model needs at least one: a concept never answered is never a gap (S4-1).
     strong_evidence      ...unless its mastery is below this after at least one answer.
     """
 
@@ -119,7 +119,8 @@ class Engine:
         out = state.copy()
         opt = self.options
         for ev in events:
-            tags = ev.concept_tags[:1] if opt.credit == "first" else ev.concept_tags
+            tags = tuple(dict.fromkeys(ev.concept_tags))  # a tag listed twice counts once (S4-1)
+            tags = tags[:1] if opt.credit == "first" else tags
             difficulty = self.item_difficulty.get(ev.item_id, 0.0) if opt.item_difficulty and ev.item_id else 0.0
             for c in tags:
                 if c not in self.params:
@@ -152,9 +153,11 @@ class Engine:
     def enough_evidence(self, state: LearnerState, concept: str) -> bool:
         """Has the engine seen enough of `concept` to send a learner to a lesson on it?"""
         opt = self.options
-        if opt.min_evidence <= 0:
-            return True
         n = state.observations.get(concept, 0)
+        if n < 1:
+            return False  # no evidence at all, for every model (S4-1)
+        if opt.min_evidence <= 1:
+            return True
         return n >= opt.min_evidence or (n >= 1 and self.mastery_of(state, concept) < opt.strong_evidence)
 
     def got_it(self, state: LearnerState, concept: str) -> LearnerState:

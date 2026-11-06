@@ -104,7 +104,7 @@ def test_two_answers_or_a_very_low_mastery_are_enough():
 def test_unobserved_concepts_are_never_a_gap_under_the_evidence_rule():
     e = engine(ModelOptions(min_evidence=2, strong_evidence=0.4))
     assert e.recommend(LearnerState(), ["diagrams"]) is None
-    assert engine().recommend(LearnerState(), ["diagrams"]) is not None  # the baseline quirk
+    assert engine().recommend(LearnerState(), ["diagrams"]) is None  # fixed for the baseline too (S4-1)
 
 
 # ---- S3-7: the improved model and the switch ------------------------------------------------

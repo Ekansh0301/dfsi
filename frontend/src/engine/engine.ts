@@ -75,7 +75,7 @@ export function recommend(l: LearnerState, assessed: ConceptId[], now: number, r
   // The observed gap is the most advanced weak concept (deepest in the DAG); the root-cause
   // search then walks back to whichever prerequisite is actually blocking it.
   const gaps = assessed
-    .filter((c) => masteryOf(l, c) < WEAK)
+    .filter((c) => (l.observations[c] ?? 0) > 0 && masteryOf(l, c) < WEAK) // a concept never answered is never a gap
     .sort((a, b) => CONCEPTS[b].pos.col - CONCEPTS[a].pos.col || masteryOf(l, a) - masteryOf(l, b));
   if (gaps.length === 0) return undefined;
   const observed = gaps[0];

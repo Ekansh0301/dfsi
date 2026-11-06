@@ -536,6 +536,19 @@
             ],
             "title": "Learner Id",
             "description": "Defaults to the attempt's student_id when storage is on"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "Defaults to the attempt id: the same attempt sent twice is applied once"
           }
         },
         "type": "object",
@@ -898,6 +911,19 @@
             ],
             "title": "Learner Id",
             "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "With storage on: a resent request with the same id for the same learner returns the saved response instead of being applied twice"
           }
         },
         "type": "object",
@@ -1025,6 +1051,19 @@
             ],
             "title": "Learner Id",
             "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "With storage on: a resent request with the same id for the same learner returns the saved response instead of being applied twice"
           }
         },
         "type": "object",
@@ -1086,6 +1125,19 @@
             ],
             "title": "Learner Id",
             "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "With storage on: a resent request with the same id for the same learner returns the saved response instead of being applied twice"
           }
         },
         "type": "object",
@@ -1157,6 +1209,19 @@
             ],
             "title": "Learner Id",
             "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "With storage on: a resent request with the same id for the same learner returns the saved response instead of being applied twice"
           }
         },
         "type": "object",
@@ -1258,7 +1323,9 @@
         "properties": {
           "mastery": {
             "additionalProperties": {
-              "type": "number"
+              "type": "number",
+              "maximum": 1.0,
+              "minimum": 0.0
             },
             "type": "object",
             "title": "Mastery",
@@ -1266,7 +1333,8 @@
           },
           "observations": {
             "additionalProperties": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 0.0
             },
             "type": "object",
             "title": "Observations",

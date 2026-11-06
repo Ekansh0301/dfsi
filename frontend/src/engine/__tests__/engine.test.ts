@@ -40,3 +40,11 @@ describe("curriculum", () => {
     expect(Object.values(QUESTIONS).every((q) => questionPoints(q) > 0)).toBe(true);
   });
 });
+
+describe("edge cases (same as the service, S4-1)", () => {
+  it("does not recommend a lesson for a concept never answered", async () => {
+    const { recommend } = await import("../engine");
+    const { freshLearner } = await import("../../data/seed");
+    expect(recommend(freshLearner(), ["symbols", "wiring", "diagrams"], 0)).toBeUndefined();
+  });
+});

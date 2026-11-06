@@ -10,10 +10,14 @@ Run:  uvicorn circuit_coach.api:app --port 8000
 
 from __future__ import annotations
 
+import math
 import os
-from typing import Literal
+from typing import Annotated, Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -39,6 +43,23 @@ engines = {name: Engine(load_params(model=name), options=opt) for name, opt in M
 engine = engines[DEFAULT_MODEL]
 
 
+def _json_safe(x):
+    """NaN and infinity cannot be written as JSON; echo them back as text."""
+    if isinstance(x, float) and not math.isfinite(x):
+        return str(x)
+    if isinstance(x, dict):
+        return {k: _json_safe(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [_json_safe(v) for v in x]
+    return x
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+    """A 422 even when the bad input itself is not valid JSON (for example NaN), never a 500 (S4-1)."""
+    return JSONResponse(status_code=422, content={"detail": jsonable_encoder(_json_safe(list(exc.errors())))})
+
+
 def pick(model: str | None) -> Engine:
     return engines[model or DEFAULT_MODEL]
 
@@ -57,19 +78,38 @@ def start_state(req) -> LearnerState:
     return state
 
 
-def remember(req, step: str, model: str | None, state: LearnerState, rec: dict | None = None) -> None:
+REQUEST_ID = Field(default=None, max_length=128, description="With storage on: a resent request with the same id for the same learner returns the saved response instead of being applied twice")
+
+
+def request_key(req) -> str | None:
+    return getattr(req, "request_id", None)
+
+
+def replay(req, step: str) -> dict | None:
+    """The saved response if this request was already applied (storage on, same learner and key)."""
+    learner_id, key = getattr(req, "learner_id", None), request_key(req)
+    if store and learner_id and key:
+        return store.replay(learner_id, step, key)
+    return None
+
+
+def remember(req, step: str, model: str | None, state: LearnerState, rec: dict | None, response: BaseModel) -> None:
     learner_id = getattr(req, "learner_id", None)
     if store and learner_id:
         store.save(learner_id, state)
-        store.log(learner_id, step, model or DEFAULT_MODEL, req.model_dump(mode="json"), rec)
+        store.log(learner_id, step, model or DEFAULT_MODEL, req.model_dump(mode="json"), rec, request_key(req), response.model_dump(mode="json"))
 
 
 MODEL_QUERY = Query(default=None, description="Engine model for this request: baseline or improved. Defaults to the service setting")
 
 
+Probability = Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)]
+Count = Annotated[int, Field(ge=0)]
+
+
 class StateModel(BaseModel):
-    mastery: dict[str, float] = Field(default_factory=dict, description="P(concept mastered), 0 to 1")
-    observations: dict[str, int] = Field(default_factory=dict, description="Answers seen per concept")
+    mastery: dict[str, Probability] = Field(default_factory=dict, description="P(concept mastered), 0 to 1")
+    observations: dict[str, Count] = Field(default_factory=dict, description="Answers seen per concept")
     tried: dict[str, list[str]] = Field(default_factory=dict, description="Lessons already tried per concept")
 
     def to_state(self) -> LearnerState:
@@ -106,6 +146,7 @@ class OnboardingRequest(BaseModel):
     experience: Literal["new", "some", "experienced"]
     events: list[EventModel] = Field(default_factory=list)
     learner_id: str | None = LEARNER_ID
+    request_id: str | None = REQUEST_ID
 
 
 class OnboardingResponse(BaseModel):
@@ -120,6 +161,7 @@ class QuizResultRequest(BaseModel):
     recheck_concept: str | None = Field(default=None, description="Set when a spaced re-check was answered wrongly")
     now: int = Field(default=0, description="Timestamp (ms) stored on the recommendation")
     learner_id: str | None = LEARNER_ID
+    request_id: str | None = REQUEST_ID
 
 
 class TextModel(BaseModel):
@@ -147,6 +189,7 @@ class GotItRequest(BaseModel):
     state: StateModel
     concept_id: str
     learner_id: str | None = LEARNER_ID
+    request_id: str | None = REQUEST_ID
 
 
 class GotItResponse(BaseModel):
@@ -202,9 +245,12 @@ def concepts() -> dict:
 def onboarding(req: OnboardingRequest, model: ModelName | None = MODEL_QUERY) -> OnboardingResponse:
     """Seed a new learner's model from their stated experience and the placement quiz."""
     engine = pick(model)
+    if (hit := replay(req, "onboarding")) is not None:
+        return hit
     state, start = engine.onboard(req.experience, [e.to_event() for e in req.events])
-    remember(req, "onboarding", model, state)
-    return OnboardingResponse(state=StateModel.of(state), start_module_id=start)
+    out = OnboardingResponse(state=StateModel.of(state), start_module_id=start)
+    remember(req, "onboarding", model, state, None, out)
+    return out
 
 
 @app.post("/v1/quiz-result", response_model=QuizResultResponse)
@@ -216,6 +262,8 @@ def quiz_result(req: QuizResultRequest, model: ModelName | None = MODEL_QUERY) -
     """
     if req.module_id not in MODULES:
         raise HTTPException(404, f"Unknown module {req.module_id}")
+    if (hit := replay(req, "quiz-result")) is not None:
+        return hit
     engine = pick(model)
     state = engine.trace(start_state(req), [e.to_event() for e in req.events])
     if req.recheck_concept:
@@ -224,8 +272,9 @@ def quiz_result(req: QuizResultRequest, model: ModelName | None = MODEL_QUERY) -
         rec = engine.recommend_repeat(state, req.recheck_concept, req.now)
     else:
         rec = engine.recommend(state, MODULES[req.module_id]["concepts"], req.now)
-    remember(req, "quiz-result", model, state, rec)
-    return QuizResultResponse(state=StateModel.of(state), recommendation=rec)
+    out = QuizResultResponse(state=StateModel.of(state), recommendation=rec)
+    remember(req, "quiz-result", model, state, rec, out)
+    return out
 
 
 @app.post("/v1/got-it", response_model=GotItResponse)
@@ -233,10 +282,13 @@ def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItRes
     """The learner said "Got it!": apply a learning step. Mastery is confirmed by a later re-check."""
     if req.concept_id not in CONCEPTS:
         raise HTTPException(422, f"Unknown concept {req.concept_id}")
+    if (hit := replay(req, "got-it")) is not None:
+        return hit
     engine = pick(model)
     state = engine.got_it(start_state(req), req.concept_id)
-    remember(req, "got-it", model, state)
-    return GotItResponse(state=StateModel.of(state))
+    out = GotItResponse(state=StateModel.of(state))
+    remember(req, "got-it", model, state, None, out)
+    return out
 
 
 
@@ -247,6 +299,7 @@ class MarkedAnswerRequest(BaseModel):
     attempt_number: int = Field(default=1, ge=1)
     now: int = 0
     learner_id: str | None = LEARNER_ID
+    request_id: str | None = REQUEST_ID
 
 
 @app.post("/v1/marked-answer", response_model=QuizResultResponse)
@@ -257,11 +310,14 @@ def marked_answer(req: MarkedAnswerRequest, model: ModelName | None = MODEL_QUER
     recommendation covers only the marked answer's concepts (null when they look fine).
     """
     ev = EventModel(concept_tags=req.concept_tags, is_correct=req.score >= 0.5, question_type="short_answer", score=req.score, attempt_number=req.attempt_number)
+    if (hit := replay(req, "marked-answer")) is not None:
+        return hit
     engine = pick(model)
     state = engine.trace(start_state(req), [ev.to_event()])
     rec = engine.recommend(state, [c for c in CONCEPTS if c in req.concept_tags], req.now)
-    remember(req, "marked-answer", model, state, rec)
-    return QuizResultResponse(state=StateModel.of(state), recommendation=rec)
+    out = QuizResultResponse(state=StateModel.of(state), recommendation=rec)
+    remember(req, "marked-answer", model, state, rec, out)
+    return out
 
 # ---- Barabari adapter --------------------------------------------------------------------
 # Barabari's LMS can send a quiz attempt in its own format; the service tags it with concepts,
@@ -333,6 +389,7 @@ class BarabariAttemptRequest(BaseModel):
     tags: BarabariTags | None = Field(default=None, description="Concept tags; defaults to the service's barabari_tags.json")
     now: int = 0
     learner_id: str | None = Field(default=None, max_length=128, description="Defaults to the attempt's student_id when storage is on")
+    request_id: str | None = Field(default=None, max_length=128, description="Defaults to the attempt id: the same attempt sent twice is applied once")
 
 
 class BarabariAttemptResponse(BaseModel):
@@ -363,12 +420,17 @@ def barabari_quiz_attempt(req: BarabariAttemptRequest, model: ModelName | None =
     engine = pick(model)
     if req.learner_id is None:
         req.learner_id = attempt.student_id
+    if req.request_id is None:
+        req.request_id = f"attempt:{attempt.id}"
+    if (hit := replay(req, "barabari-quiz-attempt")) is not None:
+        return hit
     state = engine.trace(start_state(req), barabari.attempt_events(quiz, attempt, tags))
     rec = engine.recommend(state, assessed, req.now)
-    remember(req, "barabari-quiz-attempt", model, state, rec)
-    return BarabariAttemptResponse(
+    out = BarabariAttemptResponse(
         state=StateModel.of(state), recommendation=rec, score=barabari.attempt_score(quiz, attempt), assessed_concepts=assessed
     )
+    remember(req, "barabari-quiz-attempt", model, state, rec, out)
+    return out
 
 
 
