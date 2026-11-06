@@ -1,10 +1,10 @@
-# Test spec (Sprint 3)
+# Test spec (Sprints 3 and 4)
 
 What each Sprint 3 change does, which tests cover it, what it measurably changed, and what is still weak. Run everything with:
 
 ```bash
-cd backend && pytest                       # backend: 158 tests
-cd frontend && npm test && npm run typecheck && npm run build   # 32 tests, 8 more need the service
+cd backend && pytest                       # backend: 191 tests
+cd frontend && npm test && npm run typecheck && npm run build   # 33 tests, 8 more need the service
 cd frontend && E2E_API_URL=http://localhost:8000 npm run test:e2e   # with the service running
 ```
 
@@ -37,6 +37,15 @@ Measured effects come from `results/model_comparison.md` (5 evaluation seeds of 
 | ID | Change | Tests | Effect | Still weak |
 |---|---|---|---|---|
 | S4-4 | Optional learner storage (`CIRCUIT_COACH_DB`, SQLite or PostgreSQL) | `tests/test_storage.py` (round trip, survives a restart, continues from the saved state, a sent state still wins, step log, Barabari `student_id`, stateless without storage) | State survives a service restart; every model step is logged | Only tested on SQLite here; PostgreSQL uses the same portable types |
+
+## Sprint 4
+
+| ID | Change | Tests or script | Result | Still weak |
+|---|---|---|---|---|
+| S4-1 | Edge cases: empty quiz, all "I'm not sure", a tag listed twice, a concept with no prerequisites, impossible values, non-finite numbers, resent requests | `tests/test_edge_cases.py` (33 cases, both models), `frontend/src/engine/__tests__/engine.test.ts` | A concept never answered is no longer a gap; bad input gets a 422, never a 500; with storage a resent request is applied once. Evaluation results unchanged | Without storage a resent request is applied again |
+| S4-2 | Robustness: parameters across seeds, bounds, mis-tagged questions, a wrong concept graph | `scripts/robustness.py`, `results/robustness.md` | 25% mis-tagged questions cost 12 points of true blockers; 3 missing links cost 13.5 points of hidden blockers found; wrong extra links about 2 | Tags and the graph need a trainer's check |
+| S4-3 | Calibration of predicted chances and mastery estimates | `scripts/calibration.py`, `results/calibration.md`, `results/calibration.png` | Next answer well calibrated (ECE 0.022 improved); mastery about 10 points high between 0.2 and 0.7 | No recalibration step yet |
+| S4-6 | Failure analysis for both models, revised design doc, demo plan | `scripts/failure_analysis.py`, `docs/Technical_Design_Doc.md`, `docs/demo_plan.md` | Improved model: lessons on a known concept 41.8% to 18.4% (Barabari sim) | More blockers look fine |
 
 ## Unchanged guarantees
 

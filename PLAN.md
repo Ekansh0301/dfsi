@@ -92,6 +92,17 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 | S4-4 | Done: optional SQLite or PostgreSQL storage |
 | S4-5 | Done: short answers go to a To mark list; the trainer's mark becomes partial credit |
 
+## 4c. Status of Sprint 4 on 6 November 2026
+
+| ID | State |
+|---|---|
+| S4-1 | Done: `backend/tests/test_edge_cases.py` |
+| S4-2 | Done: `backend/results/robustness.md` |
+| S4-3 | Done: `backend/results/calibration.md` (mastery estimates run about 10 points high in the middle range) |
+| S4-4, S4-5 | Done in Sprint 3 |
+| S4-6 | Done: `backend/docs/Technical_Design_Doc.md` (Sprint 4), `backend/docs/demo_plan.md`; earlier version archived |
+| S4-7 | Open: freezing the model and tagging `v0.9` is a team decision; the EdNet rerun and the missed-gaps target are still open |
+
 ## 5. How we work
 
 - **Branches:** one branch per task, named by its ID (for example `s3-2-first-tag-credit`), and a short review before merging into `main`.
