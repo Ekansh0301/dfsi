@@ -103,6 +103,37 @@ class RunningAccuracy:
         return out
 
 
+def estimate_item_difficulty(train: Iterable[Seq], tags_of=lambda t: t, shrink: float = 5.0) -> dict[str, float]:
+    """Per-question difficulty on the logit scale, from training answers (PLAN S3-3).
+
+    A question's correct rate is compared with the rate of its main concept: a question
+    answered right less often than its concept is harder (positive). Rates are shrunk towards
+    the concept's rate, so a question seen a few times stays close to 0.
+    """
+    n_item: dict[str, int] = defaultdict(int)
+    k_item: dict[str, int] = defaultdict(int)
+    concept_of: dict[str, str] = {}
+    n_c: dict[str, int] = defaultdict(int)
+    k_c: dict[str, int] = defaultdict(int)
+    for seq in train:
+        for q, tags, y, *_ in seq:
+            tags = tags_of(tags)
+            if not tags:
+                continue
+            c = tags[0]
+            concept_of[q] = c
+            n_item[q] += 1
+            k_item[q] += y
+            n_c[c] += 1
+            k_c[c] += y
+    out = {}
+    for q, c in concept_of.items():
+        rc = (k_c[c] + 1) / (n_c[c] + 2)
+        ri = (k_item[q] + shrink * rc) / (n_item[q] + shrink)
+        out[q] = bkt._logit(rc) - bkt._logit(ri)
+    return out
+
+
 @dataclass
 class BKTPredictor:
     """One BKT model per concept, with parameters fitted by EM (or fixed hand-set values)."""
@@ -116,6 +147,10 @@ class BKTPredictor:
     max_fit_sequences: int | None = None
     max_fit_len: int | None = None
     n_random_starts: int = 2
+    # Sprint 3 options (defaults = the Sprint 2 baseline)
+    item_difficulty: bool = False  # per-question slip and guess (S3-3)
+    prereqs: dict | None = None  # concept -> prerequisites, for the prerequisite-aware learning rate (S3-5)
+    prereq_learn_factor: float = 1.0
 
     def _tags(self, tags: tuple) -> tuple:
         return tags if self.max_tags is None else tags[: self.max_tags]
@@ -130,6 +165,7 @@ class BKTPredictor:
             for c, ys in local.items():
                 if len(ys) >= 2:
                     per_concept[c].append(np.array(ys, dtype=np.int8))
+        self.difficulty = estimate_item_difficulty(train, self._tags) if self.item_difficulty else {}
         self.params: dict[str, BKTParams] = {}
         if self.fit_params:
             for c, seqs in per_concept.items():
@@ -142,11 +178,22 @@ class BKTPredictor:
     def params_for(self, c: str) -> BKTParams:
         return self.params.get(c, bkt.HAND_SET)
 
+    def _learn(self, state: dict[str, float], c: str) -> float | None:
+        f = self.prereq_learn_factor
+        if f >= 1.0 or not self.prereqs:
+            return None
+        ready = 1.0
+        for p in self.prereqs.get(c, []):
+            if p in state:
+                ready *= state[p]
+        return self.params_for(c).p_learn * (f + (1 - f) * ready)
+
     def predict(self, seq: Seq) -> np.ndarray:
         state: dict[str, float] = {}
         out = np.empty(len(seq))
-        for i, (_, tags, y, unsure, *extra) in enumerate(seq):
+        for i, (qid, tags, y, unsure, *extra) in enumerate(seq):
             qtype, score, attempt = (tuple(extra) + ("multiple_choice", None, 1)[len(extra):])[:3]
+            d = self.difficulty.get(qid, 0.0) if self.item_difficulty else 0.0
             tags = self._tags(tags)
             ps = [state.get(c, self.params_for(c).p_init) for c in tags]
             pr = [self.params_for(c) for c in tags]
@@ -156,13 +203,16 @@ class BKTPredictor:
             if self.combine == "conjunctive":
                 # Every tagged concept must be mastered to answer without guessing.
                 p_all = float(np.prod(ps))
-                slip = sum(p.p_slip for p in pr) / len(pr)
-                guess = sum(bkt.guess_for(p, qtype) for p in pr) / len(pr)
+                sg = [bkt.slip_guess(p, qtype, d) for p in pr]
+                slip = sum(x[0] for x in sg) / len(sg)
+                guess = sum(x[1] for x in sg) / len(sg)
                 out[i] = _clip(p_all * (1 - slip) + (1 - p_all) * guess)
             else:  # "mean": average the per-concept predictions
-                out[i] = _clip(sum(bkt.predict_correct(p, q, qtype) for p, q in zip(ps, pr)) / len(tags))
+                out[i] = _clip(sum(bkt.predict_correct(p, q, qtype, d) for p, q in zip(ps, pr)) / len(tags))
             for c, p in zip(tags, ps):
-                state[c] = bkt.update(p, bool(y), self.params_for(c), unsure, score=score, question_type=qtype, attempt=attempt)
+                state[c] = bkt.update(
+                    p, bool(y), self.params_for(c), unsure, score=score, question_type=qtype, attempt=attempt, difficulty=d, learn=self._learn(state, c)
+                )
         return out
 
 

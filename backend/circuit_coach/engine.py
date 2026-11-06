@@ -29,16 +29,49 @@ WEAK = 0.6  # below: a gap
 _PARAMS_FILE = Path(__file__).with_name("fitted_params.json")
 
 
-def load_params(path: Path | None = None) -> dict[str, BKTParams]:
-    """Per-concept parameters: fitted values if `fitted_params.json` exists, else hand-set."""
+def load_params(path: Path | None = None, model: str = "baseline") -> dict[str, BKTParams]:
+    """Per-concept parameters: fitted values if `fitted_params.json` exists, else hand-set.
+
+    The improved model is fitted with first-tag credit and reads `concepts_first_tag`; it falls
+    back to the baseline's values if that section is missing.
+    """
     path = path or _PARAMS_FILE
     params = {c: bkt.HAND_SET for c in CONCEPTS}
     if path.exists():
         raw = json.loads(path.read_text(encoding="utf8"))
-        for c, d in raw.get("concepts", {}).items():
+        section = raw.get("concepts_first_tag") if model == "improved" else None
+        for c, d in (section or raw.get("concepts", {})).items():
             if c in params:
                 params[c] = BKTParams.from_dict(d)
     return params
+
+
+@dataclass(frozen=True)
+class ModelOptions:
+    """Switches for the Sprint 3 model changes. The defaults are the Sprint 2 baseline.
+
+    credit               "all": a multi-concept question updates every tag (naive credit).
+                         "first": only its first, main tag (PLAN S3-2).
+    item_difficulty      shift slip and guess per question by its estimated difficulty (S3-3).
+    prereq_learn_factor  learning speed while an observed prerequisite looks unmastered, as a
+                         share of the normal rate; 1 switches it off (S3-5).
+    min_evidence         answers on a concept needed before it can trigger a lesson; 0 keeps the
+                         baseline, which can flag a concept it has not observed (S3-6).
+    strong_evidence      ...unless its mastery is below this after at least one answer.
+    """
+
+    name: str = "baseline"
+    credit: str = "all"
+    item_difficulty: bool = False
+    prereq_learn_factor: float = 1.0
+    min_evidence: int = 0
+    strong_evidence: float = 0.0
+
+
+BASELINE = ModelOptions()
+# Chosen on a tuning seed (100), never on the evaluation seeds: see results/model_comparison.md.
+IMPROVED = ModelOptions("improved", credit="first", item_difficulty=True, prereq_learn_factor=0.5, min_evidence=2, strong_evidence=0.4)
+MODELS = {"baseline": BASELINE, "improved": IMPROVED}
 
 
 @dataclass
@@ -59,13 +92,22 @@ class Event:
     question_type: str = "multiple_choice"  # multiple_choice, true_false or short_answer
     score: float | None = None  # partial credit 0 to 1 (points earned / points); overrides is_correct
     attempt_number: int = 1  # 1 = first try at this quiz; retakes count for less
+    item_id: str | None = None  # the question, for per-question difficulty
 
 
 class Engine:
-    def __init__(self, params: dict[str, BKTParams] | None = None, use_prerequisites: bool = True):
+    def __init__(
+        self,
+        params: dict[str, BKTParams] | None = None,
+        use_prerequisites: bool = True,
+        options: ModelOptions = BASELINE,
+        item_difficulty: dict[str, float] | None = None,
+    ):
         self.params = params or load_params()
         # Switching this off gives the "no root-cause walk" variant used in the evaluation.
         self.use_prerequisites = use_prerequisites
+        self.options = options
+        self.item_difficulty = item_difficulty or {}
 
     # ---- tracing ---------------------------------------------------------------------
 
@@ -75,8 +117,11 @@ class Engine:
     def trace(self, state: LearnerState, events: Iterable[Event]) -> LearnerState:
         """Return a new state after observing the events in order."""
         out = state.copy()
+        opt = self.options
         for ev in events:
-            for c in ev.concept_tags:
+            tags = ev.concept_tags[:1] if opt.credit == "first" else ev.concept_tags
+            difficulty = self.item_difficulty.get(ev.item_id, 0.0) if opt.item_difficulty and ev.item_id else 0.0
+            for c in tags:
                 if c not in self.params:
                     continue
                 out.mastery[c] = bkt.update(
@@ -87,9 +132,30 @@ class Engine:
                     score=ev.score,
                     question_type=ev.question_type,
                     attempt=ev.attempt_number,
+                    difficulty=difficulty,
+                    learn=self.learn_rate(out, c),
                 )
                 out.observations[c] = out.observations.get(c, 0) + 1
         return out
+
+    def learn_rate(self, state: LearnerState, concept: str) -> float | None:
+        """Learning rate for `concept` now: slower while its observed prerequisites look weak."""
+        f = self.options.prereq_learn_factor
+        if f >= 1.0:
+            return None
+        ready = 1.0
+        for p in CONCEPTS[concept]["prereqs"]:
+            if state.observations.get(p):
+                ready *= self.mastery_of(state, p)
+        return self.params[concept].p_learn * (f + (1 - f) * ready)
+
+    def enough_evidence(self, state: LearnerState, concept: str) -> bool:
+        """Has the engine seen enough of `concept` to send a learner to a lesson on it?"""
+        opt = self.options
+        if opt.min_evidence <= 0:
+            return True
+        n = state.observations.get(concept, 0)
+        return n >= opt.min_evidence or (n >= 1 and self.mastery_of(state, concept) < opt.strong_evidence)
 
     def got_it(self, state: LearnerState, concept: str) -> LearnerState:
         """The learner says "Got it!": apply a learning step, but do not trust it as proof."""
@@ -134,7 +200,7 @@ class Engine:
 
     def observed_gap(self, state: LearnerState, assessed: list[str]) -> str | None:
         """The most advanced weak concept just assessed (deepest in the graph, then weakest)."""
-        gaps = [c for c in assessed if self.mastery_of(state, c) < WEAK]
+        gaps = [c for c in assessed if self.mastery_of(state, c) < WEAK and self.enough_evidence(state, c)]
         if not gaps:
             return None
         gaps.sort(key=lambda c: (-CONCEPTS[c]["col"], self.mastery_of(state, c)))

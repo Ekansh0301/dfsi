@@ -13,13 +13,13 @@ from __future__ import annotations
 import os
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import __version__, barabari
 from .curriculum import CONCEPTS, CONTENT, MODULES
-from .engine import _PARAMS_FILE, Engine, Event, LearnerState
+from .engine import _PARAMS_FILE, MODELS, Engine, Event, LearnerState, load_params
 
 app = FastAPI(title="Circuit Coach engine", version=__version__)
 app.add_middleware(
@@ -28,7 +28,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-engine = Engine()
+ModelName = Literal["baseline", "improved"]
+# The service default. The improved model is selectable per request with ?model=improved and
+# becomes the default only through this setting, after the promotion check in PLAN.md (S3-7).
+DEFAULT_MODEL: str = os.environ.get("CIRCUIT_COACH_MODEL", "baseline")
+if DEFAULT_MODEL not in MODELS:
+    raise RuntimeError(f"CIRCUIT_COACH_MODEL must be one of {sorted(MODELS)}")
+engines = {name: Engine(load_params(model=name), options=opt) for name, opt in MODELS.items()}
+engine = engines[DEFAULT_MODEL]
+
+
+def pick(model: str | None) -> Engine:
+    return engines[model or DEFAULT_MODEL]
+
+
+MODEL_QUERY = Query(default=None, description="Engine model for this request: baseline or improved. Defaults to the service setting")
 
 
 class StateModel(BaseModel):
@@ -118,6 +132,8 @@ class HealthResponse(BaseModel):
     status: Literal["ok"]
     version: str
     parameters: Literal["fitted", "hand-set"]
+    model: ModelName = Field(description="The model used when a request does not choose one")
+    models: list[ModelName]
 
 
 class ConceptModel(BaseModel):
@@ -138,7 +154,13 @@ class ConceptsResponse(BaseModel):
 
 @app.get("/health", response_model=HealthResponse)
 def health() -> dict:
-    return {"status": "ok", "version": __version__, "parameters": "fitted" if _PARAMS_FILE.exists() else "hand-set"}
+    return {
+        "status": "ok",
+        "version": __version__,
+        "parameters": "fitted" if _PARAMS_FILE.exists() else "hand-set",
+        "model": DEFAULT_MODEL,
+        "models": sorted(MODELS),
+    }
 
 
 @app.get("/v1/concepts", response_model=ConceptsResponse)
@@ -152,14 +174,15 @@ def concepts() -> dict:
 
 
 @app.post("/v1/onboarding", response_model=OnboardingResponse)
-def onboarding(req: OnboardingRequest) -> OnboardingResponse:
+def onboarding(req: OnboardingRequest, model: ModelName | None = MODEL_QUERY) -> OnboardingResponse:
     """Seed a new learner's model from their stated experience and the placement quiz."""
+    engine = pick(model)
     state, start = engine.onboard(req.experience, [e.to_event() for e in req.events])
     return OnboardingResponse(state=StateModel.of(state), start_module_id=start)
 
 
 @app.post("/v1/quiz-result", response_model=QuizResultResponse)
-def quiz_result(req: QuizResultRequest) -> QuizResultResponse:
+def quiz_result(req: QuizResultRequest, model: ModelName | None = MODEL_QUERY) -> QuizResultResponse:
     """Update the model from a finished quick check and return the single recommendation.
 
     When `recheck_concept` is set (a spaced re-check was failed) the recommendation is marked
@@ -167,6 +190,7 @@ def quiz_result(req: QuizResultRequest) -> QuizResultResponse:
     """
     if req.module_id not in MODULES:
         raise HTTPException(404, f"Unknown module {req.module_id}")
+    engine = pick(model)
     state = engine.trace(req.state.to_state(), [e.to_event() for e in req.events])
     if req.recheck_concept:
         if req.recheck_concept not in CONCEPTS:
@@ -178,10 +202,11 @@ def quiz_result(req: QuizResultRequest) -> QuizResultResponse:
 
 
 @app.post("/v1/got-it", response_model=GotItResponse)
-def got_it(req: GotItRequest) -> GotItResponse:
+def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItResponse:
     """The learner said "Got it!": apply a learning step. Mastery is confirmed by a later re-check."""
     if req.concept_id not in CONCEPTS:
         raise HTTPException(422, f"Unknown concept {req.concept_id}")
+    engine = pick(model)
     return GotItResponse(state=StateModel.of(engine.got_it(req.state.to_state(), req.concept_id)))
 
 
@@ -264,7 +289,7 @@ class BarabariAttemptResponse(BaseModel):
 
 
 @app.post("/v1/barabari/quiz-attempt", response_model=BarabariAttemptResponse)
-def barabari_quiz_attempt(req: BarabariAttemptRequest) -> BarabariAttemptResponse:
+def barabari_quiz_attempt(req: BarabariAttemptRequest, model: ModelName | None = MODEL_QUERY) -> BarabariAttemptResponse:
     """Trace one attempt from Barabari's LMS and return the recommendation and the quiz score."""
     quiz = barabari.parse_quiz(req.quiz.model_dump())
     attempt = barabari.parse_attempt(req.attempt.model_dump())
@@ -281,6 +306,7 @@ def barabari_quiz_attempt(req: BarabariAttemptRequest) -> BarabariAttemptRespons
     assessed = barabari.quiz_concepts(quiz, tags)
     if not assessed:
         raise HTTPException(422, f"No concept tags for unit {quiz.unit_id}; add it to the tag map")
+    engine = pick(model)
     state = engine.trace(req.state.to_state(), barabari.attempt_events(quiz, attempt, tags))
     rec = engine.recommend(state, assessed, req.now)
     return BarabariAttemptResponse(

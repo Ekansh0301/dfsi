@@ -32,7 +32,7 @@ def true_blockers(truth: dict[str, bool], gap: str) -> set[str]:
 
 
 def _events(learner: SimLearner, n: int) -> list[Event]:
-    return [Event(r.concepts, r.correct, r.unsure, r.question_type, r.score, r.attempt) for r in learner.responses[:n]]
+    return [Event(r.concepts, r.correct, r.unsure, r.question_type, r.score, r.attempt, r.item_id) for r in learner.responses[:n]]
 
 
 def _check_responses(learner: SimLearner, module: str, n: int):
@@ -86,8 +86,13 @@ class Tally:
         }
 
 
-def evaluate_diagnosis(learners: list[SimLearner], engine_params) -> dict[str, dict]:
-    variants = {
+def evaluate_diagnosis(learners: list[SimLearner], engine_params, variants: dict[str, Engine | None] | None = None) -> dict[str, dict]:
+    """Score each variant against the hidden truth. `None` is the "study what you got wrong" rule.
+
+    Without `variants` the three Sprint 2 methods are compared. Mastery quality is measured on
+    the last engine in the dict.
+    """
+    variants = variants or {
         "Study what you got wrong (status quo)": None,
         "BKT, recommend the assessed concept": Engine(engine_params, use_prerequisites=False),
         "BKT + prerequisite walk": Engine(engine_params, use_prerequisites=True),
@@ -105,7 +110,7 @@ def evaluate_diagnosis(learners: list[SimLearner], engine_params) -> dict[str, d
             blockers = set().union(*(true_blockers(truth, g) for g in gaps)) if gaps else set()
             hidden = [g for g in gaps if true_blockers(truth, g) != {g}]
 
-            base_engine = variants["BKT + prerequisite walk"]
+            base_engine = [e for e in variants.values() if e is not None][-1]
             state = base_engine.trace(LearnerState(), events)
             for c in ap.assessed:
                 if state.observations.get(c):

@@ -47,15 +47,39 @@
         "summary": "Onboarding",
         "description": "Seed a new learner's model from their stated experience and the placement quiz.",
         "operationId": "onboarding_v1_onboarding_post",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "baseline",
+                    "improved"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Engine model for this request: baseline or improved. Defaults to the service setting",
+              "title": "Model"
+            },
+            "description": "Engine model for this request: baseline or improved. Defaults to the service setting"
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/OnboardingRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -86,15 +110,39 @@
         "summary": "Quiz Result",
         "description": "Update the model from a finished quick check and return the single recommendation.\n\nWhen `recheck_concept` is set (a spaced re-check was failed) the recommendation is marked\nas a repeat gap and uses a lesson the learner has not tried.",
         "operationId": "quiz_result_v1_quiz_result_post",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "baseline",
+                    "improved"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Engine model for this request: baseline or improved. Defaults to the service setting",
+              "title": "Model"
+            },
+            "description": "Engine model for this request: baseline or improved. Defaults to the service setting"
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/QuizResultRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -125,15 +173,39 @@
         "summary": "Got It",
         "description": "The learner said \"Got it!\": apply a learning step. Mastery is confirmed by a later re-check.",
         "operationId": "got_it_v1_got_it_post",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "baseline",
+                    "improved"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Engine model for this request: baseline or improved. Defaults to the service setting",
+              "title": "Model"
+            },
+            "description": "Engine model for this request: baseline or improved. Defaults to the service setting"
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/GotItRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -164,15 +236,39 @@
         "summary": "Barabari Quiz Attempt",
         "description": "Trace one attempt from Barabari's LMS and return the recommendation and the quiz score.",
         "operationId": "barabari_quiz_attempt_v1_barabari_quiz_attempt_post",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "baseline",
+                    "improved"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Engine model for this request: baseline or improved. Defaults to the service setting",
+              "title": "Model"
+            },
+            "description": "Engine model for this request: baseline or improved. Defaults to the service setting"
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BarabariAttemptRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -725,13 +821,35 @@
               "hand-set"
             ],
             "title": "Parameters"
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "improved"
+            ],
+            "title": "Model",
+            "description": "The model used when a request does not choose one"
+          },
+          "models": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "baseline",
+                "improved"
+              ]
+            },
+            "type": "array",
+            "title": "Models"
           }
         },
         "type": "object",
         "required": [
           "status",
           "version",
-          "parameters"
+          "parameters",
+          "model",
+          "models"
         ],
         "title": "HealthResponse"
       },

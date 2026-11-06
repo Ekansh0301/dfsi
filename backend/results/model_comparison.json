@@ -1,0 +1,1846 @@
+{
+ "sprint2": [
+  {
+   "sim": "sprint2",
+   "seed": 0,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 24328,
+     "auc": 0.6856565856214409,
+     "accuracy": 0.7094705688918119,
+     "log_loss": 0.5883572183833022,
+     "rmse": 0.4469671190952289
+    },
+    "+ first-tag credit": {
+     "n": 24328,
+     "auc": 0.6759929462341754,
+     "accuracy": 0.7183903321275896,
+     "log_loss": 0.5859916297050842,
+     "rmse": 0.44545202564829306
+    },
+    "+ question difficulty": {
+     "n": 24328,
+     "auc": 0.6830856404984484,
+     "accuracy": 0.7180614929299572,
+     "log_loss": 0.5826756699133323,
+     "rmse": 0.4439520559282595
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 24328,
+     "auc": 0.6933806965558516,
+     "accuracy": 0.7207744163104242,
+     "log_loss": 0.5793097039776429,
+     "rmse": 0.442211282651485
+    },
+    "Reference: per-question accuracy": {
+     "n": 24328,
+     "auc": 0.6021728276985944,
+     "accuracy": 0.6689411377836239,
+     "log_loss": 0.625901221253736,
+     "rmse": 0.4664505811133021
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4276,
+     "with_true_gap": 3256,
+     "recommendation_is_true_blocker": 0.6056511056511057,
+     "recommendation_is_unmastered": 0.7287635290259101,
+     "missed_gap_rate": 0.06357493857493858,
+     "false_alarm_rate": 0.25980392156862747,
+     "hidden_prereq_cases": 2342,
+     "hidden_prereq_blocker_hit": 0.6656703672075149,
+     "hidden_prereq_stopped_at_assessed_concept": 0.057643040136635355,
+     "gap_precision": 0.8501719338464058,
+     "gap_recall": 0.9254901960784314,
+     "gap_f1": 0.886233677562516,
+     "known_concept_recommended": 0.27123647097408987
+    },
+    "+ first-tag credit": {
+     "points": 4276,
+     "with_true_gap": 3256,
+     "recommendation_is_true_blocker": 0.6950245700245701,
+     "recommendation_is_unmastered": 0.8402576489533011,
+     "missed_gap_rate": 0.04637592137592138,
+     "false_alarm_rate": 0.2549019607843137,
+     "hidden_prereq_cases": 2342,
+     "hidden_prereq_blocker_hit": 0.7040990606319385,
+     "hidden_prereq_stopped_at_assessed_concept": 0.10802732707087959,
+     "gap_precision": 0.8683406854428232,
+     "gap_recall": 0.9122994652406418,
+     "gap_f1": 0.8897774687065368,
+     "known_concept_recommended": 0.15974235104669887
+    },
+    "+ question difficulty": {
+     "points": 4276,
+     "with_true_gap": 3256,
+     "recommendation_is_true_blocker": 0.6965601965601965,
+     "recommendation_is_unmastered": 0.8384615384615385,
+     "missed_gap_rate": 0.04176904176904177,
+     "false_alarm_rate": 0.26862745098039215,
+     "hidden_prereq_cases": 2342,
+     "hidden_prereq_blocker_hit": 0.7040990606319385,
+     "hidden_prereq_stopped_at_assessed_concept": 0.107600341588386,
+     "gap_precision": 0.8673434856175973,
+     "gap_recall": 0.9137254901960784,
+     "gap_f1": 0.8899305555555556,
+     "known_concept_recommended": 0.16153846153846152
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4276,
+     "with_true_gap": 3256,
+     "recommendation_is_true_blocker": 0.7113022113022113,
+     "recommendation_is_unmastered": 0.8349176172370089,
+     "missed_gap_rate": 0.030712530712530713,
+     "false_alarm_rate": 0.28431372549019607,
+     "hidden_prereq_cases": 2342,
+     "hidden_prereq_blocker_hit": 0.7237403928266439,
+     "hidden_prereq_stopped_at_assessed_concept": 0.08368915456874466,
+     "gap_precision": 0.8630271330500163,
+     "gap_recall": 0.9411764705882353,
+     "gap_f1": 0.9004092769440655,
+     "known_concept_recommended": 0.16508238276299114
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4276,
+     "with_true_gap": 3256,
+     "recommendation_is_true_blocker": 0.706081081081081,
+     "recommendation_is_unmastered": 0.8340248962655602,
+     "missed_gap_rate": 0.03777641277641278,
+     "false_alarm_rate": 0.24313725490196078,
+     "hidden_prereq_cases": 2342,
+     "hidden_prereq_blocker_hit": 0.7224594363791631,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09094790777113577,
+     "gap_precision": 0.8630271330500163,
+     "gap_recall": 0.9411764705882353,
+     "gap_f1": 0.9004092769440655,
+     "known_concept_recommended": 0.1659751037344398
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.24827354040936506,
+    "first_tag": 0.15982242612134165
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.48996081443562195,
+     "p_learn": 0.21982403771992157,
+     "p_slip": 0.10787861604282285,
+     "p_guess": 0.16127200093900146
+    },
+    "quantities": {
+     "p_init": 0.15131014598606313,
+     "p_learn": 0.2818827657784125,
+     "p_slip": 0.08263362013573916,
+     "p_guess": 0.14306047083467144
+    },
+    "ohm": {
+     "p_init": 0.08254982576105825,
+     "p_learn": 0.1813049951084179,
+     "p_slip": 0.23592819949433713,
+     "p_guess": 0.10459263306310715
+    },
+    "symbols": {
+     "p_init": 0.0749985496106764,
+     "p_learn": 0.21700058502821518,
+     "p_slip": 0.1188315072721389,
+     "p_guess": 0.12155630195065975
+    },
+    "wiring": {
+     "p_init": 0.10505073713736536,
+     "p_learn": 0.2170948183159626,
+     "p_slip": 0.11277417425413215,
+     "p_guess": 0.11838431069142377
+    },
+    "multimeter": {
+     "p_init": 0.115106874427969,
+     "p_learn": 0.14881117142859285,
+     "p_slip": 0.09645614334231933,
+     "p_guess": 0.15318510981289396
+    },
+    "series_parallel": {
+     "p_init": 0.0353123825825732,
+     "p_learn": 0.16674592921219164,
+     "p_slip": 0.16027303101314463,
+     "p_guess": 0.12166148073386181
+    },
+    "diagrams": {
+     "p_init": 0.04825440967249448,
+     "p_learn": 0.0913188525466159,
+     "p_slip": 0.2239580610564832,
+     "p_guess": 0.1513852303079291
+    },
+    "earthing": {
+     "p_init": 0.019414112250483527,
+     "p_learn": 0.22841857845473795,
+     "p_slip": 0.15949090860229898,
+     "p_guess": 0.11256350045886791
+    },
+    "fault": {
+     "p_init": 0.03425130399811999,
+     "p_learn": 0.18019748845337924,
+     "p_slip": 0.3,
+     "p_guess": 0.09284722438440741
+    }
+   }
+  },
+  {
+   "sim": "sprint2",
+   "seed": 1,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 24177,
+     "auc": 0.6874854697034107,
+     "accuracy": 0.6969433759358068,
+     "log_loss": 0.5971629996561009,
+     "rmse": 0.45184431872453507
+    },
+    "+ first-tag credit": {
+     "n": 24177,
+     "auc": 0.6774491800852152,
+     "accuracy": 0.713239856061546,
+     "log_loss": 0.5902114394392716,
+     "rmse": 0.4477079905315518
+    },
+    "+ question difficulty": {
+     "n": 24177,
+     "auc": 0.6801461425025115,
+     "accuracy": 0.7137775571824462,
+     "log_loss": 0.5890398429856534,
+     "rmse": 0.4471555816217865
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 24177,
+     "auc": 0.6917933306740977,
+     "accuracy": 0.7160110849154154,
+     "log_loss": 0.5857224367058115,
+     "rmse": 0.4454171859874666
+    },
+    "Reference: per-question accuracy": {
+     "n": 24177,
+     "auc": 0.6050731870416166,
+     "accuracy": 0.6598833602183893,
+     "log_loss": 0.6299818270437719,
+     "rmse": 0.46847694677281676
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4261,
+     "with_true_gap": 3270,
+     "recommendation_is_true_blocker": 0.6027522935779817,
+     "recommendation_is_unmastered": 0.6429014259144451,
+     "missed_gap_rate": 0.01345565749235474,
+     "false_alarm_rate": 0.3410696266397578,
+     "hidden_prereq_cases": 2300,
+     "hidden_prereq_blocker_hit": 0.6330434782608696,
+     "hidden_prereq_stopped_at_assessed_concept": 0.04739130434782609,
+     "gap_precision": 0.8388625592417062,
+     "gap_recall": 0.9500805152979066,
+     "gap_f1": 0.891014346841178,
+     "known_concept_recommended": 0.3570985740855549
+    },
+    "+ first-tag credit": {
+     "points": 4261,
+     "with_true_gap": 3270,
+     "recommendation_is_true_blocker": 0.6785932721712539,
+     "recommendation_is_unmastered": 0.8321722609246358,
+     "missed_gap_rate": 0.03425076452599388,
+     "false_alarm_rate": 0.272452068617558,
+     "hidden_prereq_cases": 2300,
+     "hidden_prereq_blocker_hit": 0.6847826086956522,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11,
+     "gap_precision": 0.8672192151556157,
+     "gap_recall": 0.917337627482555,
+     "gap_f1": 0.8915746456829842,
+     "known_concept_recommended": 0.1678277390753642
+    },
+    "+ question difficulty": {
+     "points": 4261,
+     "with_true_gap": 3270,
+     "recommendation_is_true_blocker": 0.6743119266055045,
+     "recommendation_is_unmastered": 0.8311111111111111,
+     "missed_gap_rate": 0.03669724770642202,
+     "false_alarm_rate": 0.26437941473259335,
+     "hidden_prereq_cases": 2300,
+     "hidden_prereq_blocker_hit": 0.6795652173913044,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11130434782608696,
+     "gap_precision": 0.8677517802644964,
+     "gap_recall": 0.9157273215244229,
+     "gap_f1": 0.8910942804909898,
+     "known_concept_recommended": 0.16888888888888887
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4261,
+     "with_true_gap": 3270,
+     "recommendation_is_true_blocker": 0.6801223241590214,
+     "recommendation_is_unmastered": 0.8212255211623499,
+     "missed_gap_rate": 0.031804281345565746,
+     "false_alarm_rate": 0.2805247225025227,
+     "hidden_prereq_cases": 2300,
+     "hidden_prereq_blocker_hit": 0.6891304347826087,
+     "hidden_prereq_stopped_at_assessed_concept": 0.08739130434782609,
+     "gap_precision": 0.8620916105729766,
+     "gap_recall": 0.9395240651279299,
+     "gap_f1": 0.8991438356164384,
+     "known_concept_recommended": 0.17877447883765007
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4261,
+     "with_true_gap": 3270,
+     "recommendation_is_true_blocker": 0.6764525993883792,
+     "recommendation_is_unmastered": 0.8203497615262321,
+     "missed_gap_rate": 0.0382262996941896,
+     "false_alarm_rate": 0.23007063572149344,
+     "hidden_prereq_cases": 2300,
+     "hidden_prereq_blocker_hit": 0.6882608695652174,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09043478260869565,
+     "gap_precision": 0.8620916105729766,
+     "gap_recall": 0.9395240651279299,
+     "gap_f1": 0.8991438356164384,
+     "known_concept_recommended": 0.17965023847376793
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.2640531238452271,
+    "first_tag": 0.15645583832638693
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.49597517293616117,
+     "p_learn": 0.219631774748079,
+     "p_slip": 0.09052048477647563,
+     "p_guess": 0.1555312278181767
+    },
+    "quantities": {
+     "p_init": 0.14434232956879456,
+     "p_learn": 0.2812428015219827,
+     "p_slip": 0.0943667885778062,
+     "p_guess": 0.14384034477786642
+    },
+    "ohm": {
+     "p_init": 0.08450698600156034,
+     "p_learn": 0.16028734993183602,
+     "p_slip": 0.19771528217539647,
+     "p_guess": 0.1082147619345464
+    },
+    "symbols": {
+     "p_init": 0.08753810583093194,
+     "p_learn": 0.2144173474734,
+     "p_slip": 0.07051470646902737,
+     "p_guess": 0.13409345303146342
+    },
+    "wiring": {
+     "p_init": 0.0973891781094903,
+     "p_learn": 0.2375164130964748,
+     "p_slip": 0.1393396723521794,
+     "p_guess": 0.13279013878832777
+    },
+    "multimeter": {
+     "p_init": 0.1013662106473014,
+     "p_learn": 0.14715941322397114,
+     "p_slip": 0.10324680511010172,
+     "p_guess": 0.16840934908490468
+    },
+    "series_parallel": {
+     "p_init": 0.02059833148734821,
+     "p_learn": 0.18232472612722048,
+     "p_slip": 0.2181583867272567,
+     "p_guess": 0.1118765840018363
+    },
+    "diagrams": {
+     "p_init": 0.04062406844752069,
+     "p_learn": 0.08351695213337813,
+     "p_slip": 0.1967805836141758,
+     "p_guess": 0.15871354889435735
+    },
+    "earthing": {
+     "p_init": 0.057172857326444566,
+     "p_learn": 0.21165689315422737,
+     "p_slip": 0.15391567346145024,
+     "p_guess": 0.10511632316020068
+    },
+    "fault": {
+     "p_init": 0.01,
+     "p_learn": 0.15542559780769444,
+     "p_slip": 0.3,
+     "p_guess": 0.10265179457510472
+    }
+   }
+  },
+  {
+   "sim": "sprint2",
+   "seed": 2,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 23073,
+     "auc": 0.68604688459203,
+     "accuracy": 0.699778962423612,
+     "log_loss": 0.5993396493406994,
+     "rmse": 0.45251394640288684
+    },
+    "+ first-tag credit": {
+     "n": 23073,
+     "auc": 0.681582044097897,
+     "accuracy": 0.7136913275256793,
+     "log_loss": 0.5891772350000737,
+     "rmse": 0.4469195376611293
+    },
+    "+ question difficulty": {
+     "n": 23073,
+     "auc": 0.6864713302442123,
+     "accuracy": 0.7139947124344472,
+     "log_loss": 0.5876447323885801,
+     "rmse": 0.44627885088152425
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 23073,
+     "auc": 0.6960531103453347,
+     "accuracy": 0.7158583625883067,
+     "log_loss": 0.5857383284390744,
+     "rmse": 0.44529945147854894
+    },
+    "Reference: per-question accuracy": {
+     "n": 23073,
+     "auc": 0.6089034579911747,
+     "accuracy": 0.6653231049278377,
+     "log_loss": 0.6284008670556893,
+     "rmse": 0.4676291394567946
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4083,
+     "with_true_gap": 3105,
+     "recommendation_is_true_blocker": 0.5713365539452496,
+     "recommendation_is_unmastered": 0.618782722513089,
+     "missed_gap_rate": 0.015780998389694042,
+     "false_alarm_rate": 0.3323108384458078,
+     "hidden_prereq_cases": 2163,
+     "hidden_prereq_blocker_hit": 0.5908460471567267,
+     "hidden_prereq_stopped_at_assessed_concept": 0.05131761442441054,
+     "gap_precision": 0.8441992644600468,
+     "gap_recall": 0.9453388244103332,
+     "gap_f1": 0.8919109855174849,
+     "known_concept_recommended": 0.38121727748691103
+    },
+    "+ first-tag credit": {
+     "points": 4083,
+     "with_true_gap": 3105,
+     "recommendation_is_true_blocker": 0.6592592592592592,
+     "recommendation_is_unmastered": 0.8002658690594882,
+     "missed_gap_rate": 0.030917874396135265,
+     "false_alarm_rate": 0.27300613496932513,
+     "hidden_prereq_cases": 2163,
+     "hidden_prereq_blocker_hit": 0.6574202496532594,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11326860841423948,
+     "gap_precision": 0.8645705252063938,
+     "gap_recall": 0.9213777611381505,
+     "gap_f1": 0.8920706841866787,
+     "known_concept_recommended": 0.19973413094051184
+    },
+    "+ question difficulty": {
+     "points": 4083,
+     "with_true_gap": 3105,
+     "recommendation_is_true_blocker": 0.6576489533011272,
+     "recommendation_is_unmastered": 0.7996011964107677,
+     "missed_gap_rate": 0.030917874396135265,
+     "false_alarm_rate": 0.26993865030674846,
+     "hidden_prereq_cases": 2163,
+     "hidden_prereq_blocker_hit": 0.6555709662505779,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11465557096625058,
+     "gap_precision": 0.8655876143560872,
+     "gap_recall": 0.9210033695245227,
+     "gap_f1": 0.8924360602212951,
+     "known_concept_recommended": 0.20039880358923234
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4083,
+     "with_true_gap": 3105,
+     "recommendation_is_true_blocker": 0.6647342995169082,
+     "recommendation_is_unmastered": 0.7947107438016529,
+     "missed_gap_rate": 0.02576489533011272,
+     "false_alarm_rate": 0.28118609406952966,
+     "hidden_prereq_cases": 2163,
+     "hidden_prereq_blocker_hit": 0.6675913083680074,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09015256588072122,
+     "gap_precision": 0.8600851063829787,
+     "gap_recall": 0.945900411830775,
+     "gap_f1": 0.900953909244896,
+     "known_concept_recommended": 0.20528925619834715
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4083,
+     "with_true_gap": 3105,
+     "recommendation_is_true_blocker": 0.663768115942029,
+     "recommendation_is_unmastered": 0.7947699437272426,
+     "missed_gap_rate": 0.02705314009661836,
+     "false_alarm_rate": 0.25255623721881393,
+     "hidden_prereq_cases": 2163,
+     "hidden_prereq_blocker_hit": 0.6671289875173371,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09107720758206195,
+     "gap_precision": 0.8600851063829787,
+     "gap_recall": 0.945900411830775,
+     "gap_f1": 0.900953909244896,
+     "known_concept_recommended": 0.20523005627275737
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.2628637384698923,
+    "first_tag": 0.15346474752751774
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.5116311170642153,
+     "p_learn": 0.22101850082867605,
+     "p_slip": 0.1142319265979947,
+     "p_guess": 0.13556873328061467
+    },
+    "quantities": {
+     "p_init": 0.13842770325769582,
+     "p_learn": 0.28576918699963494,
+     "p_slip": 0.09425800685731743,
+     "p_guess": 0.15972408590856704
+    },
+    "ohm": {
+     "p_init": 0.05795496986269982,
+     "p_learn": 0.18305431509531972,
+     "p_slip": 0.24994491857196025,
+     "p_guess": 0.11282181164009313
+    },
+    "symbols": {
+     "p_init": 0.07013083184500717,
+     "p_learn": 0.21235901130846566,
+     "p_slip": 0.08787860289993475,
+     "p_guess": 0.12816068773312247
+    },
+    "wiring": {
+     "p_init": 0.0545086530456001,
+     "p_learn": 0.21764649342966708,
+     "p_slip": 0.14345196134127602,
+     "p_guess": 0.12802891958171783
+    },
+    "multimeter": {
+     "p_init": 0.10409021254493149,
+     "p_learn": 0.13456693342244266,
+     "p_slip": 0.11681094994519123,
+     "p_guess": 0.16093863232336247
+    },
+    "series_parallel": {
+     "p_init": 0.026975906774868583,
+     "p_learn": 0.16017097431671334,
+     "p_slip": 0.1668000461346404,
+     "p_guess": 0.11378013548083928
+    },
+    "diagrams": {
+     "p_init": 0.03608091134105184,
+     "p_learn": 0.08260368194257578,
+     "p_slip": 0.16391238847161937,
+     "p_guess": 0.16242116694213277
+    },
+    "earthing": {
+     "p_init": 0.027637954216513026,
+     "p_learn": 0.18343234997204624,
+     "p_slip": 0.09735867445524313,
+     "p_guess": 0.10954540937186097
+    },
+    "fault": {
+     "p_init": 0.016482154819046826,
+     "p_learn": 0.1658144345623368,
+     "p_slip": 0.3,
+     "p_guess": 0.09493013508521539
+    }
+   }
+  },
+  {
+   "sim": "sprint2",
+   "seed": 3,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 23625,
+     "auc": 0.6879044152822126,
+     "accuracy": 0.71005291005291,
+     "log_loss": 0.5839632281364159,
+     "rmse": 0.4449365228723622
+    },
+    "+ first-tag credit": {
+     "n": 23625,
+     "auc": 0.6757548438225577,
+     "accuracy": 0.7220740740740741,
+     "log_loss": 0.57957385911749,
+     "rmse": 0.44221462847398185
+    },
+    "+ question difficulty": {
+     "n": 23625,
+     "auc": 0.6796879791022687,
+     "accuracy": 0.7234708994708995,
+     "log_loss": 0.5780869802687312,
+     "rmse": 0.44155707749080964
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 23625,
+     "auc": 0.6910654016511736,
+     "accuracy": 0.7252486772486773,
+     "log_loss": 0.5750341048120381,
+     "rmse": 0.43993358015321593
+    },
+    "Reference: per-question accuracy": {
+     "n": 23625,
+     "auc": 0.5983284263844592,
+     "accuracy": 0.6822857142857143,
+     "log_loss": 0.6187558087757361,
+     "rmse": 0.46268950481727755
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4183,
+     "with_true_gap": 3179,
+     "recommendation_is_true_blocker": 0.5995596099402328,
+     "recommendation_is_unmastered": 0.670735624799229,
+     "missed_gap_rate": 0.020761245674740483,
+     "false_alarm_rate": 0.3187250996015936,
+     "hidden_prereq_cases": 2328,
+     "hidden_prereq_blocker_hit": 0.6078178694158075,
+     "hidden_prereq_stopped_at_assessed_concept": 0.0627147766323024,
+     "gap_precision": 0.8593622240392478,
+     "gap_recall": 0.9471881759192502,
+     "gap_f1": 0.9011403583983538,
+     "known_concept_recommended": 0.329264375200771
+    },
+    "+ first-tag credit": {
+     "points": 4183,
+     "with_true_gap": 3179,
+     "recommendation_is_true_blocker": 0.6602705253224285,
+     "recommendation_is_unmastered": 0.832339297548045,
+     "missed_gap_rate": 0.05064485687323057,
+     "false_alarm_rate": 0.2300796812749004,
+     "hidden_prereq_cases": 2328,
+     "hidden_prereq_blocker_hit": 0.6683848797250859,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11469072164948453,
+     "gap_precision": 0.8784722222222222,
+     "gap_recall": 0.9120403749098774,
+     "gap_f1": 0.8949416342412451,
+     "known_concept_recommended": 0.16766070245195497
+    },
+    "+ question difficulty": {
+     "points": 4183,
+     "with_true_gap": 3179,
+     "recommendation_is_true_blocker": 0.6615287826360491,
+     "recommendation_is_unmastered": 0.8325057927838464,
+     "missed_gap_rate": 0.0497011638880151,
+     "false_alarm_rate": 0.2350597609561753,
+     "hidden_prereq_cases": 2328,
+     "hidden_prereq_blocker_hit": 0.6688144329896907,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11426116838487972,
+     "gap_precision": 0.8781629116117851,
+     "gap_recall": 0.9133020908435472,
+     "gap_f1": 0.8953878777169111,
+     "known_concept_recommended": 0.1674942072161536
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4183,
+     "with_true_gap": 3179,
+     "recommendation_is_true_blocker": 0.6744259201006606,
+     "recommendation_is_unmastered": 0.8219401041666666,
+     "missed_gap_rate": 0.033658383139351995,
+     "false_alarm_rate": 0.2639442231075697,
+     "hidden_prereq_cases": 2328,
+     "hidden_prereq_blocker_hit": 0.686426116838488,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09235395189003437,
+     "gap_precision": 0.8722835172183216,
+     "gap_recall": 0.9405191059841385,
+     "gap_f1": 0.9051170858629662,
+     "known_concept_recommended": 0.17805989583333337
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4183,
+     "with_true_gap": 3179,
+     "recommendation_is_true_blocker": 0.6715948411450141,
+     "recommendation_is_unmastered": 0.8218729535036018,
+     "missed_gap_rate": 0.03932054105064486,
+     "false_alarm_rate": 0.22211155378486055,
+     "hidden_prereq_cases": 2328,
+     "hidden_prereq_blocker_hit": 0.686426116838488,
+     "hidden_prereq_stopped_at_assessed_concept": 0.10223367697594501,
+     "gap_precision": 0.8722835172183216,
+     "gap_recall": 0.9405191059841385,
+     "gap_f1": 0.9051170858629662,
+     "known_concept_recommended": 0.1781270464963982
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.2729455308807923,
+    "first_tag": 0.1565781639481591
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.5093150043364645,
+     "p_learn": 0.20224421985525481,
+     "p_slip": 0.07429106405027681,
+     "p_guess": 0.17016732188368555
+    },
+    "quantities": {
+     "p_init": 0.12790037684419775,
+     "p_learn": 0.2622242565565827,
+     "p_slip": 0.12428703933402141,
+     "p_guess": 0.11005825608671434
+    },
+    "ohm": {
+     "p_init": 0.08143986346168382,
+     "p_learn": 0.16779780854550605,
+     "p_slip": 0.2104786154564098,
+     "p_guess": 0.09588537988180348
+    },
+    "symbols": {
+     "p_init": 0.05682255088264141,
+     "p_learn": 0.20414584020096854,
+     "p_slip": 0.07387790235635162,
+     "p_guess": 0.12516051832734018
+    },
+    "wiring": {
+     "p_init": 0.08496493709940381,
+     "p_learn": 0.22409701275663665,
+     "p_slip": 0.14579601801051773,
+     "p_guess": 0.11857876363609852
+    },
+    "multimeter": {
+     "p_init": 0.12741010122952123,
+     "p_learn": 0.148438548826057,
+     "p_slip": 0.17245693608631055,
+     "p_guess": 0.1517420865226319
+    },
+    "series_parallel": {
+     "p_init": 0.04805944694293273,
+     "p_learn": 0.15196715346044096,
+     "p_slip": 0.15052663005261083,
+     "p_guess": 0.1137302007227039
+    },
+    "diagrams": {
+     "p_init": 0.04006961249637726,
+     "p_learn": 0.08091528521200364,
+     "p_slip": 0.1422059425090388,
+     "p_guess": 0.14807693841857492
+    },
+    "earthing": {
+     "p_init": 0.03507967547185098,
+     "p_learn": 0.20326637200387887,
+     "p_slip": 0.17186149162605352,
+     "p_guess": 0.09727872357919214
+    },
+    "fault": {
+     "p_init": 0.0120941030462609,
+     "p_learn": 0.15212939660623656,
+     "p_slip": 0.3,
+     "p_guess": 0.091854454282398
+    }
+   }
+  },
+  {
+   "sim": "sprint2",
+   "seed": 4,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 24051,
+     "auc": 0.6906426977912908,
+     "accuracy": 0.688121076046734,
+     "log_loss": 0.606497802190344,
+     "rmse": 0.45606230820751287
+    },
+    "+ first-tag credit": {
+     "n": 24051,
+     "auc": 0.6884181902901507,
+     "accuracy": 0.7088686541100162,
+     "log_loss": 0.5936861815069748,
+     "rmse": 0.44936716225349327
+    },
+    "+ question difficulty": {
+     "n": 24051,
+     "auc": 0.6899312300322517,
+     "accuracy": 0.7089518107355204,
+     "log_loss": 0.5927176742644323,
+     "rmse": 0.4489603145529919
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 24051,
+     "auc": 0.6973672409206719,
+     "accuracy": 0.711197039624132,
+     "log_loss": 0.5921808164119426,
+     "rmse": 0.44848714399586564
+    },
+    "Reference: per-question accuracy": {
+     "n": 24051,
+     "auc": 0.6022456441378469,
+     "accuracy": 0.6509500644463848,
+     "log_loss": 0.638765306606077,
+     "rmse": 0.4727650118359615
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4251,
+     "with_true_gap": 3199,
+     "recommendation_is_true_blocker": 0.5823694904657706,
+     "recommendation_is_unmastered": 0.6419478039465308,
+     "missed_gap_rate": 0.017818068146295718,
+     "false_alarm_rate": 0.344106463878327,
+     "hidden_prereq_cases": 2233,
+     "hidden_prereq_blocker_hit": 0.5960591133004927,
+     "hidden_prereq_stopped_at_assessed_concept": 0.07792207792207792,
+     "gap_precision": 0.8361970217640321,
+     "gap_recall": 0.9346991037131882,
+     "gap_f1": 0.882708585247884,
+     "known_concept_recommended": 0.35805219605346916
+    },
+    "+ first-tag credit": {
+     "points": 4251,
+     "with_true_gap": 3199,
+     "recommendation_is_true_blocker": 0.6883401062832135,
+     "recommendation_is_unmastered": 0.8281300289668491,
+     "missed_gap_rate": 0.02875898718349484,
+     "false_alarm_rate": 0.2975285171102662,
+     "hidden_prereq_cases": 2233,
+     "hidden_prereq_blocker_hit": 0.6936856247201075,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11867442901925661,
+     "gap_precision": 0.8531456672884518,
+     "gap_recall": 0.9202487653191879,
+     "gap_f1": 0.885427666314678,
+     "known_concept_recommended": 0.17186997103315094
+    },
+    "+ question difficulty": {
+     "points": 4251,
+     "with_true_gap": 3199,
+     "recommendation_is_true_blocker": 0.6852141294154424,
+     "recommendation_is_unmastered": 0.8325820991629105,
+     "missed_gap_rate": 0.02907158487027196,
+     "false_alarm_rate": 0.2965779467680608,
+     "hidden_prereq_cases": 2233,
+     "hidden_prereq_blocker_hit": 0.6865203761755486,
+     "hidden_prereq_stopped_at_assessed_concept": 0.1258396775638155,
+     "gap_precision": 0.8546630360789653,
+     "gap_recall": 0.918602524236327,
+     "gap_f1": 0.8854800317376357,
+     "known_concept_recommended": 0.16741790083708952
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4251,
+     "with_true_gap": 3199,
+     "recommendation_is_true_blocker": 0.6927164738980931,
+     "recommendation_is_unmastered": 0.8276636713735558,
+     "missed_gap_rate": 0.025945608002500783,
+     "false_alarm_rate": 0.2994296577946768,
+     "hidden_prereq_cases": 2233,
+     "hidden_prereq_blocker_hit": 0.7026421854008061,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09941782355575458,
+     "gap_precision": 0.8485197368421052,
+     "gap_recall": 0.9436619718309859,
+     "gap_f1": 0.8935654282497618,
+     "known_concept_recommended": 0.1723363286264442
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4251,
+     "with_true_gap": 3199,
+     "recommendation_is_true_blocker": 0.6889653016567677,
+     "recommendation_is_unmastered": 0.8268174474959612,
+     "missed_gap_rate": 0.03251015942482026,
+     "false_alarm_rate": 0.26425855513307983,
+     "hidden_prereq_cases": 2233,
+     "hidden_prereq_blocker_hit": 0.7021943573667712,
+     "hidden_prereq_stopped_at_assessed_concept": 0.1038961038961039,
+     "gap_precision": 0.8485197368421052,
+     "gap_recall": 0.9436619718309859,
+     "gap_f1": 0.8935654282497618,
+     "known_concept_recommended": 0.1731825525040388
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.27279597046295595,
+    "first_tag": 0.15037505670870338
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.4899068667623736,
+     "p_learn": 0.21644287492433162,
+     "p_slip": 0.0927427023560745,
+     "p_guess": 0.1708964704519823
+    },
+    "quantities": {
+     "p_init": 0.1843976448438454,
+     "p_learn": 0.29687150538537654,
+     "p_slip": 0.11551507219997259,
+     "p_guess": 0.12991049067516358
+    },
+    "ohm": {
+     "p_init": 0.0692593111999252,
+     "p_learn": 0.16743715481323845,
+     "p_slip": 0.197894042999242,
+     "p_guess": 0.11396992427623283
+    },
+    "symbols": {
+     "p_init": 0.09532730479289259,
+     "p_learn": 0.2510591678032663,
+     "p_slip": 0.162060326714685,
+     "p_guess": 0.10799630670938337
+    },
+    "wiring": {
+     "p_init": 0.060196454751660015,
+     "p_learn": 0.19265637676256847,
+     "p_slip": 0.07747161544865054,
+     "p_guess": 0.15824326609783862
+    },
+    "multimeter": {
+     "p_init": 0.11661064111754457,
+     "p_learn": 0.13130173150144311,
+     "p_slip": 0.1092706225647854,
+     "p_guess": 0.16524403425894016
+    },
+    "series_parallel": {
+     "p_init": 0.055320253528038314,
+     "p_learn": 0.17591598374391088,
+     "p_slip": 0.14841925416621723,
+     "p_guess": 0.10110489400929401
+    },
+    "diagrams": {
+     "p_init": 0.042098422712250956,
+     "p_learn": 0.07500837013158165,
+     "p_slip": 0.15514095013163995,
+     "p_guess": 0.1598861680361714
+    },
+    "earthing": {
+     "p_init": 0.024977566541890844,
+     "p_learn": 0.2028226240567078,
+     "p_slip": 0.14523598050576628,
+     "p_guess": 0.11583161721856806
+    },
+    "fault": {
+     "p_init": 0.01,
+     "p_learn": 0.15927408881483773,
+     "p_slip": 0.3,
+     "p_guess": 0.10090864885600287
+    }
+   }
+  }
+ ],
+ "barabari": [
+  {
+   "sim": "barabari",
+   "seed": 0,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 35709,
+     "auc": 0.6747326901240298,
+     "accuracy": 0.637906410148702,
+     "log_loss": 0.6364492670009745,
+     "rmse": 0.4717148775240533
+    },
+    "+ first-tag credit": {
+     "n": 35709,
+     "auc": 0.6887060360103339,
+     "accuracy": 0.6573412865104036,
+     "log_loss": 0.621939388223909,
+     "rmse": 0.4647361789793277
+    },
+    "+ question difficulty": {
+     "n": 35709,
+     "auc": 0.7082204764536417,
+     "accuracy": 0.6640622812176202,
+     "log_loss": 0.6103803852641669,
+     "rmse": 0.4593556851894896
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 35709,
+     "auc": 0.709876043805053,
+     "accuracy": 0.6643703268083676,
+     "log_loss": 0.6101041649414995,
+     "rmse": 0.4591998564220023
+    },
+    "Reference: per-question accuracy": {
+     "n": 35709,
+     "auc": 0.6311832473610082,
+     "accuracy": 0.6158951524825674,
+     "log_loss": 0.6523006865392451,
+     "rmse": 0.47978401856643976
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.42984014209591476,
+     "recommendation_is_unmastered": 0.5043709616115546,
+     "missed_gap_rate": 0.06536412078152753,
+     "false_alarm_rate": 0.4020245842371656,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.4567436861902203,
+     "hidden_prereq_stopped_at_assessed_concept": 0.05910800644814616,
+     "gap_precision": 0.7234631714971387,
+     "gap_recall": 0.8749720919848181,
+     "gap_f1": 0.792037186742118,
+     "known_concept_recommended": 0.4956290383884454
+    },
+    "+ first-tag credit": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.5079928952042628,
+     "recommendation_is_unmastered": 0.7494924888347544,
+     "missed_gap_rate": 0.125044404973357,
+     "false_alarm_rate": 0.28344179320318147,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.5217624932831811,
+     "hidden_prereq_stopped_at_assessed_concept": 0.17302525523911874,
+     "gap_precision": 0.7693828245113112,
+     "gap_recall": 0.7820942174592543,
+     "gap_f1": 0.7756864481842339,
+     "known_concept_recommended": 0.2505075111652456
+    },
+    "+ question difficulty": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.5161634103019538,
+     "recommendation_is_unmastered": 0.761266747868453,
+     "missed_gap_rate": 0.125044404973357,
+     "false_alarm_rate": 0.2660882140274765,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.5314347125201505,
+     "hidden_prereq_stopped_at_assessed_concept": 0.17947340139709833,
+     "gap_precision": 0.7770390070921985,
+     "gap_recall": 0.7827640098236214,
+     "gap_f1": 0.7798910021132244,
+     "known_concept_recommended": 0.23873325213154695
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.5602131438721136,
+     "recommendation_is_unmastered": 0.7330783938814531,
+     "missed_gap_rate": 0.07104795737122557,
+     "false_alarm_rate": 0.3051337671728127,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.5980655561526061,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11875335840945728,
+     "gap_precision": 0.7608063578212831,
+     "gap_recall": 0.8763116767135521,
+     "gap_f1": 0.8144843328491388,
+     "known_concept_recommended": 0.2669216061185469
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.5598579040852576,
+     "recommendation_is_unmastered": 0.7332567929582855,
+     "missed_gap_rate": 0.07175843694493783,
+     "false_alarm_rate": 0.2935647143890094,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.5980655561526061,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11875335840945728,
+     "gap_precision": 0.7608063578212831,
+     "gap_recall": 0.8763116767135521,
+     "gap_f1": 0.8144843328491388,
+     "known_concept_recommended": 0.2667432070417145
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.28191227934483,
+    "first_tag": 0.19861723150823704
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.4978992837027045,
+     "p_learn": 0.15904454579444566,
+     "p_slip": 0.07887143102605865,
+     "p_guess": 0.26352501948401
+    },
+    "quantities": {
+     "p_init": 0.1558700351061846,
+     "p_learn": 0.22847718917092916,
+     "p_slip": 0.1986556343614501,
+     "p_guess": 0.180397566944881
+    },
+    "ohm": {
+     "p_init": 0.07998199529114543,
+     "p_learn": 0.21940613903269202,
+     "p_slip": 0.3,
+     "p_guess": 0.21761686096201688
+    },
+    "symbols": {
+     "p_init": 0.04511276308557678,
+     "p_learn": 0.17574088779591376,
+     "p_slip": 0.1548631508210132,
+     "p_guess": 0.25703012895352667
+    },
+    "wiring": {
+     "p_init": 0.06059908875264586,
+     "p_learn": 0.16777237339683368,
+     "p_slip": 0.12891362757520328,
+     "p_guess": 0.23879863656496536
+    },
+    "multimeter": {
+     "p_init": 0.1013572785176136,
+     "p_learn": 0.12927406153066706,
+     "p_slip": 0.18852414696349545,
+     "p_guess": 0.20173133503779458
+    },
+    "series_parallel": {
+     "p_init": 0.046100041878299365,
+     "p_learn": 0.1555679548339104,
+     "p_slip": 0.19182093551133253,
+     "p_guess": 0.2094183630753532
+    },
+    "diagrams": {
+     "p_init": 0.028160859462243722,
+     "p_learn": 0.06296497007198974,
+     "p_slip": 0.18026374619653004,
+     "p_guess": 0.22423844236069224
+    },
+    "earthing": {
+     "p_init": 0.05569533334475235,
+     "p_learn": 0.20455196450097923,
+     "p_slip": 0.2642596426272875,
+     "p_guess": 0.19193512693219655
+    },
+    "fault": {
+     "p_init": 0.01,
+     "p_learn": 0.1461200044509702,
+     "p_slip": 0.3,
+     "p_guess": 0.19347673978116808
+    }
+   }
+  },
+  {
+   "sim": "barabari",
+   "seed": 1,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 37277,
+     "auc": 0.6763838452629113,
+     "accuracy": 0.6387316575904713,
+     "log_loss": 0.6357781557785375,
+     "rmse": 0.47093276670729445
+    },
+    "+ first-tag credit": {
+     "n": 37277,
+     "auc": 0.6888889046698692,
+     "accuracy": 0.6527617565791238,
+     "log_loss": 0.6238076431062448,
+     "rmse": 0.4654674910579566
+    },
+    "+ question difficulty": {
+     "n": 37277,
+     "auc": 0.706312621950608,
+     "accuracy": 0.6620436193899724,
+     "log_loss": 0.6131507900847885,
+     "rmse": 0.4604562310887699
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 37277,
+     "auc": 0.7067701618865239,
+     "accuracy": 0.658743997639295,
+     "log_loss": 0.6125577050576468,
+     "rmse": 0.46010845015670737
+    },
+    "Reference: per-question accuracy": {
+     "n": 37277,
+     "auc": 0.6316299520679353,
+     "accuracy": 0.6139710813638437,
+     "log_loss": 0.653024587802155,
+     "rmse": 0.4801549095093938
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.44905008635578586,
+     "recommendation_is_unmastered": 0.5414222873900293,
+     "missed_gap_rate": 0.05768566493955095,
+     "false_alarm_rate": 0.39589235127478756,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.45882962195753496,
+     "hidden_prereq_stopped_at_assessed_concept": 0.07198342827550493,
+     "gap_precision": 0.7400768245838668,
+     "gap_recall": 0.8663811563169165,
+     "gap_f1": 0.7982637861300187,
+     "known_concept_recommended": 0.4585777126099707
+    },
+    "+ first-tag credit": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.5077720207253886,
+     "recommendation_is_unmastered": 0.7223511214230471,
+     "missed_gap_rate": 0.10673575129533679,
+     "false_alarm_rate": 0.29461756373937675,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.5256343863283273,
+     "hidden_prereq_stopped_at_assessed_concept": 0.1444847229414811,
+     "gap_precision": 0.7691832956181855,
+     "gap_recall": 0.800642398286938,
+     "gap_f1": 0.7845976287902634,
+     "known_concept_recommended": 0.27764887857695286
+    },
+    "+ question difficulty": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.5143350604490501,
+     "recommendation_is_unmastered": 0.7306501547987616,
+     "missed_gap_rate": 0.107426597582038,
+     "false_alarm_rate": 0.29320113314447593,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.5297773174520973,
+     "hidden_prereq_stopped_at_assessed_concept": 0.14759192128430865,
+     "gap_precision": 0.7742803893145579,
+     "gap_recall": 0.800642398286938,
+     "gap_f1": 0.7872407621854932,
+     "known_concept_recommended": 0.2693498452012384
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.5329879101899827,
+     "recommendation_is_unmastered": 0.7015861305791221,
+     "missed_gap_rate": 0.06355785837651122,
+     "false_alarm_rate": 0.3271954674220963,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.569135163127913,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09114448472294148,
+     "gap_precision": 0.7551168266618367,
+     "gap_recall": 0.8927194860813704,
+     "gap_f1": 0.8181728976547933,
+     "known_concept_recommended": 0.2984138694208779
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.5309153713298791,
+     "recommendation_is_unmastered": 0.7011834319526628,
+     "missed_gap_rate": 0.06597582037996545,
+     "false_alarm_rate": 0.3052407932011331,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.5686172967374418,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09114448472294148,
+     "gap_precision": 0.7551168266618367,
+     "gap_recall": 0.8927194860813704,
+     "gap_f1": 0.8181728976547933,
+     "known_concept_recommended": 0.29881656804733725
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.26790390081549365,
+    "first_tag": 0.1858576039121331
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.4848206227036689,
+     "p_learn": 0.1576536081671373,
+     "p_slip": 0.11018008943651371,
+     "p_guess": 0.2516019957327895
+    },
+    "quantities": {
+     "p_init": 0.14548022778300956,
+     "p_learn": 0.20713558359845813,
+     "p_slip": 0.15098746113473882,
+     "p_guess": 0.1788317410070483
+    },
+    "ohm": {
+     "p_init": 0.10179803092720156,
+     "p_learn": 0.16425175280328652,
+     "p_slip": 0.3,
+     "p_guess": 0.18426321393184114
+    },
+    "symbols": {
+     "p_init": 0.08833573177719736,
+     "p_learn": 0.16656342211799985,
+     "p_slip": 0.08131368355251312,
+     "p_guess": 0.2965768415607339
+    },
+    "wiring": {
+     "p_init": 0.05874011159202586,
+     "p_learn": 0.14789038558720802,
+     "p_slip": 0.09530138386856979,
+     "p_guess": 0.21338316764771276
+    },
+    "multimeter": {
+     "p_init": 0.10588219133225549,
+     "p_learn": 0.11724672492516271,
+     "p_slip": 0.13391254030908556,
+     "p_guess": 0.21981871973158337
+    },
+    "series_parallel": {
+     "p_init": 0.06635056808225909,
+     "p_learn": 0.17389204241119688,
+     "p_slip": 0.3,
+     "p_guess": 0.16250505154133202
+    },
+    "diagrams": {
+     "p_init": 0.022582582413856994,
+     "p_learn": 0.06802780244907687,
+     "p_slip": 0.19733588013214257,
+     "p_guess": 0.2513880961001318
+    },
+    "earthing": {
+     "p_init": 0.04545488998731255,
+     "p_learn": 0.16104403719807142,
+     "p_slip": 0.21585524605749526,
+     "p_guess": 0.18003928940923414
+    },
+    "fault": {
+     "p_init": 0.02149111418556599,
+     "p_learn": 0.18725690335386677,
+     "p_slip": 0.2736897546302724,
+     "p_guess": 0.23955358159627024
+    }
+   }
+  },
+  {
+   "sim": "barabari",
+   "seed": 2,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 35763,
+     "auc": 0.6768456455826929,
+     "accuracy": 0.6363000866817661,
+     "log_loss": 0.6376696793364806,
+     "rmse": 0.4720633172775345
+    },
+    "+ first-tag credit": {
+     "n": 35763,
+     "auc": 0.6851954796411814,
+     "accuracy": 0.6467857841903644,
+     "log_loss": 0.6291394460565576,
+     "rmse": 0.46819732571215483
+    },
+    "+ question difficulty": {
+     "n": 35763,
+     "auc": 0.6974828751284567,
+     "accuracy": 0.6524340799149959,
+     "log_loss": 0.6215856997704289,
+     "rmse": 0.46465227882475985
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 35763,
+     "auc": 0.6978208564366681,
+     "accuracy": 0.6519866901546291,
+     "log_loss": 0.6207343149362912,
+     "rmse": 0.46408648680446984
+    },
+    "Reference: per-question accuracy": {
+     "n": 35763,
+     "auc": 0.6287016280150236,
+     "accuracy": 0.6123647345021391,
+     "log_loss": 0.6567635671908019,
+     "rmse": 0.48196128949973
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.46102992345163535,
+     "recommendation_is_unmastered": 0.5635009310986965,
+     "missed_gap_rate": 0.06576200417536535,
+     "false_alarm_rate": 0.34253731343283583,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.4978165938864629,
+     "hidden_prereq_stopped_at_assessed_concept": 0.060589519650655024,
+     "gap_precision": 0.7369305451829724,
+     "gap_recall": 0.8711101302140808,
+     "gap_f1": 0.7984221705269545,
+     "known_concept_recommended": 0.4364990689013035
+    },
+    "+ first-tag credit": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.5121781489213639,
+     "recommendation_is_unmastered": 0.7417840375586855,
+     "missed_gap_rate": 0.11064718162839249,
+     "false_alarm_rate": 0.27238805970149255,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.5109170305676856,
+     "hidden_prereq_stopped_at_assessed_concept": 0.17194323144104803,
+     "gap_precision": 0.7755768393556813,
+     "gap_recall": 0.7863606267932024,
+     "gap_f1": 0.780931506849315,
+     "known_concept_recommended": 0.2582159624413145
+    },
+    "+ question difficulty": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.5031315240083507,
+     "recommendation_is_unmastered": 0.750294927251278,
+     "missed_gap_rate": 0.1151704940848991,
+     "false_alarm_rate": 0.26492537313432835,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.4912663755458515,
+     "hidden_prereq_stopped_at_assessed_concept": 0.17685589519650655,
+     "gap_precision": 0.7790006603565925,
+     "gap_recall": 0.7810637828293975,
+     "gap_f1": 0.7800308573947542,
+     "known_concept_recommended": 0.249705072748722
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.5334029227557411,
+     "recommendation_is_unmastered": 0.7270685136652939,
+     "missed_gap_rate": 0.07063326374391092,
+     "false_alarm_rate": 0.30671641791044774,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.5365720524017468,
+     "hidden_prereq_stopped_at_assessed_concept": 0.13100436681222707,
+     "gap_precision": 0.7642150203764797,
+     "gap_recall": 0.8691238137276539,
+     "gap_f1": 0.8133002891367205,
+     "known_concept_recommended": 0.2729314863347061
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.5330549756437022,
+     "recommendation_is_unmastered": 0.7272386661671038,
+     "missed_gap_rate": 0.07132915796798886,
+     "false_alarm_rate": 0.29328358208955224,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.5360262008733624,
+     "hidden_prereq_stopped_at_assessed_concept": 0.13100436681222707,
+     "gap_precision": 0.7642150203764797,
+     "gap_recall": 0.8691238137276539,
+     "gap_f1": 0.8133002891367205,
+     "known_concept_recommended": 0.27276133383289625
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.27591881425306175,
+    "first_tag": 0.18660906337912006
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.4845761386797136,
+     "p_learn": 0.16301206761623463,
+     "p_slip": 0.09676107048980799,
+     "p_guess": 0.28362487177375495
+    },
+    "quantities": {
+     "p_init": 0.17662948144809545,
+     "p_learn": 0.25267644603197836,
+     "p_slip": 0.1614545887300887,
+     "p_guess": 0.2205916493766633
+    },
+    "ohm": {
+     "p_init": 0.05442279328089898,
+     "p_learn": 0.2036330811557489,
+     "p_slip": 0.3,
+     "p_guess": 0.20088274287216903
+    },
+    "symbols": {
+     "p_init": 0.09492922824313497,
+     "p_learn": 0.151004236863882,
+     "p_slip": 0.0979650209279299,
+     "p_guess": 0.27341148986147307
+    },
+    "wiring": {
+     "p_init": 0.07659487461868268,
+     "p_learn": 0.1875404913558232,
+     "p_slip": 0.18215675765517833,
+     "p_guess": 0.25368369203420105
+    },
+    "multimeter": {
+     "p_init": 0.0949006896646105,
+     "p_learn": 0.11846262108162432,
+     "p_slip": 0.13955251004146788,
+     "p_guess": 0.23000427704272447
+    },
+    "series_parallel": {
+     "p_init": 0.0453987477922586,
+     "p_learn": 0.1585404766881271,
+     "p_slip": 0.19011092060472368,
+     "p_guess": 0.24419507356848502
+    },
+    "diagrams": {
+     "p_init": 0.022601225765126416,
+     "p_learn": 0.07505061238815648,
+     "p_slip": 0.214207576801974,
+     "p_guess": 0.23058070396966895
+    },
+    "earthing": {
+     "p_init": 0.0655517387843239,
+     "p_learn": 0.25172453748910717,
+     "p_slip": 0.22574946949974564,
+     "p_guess": 0.2285284241954223
+    },
+    "fault": {
+     "p_init": 0.020025938842061268,
+     "p_learn": 0.10931992091233143,
+     "p_slip": 0.2581327190402844,
+     "p_guess": 0.15609794842478272
+    }
+   }
+  },
+  {
+   "sim": "barabari",
+   "seed": 3,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 35006,
+     "auc": 0.6645472131244592,
+     "accuracy": 0.6208364280409072,
+     "log_loss": 0.6441701693514861,
+     "rmse": 0.475406883650577
+    },
+    "+ first-tag credit": {
+     "n": 35006,
+     "auc": 0.677255384101161,
+     "accuracy": 0.6290635890990116,
+     "log_loss": 0.6370576015631536,
+     "rmse": 0.4721049354128699
+    },
+    "+ question difficulty": {
+     "n": 35006,
+     "auc": 0.6894036299793492,
+     "accuracy": 0.6345769296691995,
+     "log_loss": 0.6280225424868269,
+     "rmse": 0.4679917922925598
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 35006,
+     "auc": 0.6901573458324636,
+     "accuracy": 0.6341769982288751,
+     "log_loss": 0.6259283582065951,
+     "rmse": 0.46695625153969217
+    },
+    "Reference: per-question accuracy": {
+     "n": 35006,
+     "auc": 0.6177843129179944,
+     "accuracy": 0.6000399931440324,
+     "log_loss": 0.6622284296321838,
+     "rmse": 0.4846707651141866
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.5209071580439405,
+     "recommendation_is_unmastered": 0.7011363636363637,
+     "missed_gap_rate": 0.06449326718639263,
+     "false_alarm_rate": 0.37037037037037035,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5148514851485149,
+     "hidden_prereq_stopped_at_assessed_concept": 0.13392391870766024,
+     "gap_precision": 0.7510524301569078,
+     "gap_recall": 0.8553061669208978,
+     "gap_f1": 0.7997962302598065,
+     "known_concept_recommended": 0.29886363636363633
+    },
+    "+ first-tag credit": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.5318922749822821,
+     "recommendation_is_unmastered": 0.7736289381563594,
+     "missed_gap_rate": 0.08894401133947555,
+     "false_alarm_rate": 0.2866666666666667,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5310057321521626,
+     "hidden_prereq_stopped_at_assessed_concept": 0.16883793642522146,
+     "gap_precision": 0.7718536887786733,
+     "gap_recall": 0.8139028110699499,
+     "gap_f1": 0.7923207467119219,
+     "known_concept_recommended": 0.22637106184364064
+    },
+    "+ question difficulty": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.5244507441530829,
+     "recommendation_is_unmastered": 0.7762951334379906,
+     "missed_gap_rate": 0.09709425939050319,
+     "false_alarm_rate": 0.2837037037037037,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5205836373110996,
+     "hidden_prereq_stopped_at_assessed_concept": 0.1709223553934341,
+     "gap_precision": 0.7766359060402684,
+     "gap_recall": 0.8069296142950534,
+     "gap_f1": 0.7914929998931282,
+     "known_concept_recommended": 0.22370486656200939
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.5687455705173635,
+     "recommendation_is_unmastered": 0.7589051368578927,
+     "missed_gap_rate": 0.05492558469170801,
+     "false_alarm_rate": 0.3214814814814815,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5893694632621157,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11829077644606566,
+     "gap_precision": 0.7637707948243992,
+     "gap_recall": 0.9004140335585095,
+     "gap_f1": 0.8264826482648265,
+     "known_concept_recommended": 0.24109486314210726
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.5687455705173635,
+     "recommendation_is_unmastered": 0.7589051368578927,
+     "missed_gap_rate": 0.05492558469170801,
+     "false_alarm_rate": 0.3214814814814815,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5893694632621157,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11829077644606566,
+     "gap_precision": 0.7637707948243992,
+     "gap_recall": 0.9004140335585095,
+     "gap_f1": 0.8264826482648265,
+     "known_concept_recommended": 0.24109486314210726
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.2681409077090851,
+    "first_tag": 0.19114507503035916
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.4828953522307601,
+     "p_learn": 0.15292693555059175,
+     "p_slip": 0.13323716341857217,
+     "p_guess": 0.2498896407606152
+    },
+    "quantities": {
+     "p_init": 0.166000597114546,
+     "p_learn": 0.22876091220629174,
+     "p_slip": 0.18960519800841724,
+     "p_guess": 0.15795204123927983
+    },
+    "ohm": {
+     "p_init": 0.027995649495305742,
+     "p_learn": 0.1711614100640239,
+     "p_slip": 0.27349306473938567,
+     "p_guess": 0.243675869626815
+    },
+    "symbols": {
+     "p_init": 0.08368005266413554,
+     "p_learn": 0.1560604758377093,
+     "p_slip": 0.12921142411900838,
+     "p_guess": 0.22158428524341325
+    },
+    "wiring": {
+     "p_init": 0.09093547040931728,
+     "p_learn": 0.16981136195918117,
+     "p_slip": 0.12148837093298509,
+     "p_guess": 0.25234869941114574
+    },
+    "multimeter": {
+     "p_init": 0.08745233812816627,
+     "p_learn": 0.11825254540803716,
+     "p_slip": 0.16666534202176278,
+     "p_guess": 0.24033852979876036
+    },
+    "series_parallel": {
+     "p_init": 0.029828201688165315,
+     "p_learn": 0.17485880853533922,
+     "p_slip": 0.3,
+     "p_guess": 0.23249261259412626
+    },
+    "diagrams": {
+     "p_init": 0.029515166668508893,
+     "p_learn": 0.06484271232919886,
+     "p_slip": 0.17988192303720096,
+     "p_guess": 0.2970681969086651
+    },
+    "earthing": {
+     "p_init": 0.05298324345624597,
+     "p_learn": 0.1721661284740442,
+     "p_slip": 0.11786826402625918,
+     "p_guess": 0.2263994125745121
+    },
+    "fault": {
+     "p_init": 0.01,
+     "p_learn": 0.18174215636717617,
+     "p_slip": 0.3,
+     "p_guess": 0.254612216754096
+    }
+   }
+  },
+  {
+   "sim": "barabari",
+   "seed": 4,
+   "prediction": {
+    "Baseline: BKT, fitted": {
+     "n": 35443,
+     "auc": 0.6695878302095593,
+     "accuracy": 0.6331856784132269,
+     "log_loss": 0.6396390295213369,
+     "rmse": 0.47317272688050793
+    },
+    "+ first-tag credit": {
+     "n": 35443,
+     "auc": 0.6806684410103742,
+     "accuracy": 0.6474339079649014,
+     "log_loss": 0.6280053616310628,
+     "rmse": 0.46771351360167057
+    },
+    "+ question difficulty": {
+     "n": 35443,
+     "auc": 0.6997864880260061,
+     "accuracy": 0.6556442739045791,
+     "log_loss": 0.6168269515150523,
+     "rmse": 0.46249563017933965
+    },
+    "Improved: + prerequisite-aware learning": {
+     "n": 35443,
+     "auc": 0.7013544196174859,
+     "accuracy": 0.6533024856812346,
+     "log_loss": 0.616113019753786,
+     "rmse": 0.46215211150342983
+    },
+    "Reference: per-question accuracy": {
+     "n": 35443,
+     "auc": 0.6325937261302808,
+     "accuracy": 0.6127020850379482,
+     "log_loss": 0.6528537252327209,
+     "rmse": 0.4801165939723068
+    }
+   },
+   "diagnosis": {
+    "Baseline: BKT + prerequisite walk": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.49893162393162394,
+     "recommendation_is_unmastered": 0.5959480122324159,
+     "missed_gap_rate": 0.06837606837606838,
+     "false_alarm_rate": 0.4004329004329004,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.5233644859813084,
+     "hidden_prereq_stopped_at_assessed_concept": 0.05970924195223261,
+     "gap_precision": 0.729479340374282,
+     "gap_recall": 0.8743060182100821,
+     "gap_f1": 0.7953535353535354,
+     "known_concept_recommended": 0.4040519877675841
+    },
+    "+ first-tag credit": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.5505698005698005,
+     "recommendation_is_unmastered": 0.7632202052091555,
+     "missed_gap_rate": 0.09757834757834757,
+     "false_alarm_rate": 0.3008658008658009,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.5680166147455867,
+     "hidden_prereq_stopped_at_assessed_concept": 0.14953271028037382,
+     "gap_precision": 0.7637051039697542,
+     "gap_recall": 0.8074616922051966,
+     "gap_f1": 0.7849740932642487,
+     "known_concept_recommended": 0.23677979479084454
+    },
+    "+ question difficulty": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.5498575498575499,
+     "recommendation_is_unmastered": 0.7727993655828708,
+     "missed_gap_rate": 0.10185185185185185,
+     "false_alarm_rate": 0.2994227994227994,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.5654205607476636,
+     "hidden_prereq_stopped_at_assessed_concept": 0.152128764278297,
+     "gap_precision": 0.7652173913043478,
+     "gap_recall": 0.8012436153675327,
+     "gap_f1": 0.782816229116945,
+     "known_concept_recommended": 0.22720063441712923
+    },
+    "+ prerequisite-aware learning": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.5819088319088319,
+     "recommendation_is_unmastered": 0.7465264739016148,
+     "missed_gap_rate": 0.05163817663817664,
+     "false_alarm_rate": 0.34054834054834054,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.622533748701973,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09657320872274143,
+     "gap_precision": 0.7543207582233785,
+     "gap_recall": 0.9013990672884743,
+     "gap_f1": 0.8213273978146498,
+     "known_concept_recommended": 0.25347352609838525
+    },
+    "Improved: + more evidence before a lesson": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.5819088319088319,
+     "recommendation_is_unmastered": 0.7470875610672679,
+     "missed_gap_rate": 0.05235042735042735,
+     "false_alarm_rate": 0.3217893217893218,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.622533748701973,
+     "hidden_prereq_stopped_at_assessed_concept": 0.09657320872274143,
+     "gap_precision": 0.7543207582233785,
+     "gap_recall": 0.9013990672884743,
+     "gap_f1": 0.8213273978146498,
+     "known_concept_recommended": 0.2529124389327321
+    }
+   },
+   "mean_slip": {
+    "all_tags": 0.28931012741034473,
+    "first_tag": 0.20476421422418944
+   },
+   "params_first_tag": {
+    "safety": {
+     "p_init": 0.5048395991680779,
+     "p_learn": 0.1596537838387363,
+     "p_slip": 0.11247866765305627,
+     "p_guess": 0.2627008656070015
+    },
+    "quantities": {
+     "p_init": 0.15336004351284327,
+     "p_learn": 0.1979828791832632,
+     "p_slip": 0.11583144354733559,
+     "p_guess": 0.21963578636071743
+    },
+    "ohm": {
+     "p_init": 0.08374958228506708,
+     "p_learn": 0.1751034894401086,
+     "p_slip": 0.2739841361385955,
+     "p_guess": 0.20841518256427144
+    },
+    "symbols": {
+     "p_init": 0.09703332449716505,
+     "p_learn": 0.16399234497132414,
+     "p_slip": 0.16436430057073953,
+     "p_guess": 0.20986143092571455
+    },
+    "wiring": {
+     "p_init": 0.082318961243073,
+     "p_learn": 0.14834175863724933,
+     "p_slip": 0.1049065093692887,
+     "p_guess": 0.24690179796109812
+    },
+    "multimeter": {
+     "p_init": 0.11059300560907664,
+     "p_learn": 0.11315449975893983,
+     "p_slip": 0.16251423863523773,
+     "p_guess": 0.26021416349587023
+    },
+    "series_parallel": {
+     "p_init": 0.0683243329711245,
+     "p_learn": 0.17053537294965704,
+     "p_slip": 0.3,
+     "p_guess": 0.2097739465321956
+    },
+    "diagrams": {
+     "p_init": 0.010984620305285736,
+     "p_learn": 0.06310284397731866,
+     "p_slip": 0.2135628463276411,
+     "p_guess": 0.24343473014428127
+    },
+    "earthing": {
+     "p_init": 0.07682389798818894,
+     "p_learn": 0.2082553824651878,
+     "p_slip": 0.3,
+     "p_guess": 0.16929341453927338
+    },
+    "fault": {
+     "p_init": 0.0237909152504822,
+     "p_learn": 0.17180900550708866,
+     "p_slip": 0.3,
+     "p_guess": 0.21689087181885697
+    }
+   }
+  }
+ ]
+}

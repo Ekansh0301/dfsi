@@ -62,17 +62,43 @@ def guess_for(params: BKTParams, question_type: str = "multiple_choice") -> floa
     return TYPE_GUESS.get(question_type, params.p_guess)
 
 
+def _logit(x: float) -> float:
+    x = min(1 - 1e-6, max(1e-6, x))
+    return float(np.log(x / (1 - x)))
+
+
+def _sigmoid(x: float) -> float:
+    return float(1 / (1 + np.exp(-x)))
+
+
+def slip_guess(params: BKTParams, question_type: str = "multiple_choice", difficulty: float = 0.0) -> tuple[float, float]:
+    """Slip and guess for one question (PLAN S3-3).
+
+    `difficulty` is a shift on the logit scale estimated per question: a harder question
+    (positive) is slipped on more and guessed less. True/false and short-answer guess rates are
+    fixed by the question type, so only their slip moves.
+    """
+    slip, guess = params.p_slip, guess_for(params, question_type)
+    if difficulty:
+        slip = _sigmoid(_logit(slip) + difficulty)
+        if question_type not in TYPE_GUESS:
+            guess = _sigmoid(_logit(guess) - difficulty)
+    return slip, guess
+
+
 def retake_weight(attempt: int) -> float:
     """How much an answer on attempt `attempt` (1 = first try) counts."""
     return RETAKE_DECAY ** (max(attempt, 1) - 1)
 
 
-def posterior(p: float, correct: bool, params: BKTParams, unsure: bool = False, guess: float | None = None) -> float:
+def posterior(
+    p: float, correct: bool, params: BKTParams, unsure: bool = False, guess: float | None = None, slip: float | None = None
+) -> float:
     """P(mastered | this answer), before applying the learning step."""
     guess = params.p_guess if guess is None else guess
     if unsure:
         guess = min(guess, UNSURE_GUESS)
-    s = params.p_slip
+    s = params.p_slip if slip is None else slip
     if correct:
         num = p * (1 - s)
         return num / (num + (1 - p) * guess)
@@ -89,6 +115,7 @@ def evidence(
     score: float | None = None,
     question_type: str = "multiple_choice",
     attempt: int = 1,
+    difficulty: float = 0.0,
 ) -> float:
     """P(mastered | this answer) for any of Barabari's answer kinds, before learning.
 
@@ -96,12 +123,12 @@ def evidence(
     posterior is the score-weighted mix of the right-answer and wrong-answer posteriors. It
     replaces `correct` when given. A retake moves the estimate only part of the way.
     """
-    g = guess_for(params, question_type)
+    sl, g = slip_guess(params, question_type, difficulty)
     if score is None:
-        post = posterior(p, correct, params, unsure, g)
+        post = posterior(p, correct, params, unsure, g, sl)
     else:
         s = min(1.0, max(0.0, score))
-        post = s * posterior(p, True, params, False, g) + (1 - s) * posterior(p, False, params, False, g)
+        post = s * posterior(p, True, params, False, g, sl) + (1 - s) * posterior(p, False, params, False, g, sl)
     return p + retake_weight(attempt) * (post - p)
 
 
@@ -114,10 +141,17 @@ def update(
     score: float | None = None,
     question_type: str = "multiple_choice",
     attempt: int = 1,
+    difficulty: float = 0.0,
+    learn: float | None = None,
 ) -> float:
-    """One full BKT step: condition on the answer, then apply the learning transition."""
-    post = evidence(p, correct, params, unsure, score=score, question_type=question_type, attempt=attempt)
-    return _clamp(post + (1 - post) * params.p_learn)
+    """One full BKT step: condition on the answer, then apply the learning transition.
+
+    `learn` replaces the concept's learning rate for this step (the prerequisite-aware model
+    slows learning while a prerequisite looks unmastered).
+    """
+    post = evidence(p, correct, params, unsure, score=score, question_type=question_type, attempt=attempt, difficulty=difficulty)
+    rate = params.p_learn if learn is None else learn
+    return _clamp(post + (1 - post) * rate)
 
 
 def learn_step(p: float, params: BKTParams) -> float:
@@ -125,8 +159,9 @@ def learn_step(p: float, params: BKTParams) -> float:
     return _clamp(p + (1 - p) * params.p_learn)
 
 
-def predict_correct(p_mastered: float, params: BKTParams, question_type: str = "multiple_choice") -> float:
-    return p_mastered * (1 - params.p_slip) + (1 - p_mastered) * guess_for(params, question_type)
+def predict_correct(p_mastered: float, params: BKTParams, question_type: str = "multiple_choice", difficulty: float = 0.0) -> float:
+    slip, guess = slip_guess(params, question_type, difficulty)
+    return p_mastered * (1 - slip) + (1 - p_mastered) * guess
 
 
 # --------------------------------------------------------------------------------------
