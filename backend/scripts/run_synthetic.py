@@ -1,10 +1,12 @@
 """Baseline evaluation on made-up learners with known hidden mastery.
 
-    python scripts/run_synthetic.py [--learners 3000] [--seeds 5]
+    python scripts/run_synthetic.py [--learners 3000] [--seeds 5] [--sim sprint2|barabari]
 
-Writes results/synthetic_results.json and results/synthetic_results.md, and saves the
-fitted BKT parameters to circuit_coach/fitted_params.json (fitted on the first seed's
-training split) so the API uses them.
+`--sim sprint2` (the default) is the Sprint 2 simulator: it writes results/synthetic_results.json
+and .md and saves the fitted BKT parameters to circuit_coach/fitted_params.json (fitted on the
+first seed's training split) so the API uses them. `--sim barabari` adds Barabari's quiz format
+(true/false, short answers, points, difficulty, retakes) and writes
+results/synthetic_barabari_results.json and .md without touching the service's parameters.
 """
 
 from __future__ import annotations
@@ -19,17 +21,17 @@ import numpy as np
 from circuit_coach import bkt, prediction
 from circuit_coach.curriculum import CONCEPT_ORDER
 from circuit_coach.diagnosis_eval import evaluate_diagnosis
-from circuit_coach.simulate import concept_sequences, simulate
+from circuit_coach.simulate import SimConfig, simulate
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def to_seqs(learners):
-    return [[(r.item_id, r.concepts, int(r.correct), r.unsure) for r in lr.responses] for lr in learners]
+    return [[(r.item_id, r.concepts, int(r.correct), r.unsure, r.question_type, r.score, r.attempt) for r in lr.responses] for lr in learners]
 
 
-def run_seed(seed: int, n_learners: int) -> dict:
-    learners, _ = simulate(n_learners, seed)
+def run_seed(seed: int, n_learners: int, config: SimConfig | None = None) -> dict:
+    learners, _ = simulate(n_learners, seed, config)
     cut = int(0.7 * len(learners))
     train, test = learners[:cut], learners[cut:]
     train_seqs, test_seqs = to_seqs(train), to_seqs(test)
@@ -70,32 +72,37 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--learners", type=int, default=3000)
     ap.add_argument("--seeds", type=int, default=5)
+    ap.add_argument("--sim", choices=["sprint2", "barabari"], default="sprint2")
     args = ap.parse_args()
+    config = SimConfig.named(args.sim)
+    stem = "synthetic_results" if args.sim == "sprint2" else "synthetic_barabari_results"
 
     t0 = time.time()
     runs = []
     for seed in range(args.seeds):
-        runs.append(run_seed(seed, args.learners))
+        runs.append(run_seed(seed, args.learners, config))
         print(f"seed {seed} done ({time.time() - t0:.0f}s)", flush=True)
 
-    # fitted parameters from the first seed go to the service
+    # fitted parameters from the first seed of the Sprint 2 simulator go to the service
     params_file = ROOT / "circuit_coach" / "fitted_params.json"
-    params_file.write_text(
-        json.dumps(
-            {
-                "source": f"EM fit on {int(0.7 * args.learners)} made-up learners (seed 0). Placeholder until real learner data exists.",
-                "concepts": runs[0]["fitted_params"],
-            },
-            indent=2,
+    if args.sim == "sprint2":
+        params_file.write_text(
+            json.dumps(
+                {
+                    "source": f"EM fit on {int(0.7 * args.learners)} made-up learners (seed 0). Placeholder until real learner data exists.",
+                    "concepts": runs[0]["fitted_params"],
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf8",
         )
-        + "\n",
-        encoding="utf8",
-    )
 
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "synthetic_results.json").write_text(json.dumps(runs, indent=1) + "\n", encoding="utf8")
+    (ROOT / "results" / f"{stem}.json").write_text(json.dumps(runs, indent=1) + "\n", encoding="utf8")
 
-    lines = [f"# Baseline results on made-up learners", "", f"{args.seeds} runs, {args.learners} learners each (70% train, 30% test). Mean ± standard deviation across runs.", ""]
+    title = "Baseline results on made-up learners" if args.sim == "sprint2" else "Baseline results on made-up learners with Barabari's quiz format"
+    lines = [f"# {title}", "", f"{args.seeds} runs, {args.learners} learners each (70% train, 30% test). Mean ± standard deviation across runs.", ""]
     lines += ["## 1. Predicting the next answer", "", "| Method | AUC | Accuracy | Log loss | RMSE |", "|---|---|---|---|---|"]
     for name in runs[0]["ladder"]:
         row = [fmt(*mean_std(runs, ["ladder", name, k])) for k in ("auc", "accuracy", "log_loss", "rmse")]
@@ -115,7 +122,7 @@ def main() -> None:
     lines += ["", "## 3. Fitted parameters (seed 0)", "", "| Concept | p_init | p_learn | p_slip | p_guess |", "|---|---|---|---|---|"]
     for c, d in runs[0]["fitted_params"].items():
         lines.append(f"| {c} | {d['p_init']:.2f} | {d['p_learn']:.2f} | {d['p_slip']:.2f} | {d['p_guess']:.2f} |")
-    (ROOT / "results" / "synthetic_results.md").write_text("\n".join(lines) + "\n", encoding="utf8")
+    (ROOT / "results" / f"{stem}.md").write_text("\n".join(lines) + "\n", encoding="utf8")
     print("\n".join(lines))
     print(f"total {time.time() - t0:.0f}s")
 

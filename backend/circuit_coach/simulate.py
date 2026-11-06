@@ -17,11 +17,17 @@ Generative story (kept deliberately simple and written down so its limits are cl
   sometimes pick "I'm not sure" instead of guessing.
 * Learners take the modules in order, with some dropping out, and practise concepts they
   got wrong.
+
+`SimConfig` switches on the parts of Barabari's quiz format (PLAN S3-1): true/false and
+short-answer questions, points per question, per-question difficulty, and retakes of a failed
+quick check (pass mark 60%, answers revealed after 3 attempts, so a learner may then answer
+from memory). `SimConfig.sprint2()` turns them all off and draws exactly the same random
+numbers as the Sprint 2 simulator, so the earlier results stay reproducible.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 
@@ -38,11 +44,41 @@ P_MULTI_TAG = 0.3
 
 
 @dataclass(frozen=True)
+class SimConfig:
+    """Which parts of Barabari's quiz format the made-up learners follow."""
+
+    name: str = "barabari"
+    p_true_false: float = 0.2  # share of items that are true/false questions
+    p_short_answer: float = 0.1  # share of items that are instructor-marked short answers
+    difficulty_sd: float = 0.8  # spread of per-question difficulty on the logit scale (0 = off)
+    max_attempts: int = 4  # 1 = no retakes
+    p_retake: float = 0.8  # chance a learner retakes a failed quick check
+    pass_share: float = 0.6  # Barabari's default pass mark
+    reveal_after: int = 3  # correct answers shown after this many attempts
+    p_feedback_recall: float = 0.15  # right/wrong feedback helps a little on attempts 2 and 3
+    p_reveal_recall: float = 0.6  # after the reveal, a learner may simply remember the answer
+
+    @staticmethod
+    def sprint2() -> "SimConfig":
+        return SimConfig("sprint2", 0.0, 0.0, 0.0, 1, 0.0, 0.6, 3, 0.0, 0.0)
+
+    @staticmethod
+    def named(name: str) -> "SimConfig":
+        return {"sprint2": SimConfig.sprint2(), "barabari": SimConfig()}[name]
+
+    def with_(self, **kw) -> "SimConfig":
+        return replace(self, **kw)
+
+
+@dataclass(frozen=True)
 class Item:
     id: str
     concepts: tuple[str, ...]
     slip: float
     guess: float
+    question_type: str = "multiple_choice"
+    points: float = 1.0
+    difficulty: float = 0.0  # logit shift: positive = harder (more slips, fewer lucky guesses)
 
 
 @dataclass
@@ -52,6 +88,10 @@ class Response:
     correct: bool
     unsure: bool
     module: str
+    question_type: str = "multiple_choice"
+    score: float | None = None  # partial credit for a short answer
+    attempt: int = 1
+    points: float = 1.0
 
 
 @dataclass
@@ -72,7 +112,16 @@ class SimLearner:
     assess_points: list[AssessPoint] = field(default_factory=list)
 
 
-def make_item_bank(rng: np.random.Generator) -> dict[str, list[Item]]:
+def _logit(x: float) -> float:
+    return float(np.log(x / (1 - x)))
+
+
+def _sigmoid(x: float) -> float:
+    return float(1 / (1 + np.exp(-x)))
+
+
+def make_item_bank(rng: np.random.Generator, config: SimConfig | None = None) -> dict[str, list[Item]]:
+    config = config or SimConfig.sprint2()
     bank: dict[str, list[Item]] = {}
     for c in CONCEPT_ORDER:
         items = []
@@ -82,7 +131,16 @@ def make_item_bank(rng: np.random.Generator) -> dict[str, list[Item]]:
                 pool = prereqs(c) or [x for x in CONCEPT_ORDER if x != c and CONCEPTS[x]["col"] <= CONCEPTS[c]["col"]]
                 if pool:
                     tags = (c, str(rng.choice(pool)))
-            items.append(Item(f"s_{c}_{k}", tags, float(rng.uniform(0.04, 0.14)), float(rng.uniform(0.15, 0.30))))
+            slip, guess = float(rng.uniform(0.04, 0.14)), float(rng.uniform(0.15, 0.30))
+            item = Item(f"s_{c}_{k}", tags, slip, guess)
+            if config.name != "sprint2":  # extra draws only here, so Sprint 2 runs stay identical
+                u = float(rng.random())
+                qtype = "true_false" if u < config.p_true_false else "short_answer" if u < config.p_true_false + config.p_short_answer else "multiple_choice"
+                d = float(rng.normal(0.0, config.difficulty_sd)) if config.difficulty_sd > 0 else 0.0
+                slip = _sigmoid(_logit(slip) + d)
+                guess = {"true_false": 0.5, "short_answer": 0.05}.get(qtype, _sigmoid(_logit(guess) - d))
+                item = Item(item.id, tags, slip, guess, qtype, 20.0 if d > 0.5 else 10.0, d)
+            items.append(item)
         bank[c] = items
     return bank
 
@@ -100,7 +158,8 @@ def _learn(mastered: dict[str, bool], c: str, p: float, rng: np.random.Generator
         mastered[c] = True
 
 
-def simulate_learner(lid: int, bank: dict[str, list[Item]], rng: np.random.Generator) -> SimLearner:
+def simulate_learner(lid: int, bank: dict[str, list[Item]], rng: np.random.Generator, config: SimConfig | None = None) -> SimLearner:
+    config = config or SimConfig.sprint2()
     kinds = list(EXPERIENCE)
     experience = str(rng.choice(kinds, p=[EXPERIENCE[k][0] for k in kinds]))
     base = EXPERIENCE[experience][1]
@@ -118,20 +177,32 @@ def simulate_learner(lid: int, bank: dict[str, list[Item]], rng: np.random.Gener
     learner = SimLearner(lid, experience)
     seen: set[str] = set()
 
-    def ask(item: Item, module: str) -> bool:
+    def recall(attempt: int) -> float:
+        if attempt <= 1:
+            return 0.0
+        return config.p_reveal_recall if attempt > config.reveal_after else config.p_feedback_recall
+
+    def ask(item: Item, module: str, attempt: int = 1) -> float:
+        """Answer one item; returns the share of its points earned."""
         knows = all(mastered[c] for c in item.concepts)
-        unsure = False
-        if knows:
+        unsure, score = False, None
+        if item.question_type == "short_answer":
+            mean = 0.85 if knows else 0.2
+            score = round(min(1.0, max(0.0, float(rng.normal(mean, 0.15)))) * 4) / 4  # marked in quarters
+            correct = score >= 0.5
+        elif knows:
             correct = bool(rng.random() < 1 - item.slip)
+        elif attempt > 1 and rng.random() < recall(attempt):
+            correct = True  # remembered from feedback or the revealed answer, not mastery
         elif rng.random() < P_UNSURE_WHEN_UNKNOWN:
             correct, unsure = False, True
         else:
             correct = bool(rng.random() < item.guess)
-        learner.responses.append(Response(item.id, item.concepts, correct, unsure, module))
+        learner.responses.append(Response(item.id, item.concepts, correct, unsure, module, item.question_type, score, attempt, item.points))
         seen.add(item.id)
         for c in item.concepts:
             _learn(mastered, c, P_LEARN * speed, rng)
-        return correct
+        return score if score is not None else float(correct)
 
     def pick(concepts: list[str], k: int) -> list[Item]:
         out: list[Item] = []
@@ -146,10 +217,20 @@ def simulate_learner(lid: int, bank: dict[str, list[Item]], rng: np.random.Gener
         return out
 
     for mid, m in MODULES.items():
-        got_wrong: set[str] = set()
-        for item in pick(m["concepts"], QUIZ_LENGTH[mid]):
-            if not ask(item, mid):
-                got_wrong.update(item.concepts)
+        quiz = pick(m["concepts"], QUIZ_LENGTH[mid])
+        total = sum(i.points for i in quiz)
+        for attempt in range(1, config.max_attempts + 1):
+            got_wrong: set[str] = set()
+            earned = 0.0
+            for item in quiz:
+                got = ask(item, mid, attempt)
+                earned += got * item.points
+                if got < 0.5:
+                    got_wrong.update(item.concepts)
+            if earned / total >= config.pass_share or attempt == config.max_attempts:
+                break
+            if rng.random() > config.p_retake:
+                break
         learner.assess_points.append(
             AssessPoint(mid, len(learner.responses), list(m["concepts"]), dict(mastered))
         )
@@ -163,10 +244,12 @@ def simulate_learner(lid: int, bank: dict[str, list[Item]], rng: np.random.Gener
     return learner
 
 
-def simulate(n_learners: int, seed: int = 0) -> tuple[list[SimLearner], dict[str, list[Item]]]:
+def simulate(n_learners: int, seed: int = 0, config: SimConfig | None = None) -> tuple[list[SimLearner], dict[str, list[Item]]]:
+    """Made-up learners. Without `config` this is the Sprint 2 simulator, unchanged."""
+    config = config or SimConfig.sprint2()
     rng = np.random.default_rng(seed)
-    bank = make_item_bank(rng)
-    return [simulate_learner(i, bank, rng) for i in range(n_learners)], bank
+    bank = make_item_bank(rng, config)
+    return [simulate_learner(i, bank, rng, config) for i in range(n_learners)], bank
 
 
 def concept_sequences(learners: list[SimLearner], concept: str) -> list[np.ndarray]:

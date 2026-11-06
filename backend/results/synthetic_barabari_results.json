@@ -1,0 +1,1032 @@
+[
+ {
+  "seed": 0,
+  "ladder": {
+   "Global average": {
+    "n": 35709,
+    "auc": 0.5,
+    "accuracy": 0.5843904897924893,
+    "log_loss": 0.6791794393900284,
+    "rmse": 0.4929973399133255
+   },
+   "Per-question accuracy": {
+    "n": 35709,
+    "auc": 0.6311832473610082,
+    "accuracy": 0.6158951524825674,
+    "log_loss": 0.6523006865392451,
+    "rmse": 0.47978401856643976
+   },
+   "Learner's running accuracy": {
+    "n": 35709,
+    "auc": 0.5728408837336879,
+    "accuracy": 0.6124226385505055,
+    "log_loss": 0.693621713410625,
+    "rmse": 0.49596919703850695
+   },
+   "BKT (hand-set parameters)": {
+    "n": 35709,
+    "auc": 0.6646467006211145,
+    "accuracy": 0.6495001260186508,
+    "log_loss": 0.6325243722668877,
+    "rmse": 0.46994016089260177
+   },
+   "BKT (fitted)": {
+    "n": 35709,
+    "auc": 0.6747326901240298,
+    "accuracy": 0.637906410148702,
+    "log_loss": 0.6364492670009745,
+    "rmse": 0.4717148775240533
+   }
+  },
+  "diagnosis": {
+   "fitted": {
+    "Study what you got wrong (status quo)": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.3364120781527531,
+     "recommendation_is_unmastered": 0.9219088937093276,
+     "missed_gap_rate": 0.017406749555950268,
+     "false_alarm_rate": 0.6391901663051338,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.07307898979043526,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9344438473938743,
+     "gap_precision": 0.6686814060760299,
+     "gap_recall": 0.9386023665996874,
+     "gap_f1": 0.7809771502879435
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.30088809946714035,
+     "recommendation_is_unmastered": 0.9319650323071076,
+     "missed_gap_rate": 0.06536412078152753,
+     "false_alarm_rate": 0.4020245842371656,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.047286405158516925,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9097259537882859,
+     "gap_precision": 0.7234631714971387,
+     "gap_recall": 0.8749720919848181,
+     "gap_f1": 0.792037186742118
+    },
+    "BKT + prerequisite walk": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.42984014209591476,
+     "recommendation_is_unmastered": 0.5043709616115546,
+     "missed_gap_rate": 0.06536412078152753,
+     "false_alarm_rate": 0.4020245842371656,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.4567436861902203,
+     "hidden_prereq_stopped_at_assessed_concept": 0.05910800644814616,
+     "gap_precision": 0.7234631714971387,
+     "gap_recall": 0.8749720919848181,
+     "gap_f1": 0.792037186742118
+    },
+    "_mastery_estimates": {
+     "n": 7637,
+     "auc": 0.7849994789561193,
+     "brier": 0.18312917336646864,
+     "mean_abs_error": 0.37330602069467667,
+     "share_truly_mastered": 0.4135131596176509
+    }
+   },
+   "hand_set": {
+    "Study what you got wrong (status quo)": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.3364120781527531,
+     "recommendation_is_unmastered": 0.9219088937093276,
+     "missed_gap_rate": 0.017406749555950268,
+     "false_alarm_rate": 0.6391901663051338,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.07307898979043526,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9344438473938743,
+     "gap_precision": 0.6686814060760299,
+     "gap_recall": 0.9386023665996874,
+     "gap_f1": 0.7809771502879435
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.3094138543516874,
+     "recommendation_is_unmastered": 0.9452371770150405,
+     "missed_gap_rate": 0.07886323268206039,
+     "false_alarm_rate": 0.2942877801879971,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.07522837184309511,
+     "hidden_prereq_stopped_at_assessed_concept": 0.92423428264374,
+     "gap_precision": 0.780638516992791,
+     "gap_recall": 0.8461710203170351,
+     "gap_f1": 0.8120848510820655
+    },
+    "BKT + prerequisite walk": {
+     "points": 4198,
+     "with_true_gap": 2815,
+     "recommendation_is_true_blocker": 0.45612788632326823,
+     "recommendation_is_unmastered": 0.5796374855379869,
+     "missed_gap_rate": 0.07886323268206039,
+     "false_alarm_rate": 0.2942877801879971,
+     "hidden_prereq_cases": 1861,
+     "hidden_prereq_blocker_hit": 0.4696399785061795,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11015583019881783,
+     "gap_precision": 0.780638516992791,
+     "gap_recall": 0.8461710203170351,
+     "gap_f1": 0.8120848510820655
+    },
+    "_mastery_estimates": {
+     "n": 7637,
+     "auc": 0.8335992990157007,
+     "brier": 0.17177820248451006,
+     "mean_abs_error": 0.3565093386347291,
+     "share_truly_mastered": 0.4135131596176509
+    }
+   }
+  },
+  "fitted_params": {
+   "safety": {
+    "p_init": 0.6014543285332083,
+    "p_learn": 0.011209529170204964,
+    "p_slip": 0.3,
+    "p_guess": 0.35
+   },
+   "quantities": {
+    "p_init": 0.15689460750337014,
+    "p_learn": 0.08754576346405929,
+    "p_slip": 0.3,
+    "p_guess": 0.29963588165135224
+   },
+   "ohm": {
+    "p_init": 0.0598027872623316,
+    "p_learn": 0.1294427582688216,
+    "p_slip": 0.3,
+    "p_guess": 0.2801845557951036
+   },
+   "symbols": {
+    "p_init": 0.04511276308557678,
+    "p_learn": 0.17574088779591376,
+    "p_slip": 0.1548631508210132,
+    "p_guess": 0.25703012895352667
+   },
+   "wiring": {
+    "p_init": 0.06060875463100357,
+    "p_learn": 0.10405825241999565,
+    "p_slip": 0.3,
+    "p_guess": 0.2566420500627258
+   },
+   "multimeter": {
+    "p_init": 0.12316884513574466,
+    "p_learn": 0.1331677627557321,
+    "p_slip": 0.3,
+    "p_guess": 0.19921679843680418
+   },
+   "series_parallel": {
+    "p_init": 0.045310211123049754,
+    "p_learn": 0.1300219395538595,
+    "p_slip": 0.3,
+    "p_guess": 0.237771621120804
+   },
+   "diagrams": {
+    "p_init": 0.04284263176072988,
+    "p_learn": 0.0665540174545846,
+    "p_slip": 0.3,
+    "p_guess": 0.21936156164374548
+   },
+   "earthing": {
+    "p_init": 0.05569533334475235,
+    "p_learn": 0.20455196450097923,
+    "p_slip": 0.2642596426272875,
+    "p_guess": 0.19193512693219655
+   },
+   "fault": {
+    "p_init": 0.01,
+    "p_learn": 0.1461200044509702,
+    "p_slip": 0.3,
+    "p_guess": 0.19347673978116808
+   }
+  }
+ },
+ {
+  "seed": 1,
+  "ladder": {
+   "Global average": {
+    "n": 37277,
+    "auc": 0.5,
+    "accuracy": 0.5823966520911017,
+    "log_loss": 0.6798159455875966,
+    "rmse": 0.4933173813085622
+   },
+   "Per-question accuracy": {
+    "n": 37277,
+    "auc": 0.6316299520679353,
+    "accuracy": 0.6139710813638437,
+    "log_loss": 0.653024587802155,
+    "rmse": 0.4801549095093938
+   },
+   "Learner's running accuracy": {
+    "n": 37277,
+    "auc": 0.5777049529918623,
+    "accuracy": 0.6141588647155082,
+    "log_loss": 0.6913986283004221,
+    "rmse": 0.4952229354860982
+   },
+   "BKT (hand-set parameters)": {
+    "n": 37277,
+    "auc": 0.6720608740270323,
+    "accuracy": 0.6473428655739464,
+    "log_loss": 0.6312436670557544,
+    "rmse": 0.4692429077573368
+   },
+   "BKT (fitted)": {
+    "n": 37277,
+    "auc": 0.6763838452629113,
+    "accuracy": 0.6387316575904713,
+    "log_loss": 0.6357781557785375,
+    "rmse": 0.47093276670729445
+   }
+  },
+  "diagnosis": {
+   "fitted": {
+    "Study what you got wrong (status quo)": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.3271157167530225,
+     "recommendation_is_unmastered": 0.9106577558916638,
+     "missed_gap_rate": 0.017962003454231434,
+     "false_alarm_rate": 0.6628895184135978,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.07767995857068877,
+     "hidden_prereq_stopped_at_assessed_concept": 0.928016571724495,
+     "gap_precision": 0.6660508083140878,
+     "gap_recall": 0.926338329764454,
+     "gap_f1": 0.7749216300940439
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.290846286701209,
+     "recommendation_is_unmastered": 0.9274193548387096,
+     "missed_gap_rate": 0.05768566493955095,
+     "false_alarm_rate": 0.39589235127478756,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.04194717762817193,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9161056447436562,
+     "gap_precision": 0.7400768245838668,
+     "gap_recall": 0.8663811563169165,
+     "gap_f1": 0.7982637861300187
+    },
+    "BKT + prerequisite walk": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.44905008635578586,
+     "recommendation_is_unmastered": 0.5414222873900293,
+     "missed_gap_rate": 0.05768566493955095,
+     "false_alarm_rate": 0.39589235127478756,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.45882962195753496,
+     "hidden_prereq_stopped_at_assessed_concept": 0.07198342827550493,
+     "gap_precision": 0.7400768245838668,
+     "gap_recall": 0.8663811563169165,
+     "gap_f1": 0.7982637861300187
+    },
+    "_mastery_estimates": {
+     "n": 7846,
+     "auc": 0.7882970647090869,
+     "brier": 0.18250339793966597,
+     "mean_abs_error": 0.37254361438681083,
+     "share_truly_mastered": 0.4047922508284476
+    }
+   },
+   "hand_set": {
+    "Study what you got wrong (status quo)": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.3271157167530225,
+     "recommendation_is_unmastered": 0.9106577558916638,
+     "missed_gap_rate": 0.017962003454231434,
+     "false_alarm_rate": 0.6628895184135978,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.07767995857068877,
+     "hidden_prereq_stopped_at_assessed_concept": 0.928016571724495,
+     "gap_precision": 0.6660508083140878,
+     "gap_recall": 0.926338329764454,
+     "gap_f1": 0.7749216300940439
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.30397236614853196,
+     "recommendation_is_unmastered": 0.9328582145536384,
+     "missed_gap_rate": 0.07910189982728842,
+     "false_alarm_rate": 0.29107648725212465,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.08234075608493009,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9145520455722423,
+     "gap_precision": 0.7797356828193832,
+     "gap_recall": 0.8338329764453961,
+     "gap_f1": 0.8058774834437086
+    },
+    "BKT + prerequisite walk": {
+     "points": 4307,
+     "with_true_gap": 2895,
+     "recommendation_is_true_blocker": 0.43419689119170984,
+     "recommendation_is_unmastered": 0.5570142535633908,
+     "missed_gap_rate": 0.07910189982728842,
+     "false_alarm_rate": 0.29107648725212465,
+     "hidden_prereq_cases": 1931,
+     "hidden_prereq_blocker_hit": 0.4438114966338685,
+     "hidden_prereq_stopped_at_assessed_concept": 0.1046090108751942,
+     "gap_precision": 0.7797356828193832,
+     "gap_recall": 0.8338329764453961,
+     "gap_f1": 0.8058774834437086
+    },
+    "_mastery_estimates": {
+     "n": 7846,
+     "auc": 0.8198125731530375,
+     "brier": 0.18018757448621153,
+     "mean_abs_error": 0.3680329923937486,
+     "share_truly_mastered": 0.4047922508284476
+    }
+   }
+  },
+  "fitted_params": {
+   "safety": {
+    "p_init": 0.5953336104034646,
+    "p_learn": 0.01796491690534956,
+    "p_slip": 0.3,
+    "p_guess": 0.35
+   },
+   "quantities": {
+    "p_init": 0.17590926641121926,
+    "p_learn": 0.10243832973142476,
+    "p_slip": 0.3,
+    "p_guess": 0.2720424350800029
+   },
+   "ohm": {
+    "p_init": 0.07416436256536396,
+    "p_learn": 0.05812539819710435,
+    "p_slip": 0.3,
+    "p_guess": 0.2725937046161496
+   },
+   "symbols": {
+    "p_init": 0.11200790249610594,
+    "p_learn": 0.12084801204397326,
+    "p_slip": 0.3,
+    "p_guess": 0.2874170202968207
+   },
+   "wiring": {
+    "p_init": 0.11692264220938296,
+    "p_learn": 0.12474522900241353,
+    "p_slip": 0.3,
+    "p_guess": 0.229435529768269
+   },
+   "multimeter": {
+    "p_init": 0.10588219133225549,
+    "p_learn": 0.11724672492516271,
+    "p_slip": 0.13391254030908556,
+    "p_guess": 0.21981871973158337
+   },
+   "series_parallel": {
+    "p_init": 0.06635056808225909,
+    "p_learn": 0.17389204241119688,
+    "p_slip": 0.3,
+    "p_guess": 0.16250505154133202
+   },
+   "diagrams": {
+    "p_init": 0.028732098925408945,
+    "p_learn": 0.06817907818330571,
+    "p_slip": 0.255581467158083,
+    "p_guess": 0.2522296564492768
+   },
+   "earthing": {
+    "p_init": 0.04545488998731255,
+    "p_learn": 0.16104403719807142,
+    "p_slip": 0.21585524605749526,
+    "p_guess": 0.18003928940923414
+   },
+   "fault": {
+    "p_init": 0.02149111418556599,
+    "p_learn": 0.18725690335386677,
+    "p_slip": 0.2736897546302724,
+    "p_guess": 0.23955358159627024
+   }
+  }
+ },
+ {
+  "seed": 2,
+  "ladder": {
+   "Global average": {
+    "n": 35763,
+    "auc": 0.5,
+    "accuracy": 0.5750356513715292,
+    "log_loss": 0.6825111762330593,
+    "rmse": 0.4946695953712438
+   },
+   "Per-question accuracy": {
+    "n": 35763,
+    "auc": 0.6287016280150236,
+    "accuracy": 0.6123647345021391,
+    "log_loss": 0.6567635671908019,
+    "rmse": 0.48196128949973
+   },
+   "Learner's running accuracy": {
+    "n": 35763,
+    "auc": 0.5770892682431918,
+    "accuracy": 0.6064368201772782,
+    "log_loss": 0.6924488352171798,
+    "rmse": 0.49637397464309474
+   },
+   "BKT (hand-set parameters)": {
+    "n": 35763,
+    "auc": 0.6643543334796475,
+    "accuracy": 0.6408858317255264,
+    "log_loss": 0.6380543548322505,
+    "rmse": 0.47251458770343385
+   },
+   "BKT (fitted)": {
+    "n": 35763,
+    "auc": 0.6768456455826929,
+    "accuracy": 0.6363000866817661,
+    "log_loss": 0.6376696793364806,
+    "rmse": 0.4720633172775345
+   }
+  },
+  "diagnosis": {
+   "fitted": {
+    "Study what you got wrong (status quo)": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.34829505915100906,
+     "recommendation_is_unmastered": 0.9117959617428267,
+     "missed_gap_rate": 0.017745302713987474,
+     "false_alarm_rate": 0.6350746268656716,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.07532751091703056,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9339519650655022,
+     "gap_precision": 0.666877071169323,
+     "gap_recall": 0.9326859412933127,
+     "gap_f1": 0.7776959882223041
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.3180236604036186,
+     "recommendation_is_unmastered": 0.9266294227188082,
+     "missed_gap_rate": 0.06576200417536535,
+     "false_alarm_rate": 0.34253731343283583,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.056222707423580785,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9153930131004366,
+     "gap_precision": 0.7369305451829724,
+     "gap_recall": 0.8711101302140808,
+     "gap_f1": 0.7984221705269545
+    },
+    "BKT + prerequisite walk": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.46102992345163535,
+     "recommendation_is_unmastered": 0.5635009310986965,
+     "missed_gap_rate": 0.06576200417536535,
+     "false_alarm_rate": 0.34253731343283583,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.4978165938864629,
+     "hidden_prereq_stopped_at_assessed_concept": 0.060589519650655024,
+     "gap_precision": 0.7369305451829724,
+     "gap_recall": 0.8711101302140808,
+     "gap_f1": 0.7984221705269545
+    },
+    "_mastery_estimates": {
+     "n": 7664,
+     "auc": 0.7938031321344614,
+     "brier": 0.1809033282180815,
+     "mean_abs_error": 0.3705181321102833,
+     "share_truly_mastered": 0.408794363256785
+    }
+   },
+   "hand_set": {
+    "Study what you got wrong (status quo)": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.34829505915100906,
+     "recommendation_is_unmastered": 0.9117959617428267,
+     "missed_gap_rate": 0.017745302713987474,
+     "false_alarm_rate": 0.6350746268656716,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.07532751091703056,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9339519650655022,
+     "gap_precision": 0.666877071169323,
+     "gap_recall": 0.9326859412933127,
+     "gap_f1": 0.7776959882223041
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.336812804453723,
+     "recommendation_is_unmastered": 0.9270597127739985,
+     "missed_gap_rate": 0.07933194154488518,
+     "false_alarm_rate": 0.2753731343283582,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.09606986899563319,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9066593886462883,
+     "gap_precision": 0.7784628031237156,
+     "gap_recall": 0.8360185389538733,
+     "gap_f1": 0.8062147493881026
+    },
+    "BKT + prerequisite walk": {
+     "points": 4214,
+     "with_true_gap": 2874,
+     "recommendation_is_true_blocker": 0.4498956158663883,
+     "recommendation_is_unmastered": 0.5808767951625095,
+     "missed_gap_rate": 0.07933194154488518,
+     "false_alarm_rate": 0.2753731343283582,
+     "hidden_prereq_cases": 1832,
+     "hidden_prereq_blocker_hit": 0.45360262008733626,
+     "hidden_prereq_stopped_at_assessed_concept": 0.11244541484716157,
+     "gap_precision": 0.7784628031237156,
+     "gap_recall": 0.8360185389538733,
+     "gap_f1": 0.8062147493881026
+    },
+    "_mastery_estimates": {
+     "n": 7664,
+     "auc": 0.8208962015967879,
+     "brier": 0.17918319371059313,
+     "mean_abs_error": 0.3668123646593865,
+     "share_truly_mastered": 0.408794363256785
+    }
+   }
+  },
+  "fitted_params": {
+   "safety": {
+    "p_init": 0.6408643189221337,
+    "p_learn": 0.05113590647185621,
+    "p_slip": 0.3,
+    "p_guess": 0.35
+   },
+   "quantities": {
+    "p_init": 0.17815380058364627,
+    "p_learn": 0.10552562765496416,
+    "p_slip": 0.3,
+    "p_guess": 0.32994847088430995
+   },
+   "ohm": {
+    "p_init": 0.03673863507048702,
+    "p_learn": 0.0842418156880511,
+    "p_slip": 0.3,
+    "p_guess": 0.282401295633897
+   },
+   "symbols": {
+    "p_init": 0.14250811326812415,
+    "p_learn": 0.1335397970355557,
+    "p_slip": 0.2610983771886131,
+    "p_guess": 0.2635897598781484
+   },
+   "wiring": {
+    "p_init": 0.04806525561356754,
+    "p_learn": 0.11088204630174602,
+    "p_slip": 0.3,
+    "p_guess": 0.2858760228150185
+   },
+   "multimeter": {
+    "p_init": 0.15052971459208625,
+    "p_learn": 0.11659876385048376,
+    "p_slip": 0.3,
+    "p_guess": 0.22154123202502332
+   },
+   "series_parallel": {
+    "p_init": 0.05278009020239052,
+    "p_learn": 0.13565995138138634,
+    "p_slip": 0.3,
+    "p_guess": 0.2601017842125277
+   },
+   "diagrams": {
+    "p_init": 0.022601225765126416,
+    "p_learn": 0.07505061238815648,
+    "p_slip": 0.214207576801974,
+    "p_guess": 0.23058070396966895
+   },
+   "earthing": {
+    "p_init": 0.0655517387843239,
+    "p_learn": 0.25172453748910717,
+    "p_slip": 0.22574946949974564,
+    "p_guess": 0.2285284241954223
+   },
+   "fault": {
+    "p_init": 0.020025938842061268,
+    "p_learn": 0.10931992091233143,
+    "p_slip": 0.2581327190402844,
+    "p_guess": 0.15609794842478272
+   }
+  }
+ },
+ {
+  "seed": 3,
+  "ladder": {
+   "Global average": {
+    "n": 35006,
+    "auc": 0.5,
+    "accuracy": 0.5672741815688739,
+    "log_loss": 0.6842389713320713,
+    "rmse": 0.4955384649351273
+   },
+   "Per-question accuracy": {
+    "n": 35006,
+    "auc": 0.6177843129179944,
+    "accuracy": 0.6000399931440324,
+    "log_loss": 0.6622284296321838,
+    "rmse": 0.4846707651141866
+   },
+   "Learner's running accuracy": {
+    "n": 35006,
+    "auc": 0.5707181704386861,
+    "accuracy": 0.6008684225561333,
+    "log_loss": 0.7013320273554027,
+    "rmse": 0.5001607429338204
+   },
+   "BKT (hand-set parameters)": {
+    "n": 35006,
+    "auc": 0.6600398311241927,
+    "accuracy": 0.6250642746957664,
+    "log_loss": 0.6449416902383422,
+    "rmse": 0.47613195756421295
+   },
+   "BKT (fitted)": {
+    "n": 35006,
+    "auc": 0.6645472131244592,
+    "accuracy": 0.6208364280409072,
+    "log_loss": 0.6441701693514861,
+    "rmse": 0.475406883650577
+   }
+  },
+  "diagnosis": {
+   "fitted": {
+    "Study what you got wrong (status quo)": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.31254429482636426,
+     "recommendation_is_unmastered": 0.9141615356754799,
+     "missed_gap_rate": 0.02161587526576896,
+     "false_alarm_rate": 0.6644444444444444,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.07399687337154769,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9296508598228244,
+     "gap_precision": 0.6791996127158303,
+     "gap_recall": 0.9171932882981042,
+     "gap_f1": 0.780456146857037
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.27462792345854004,
+     "recommendation_is_unmastered": 0.9162878787878788,
+     "missed_gap_rate": 0.06449326718639263,
+     "false_alarm_rate": 0.37037037037037035,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.044815007816571134,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9015112037519541,
+     "gap_precision": 0.7510524301569078,
+     "gap_recall": 0.8553061669208978,
+     "gap_f1": 0.7997962302598065
+    },
+    "BKT + prerequisite walk": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.5209071580439405,
+     "recommendation_is_unmastered": 0.7011363636363637,
+     "missed_gap_rate": 0.06449326718639263,
+     "false_alarm_rate": 0.37037037037037035,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5148514851485149,
+     "hidden_prereq_stopped_at_assessed_concept": 0.13392391870766024,
+     "gap_precision": 0.7510524301569078,
+     "gap_recall": 0.8553061669208978,
+     "gap_f1": 0.7997962302598065
+    },
+    "_mastery_estimates": {
+     "n": 7588,
+     "auc": 0.7876595532570565,
+     "brier": 0.18273389825576583,
+     "mean_abs_error": 0.37074438597783993,
+     "share_truly_mastered": 0.3952293094359515
+    }
+   },
+   "hand_set": {
+    "Study what you got wrong (status quo)": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.31254429482636426,
+     "recommendation_is_unmastered": 0.9141615356754799,
+     "missed_gap_rate": 0.02161587526576896,
+     "false_alarm_rate": 0.6644444444444444,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.07399687337154769,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9296508598228244,
+     "gap_precision": 0.6791996127158303,
+     "gap_recall": 0.9171932882981042,
+     "gap_f1": 0.780456146857037
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.30014174344436567,
+     "recommendation_is_unmastered": 0.9349406812093379,
+     "missed_gap_rate": 0.07406094968107725,
+     "false_alarm_rate": 0.28444444444444444,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.08337675872850443,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9150599270453361,
+     "gap_precision": 0.7910386965376782,
+     "gap_recall": 0.8463717585530617,
+     "gap_f1": 0.8177702916096431
+    },
+    "BKT + prerequisite walk": {
+     "points": 4172,
+     "with_true_gap": 2822,
+     "recommendation_is_true_blocker": 0.4911410347271439,
+     "recommendation_is_unmastered": 0.6127057022579411,
+     "missed_gap_rate": 0.07406094968107725,
+     "false_alarm_rate": 0.28444444444444444,
+     "hidden_prereq_cases": 1919,
+     "hidden_prereq_blocker_hit": 0.5226680562793121,
+     "hidden_prereq_stopped_at_assessed_concept": 0.10005211047420531,
+     "gap_precision": 0.7910386965376782,
+     "gap_recall": 0.8463717585530617,
+     "gap_f1": 0.8177702916096431
+    },
+    "_mastery_estimates": {
+     "n": 7588,
+     "auc": 0.8301074208581621,
+     "brier": 0.17499025366381488,
+     "mean_abs_error": 0.36227891555963365,
+     "share_truly_mastered": 0.3952293094359515
+    }
+   }
+  },
+  "fitted_params": {
+   "safety": {
+    "p_init": 0.5715457854367759,
+    "p_learn": 0.0433011213286452,
+    "p_slip": 0.3,
+    "p_guess": 0.35
+   },
+   "quantities": {
+    "p_init": 0.19690478836780995,
+    "p_learn": 0.16120518573906373,
+    "p_slip": 0.3,
+    "p_guess": 0.20815104480111102
+   },
+   "ohm": {
+    "p_init": 0.015290190197024505,
+    "p_learn": 0.08756435380175163,
+    "p_slip": 0.3,
+    "p_guess": 0.30447470495200657
+   },
+   "symbols": {
+    "p_init": 0.09974109258168544,
+    "p_learn": 0.14796313613140966,
+    "p_slip": 0.21921037323086737,
+    "p_guess": 0.22246644418461514
+   },
+   "wiring": {
+    "p_init": 0.12955923861503002,
+    "p_learn": 0.14040836617030333,
+    "p_slip": 0.3,
+    "p_guess": 0.2682771873226796
+   },
+   "multimeter": {
+    "p_init": 0.13213796005916062,
+    "p_learn": 0.14342963494855987,
+    "p_slip": 0.3,
+    "p_guess": 0.21486355329640466
+   },
+   "series_parallel": {
+    "p_init": 0.023865136221403994,
+    "p_learn": 0.12589141684596136,
+    "p_slip": 0.3,
+    "p_guess": 0.2700576052736862
+   },
+   "diagrams": {
+    "p_init": 0.038242343086883394,
+    "p_learn": 0.06336573475570037,
+    "p_slip": 0.2443304398337247,
+    "p_guess": 0.2981465554825926
+   },
+   "earthing": {
+    "p_init": 0.05298324345624597,
+    "p_learn": 0.1721661284740442,
+    "p_slip": 0.11786826402625918,
+    "p_guess": 0.2263994125745121
+   },
+   "fault": {
+    "p_init": 0.01,
+    "p_learn": 0.18174215636717617,
+    "p_slip": 0.3,
+    "p_guess": 0.254612216754096
+   }
+  }
+ },
+ {
+  "seed": 4,
+  "ladder": {
+   "Global average": {
+    "n": 35443,
+    "auc": 0.5,
+    "accuracy": 0.5797477640154615,
+    "log_loss": 0.6806352965562277,
+    "rmse": 0.49372924216211317
+   },
+   "Per-question accuracy": {
+    "n": 35443,
+    "auc": 0.6325937261302808,
+    "accuracy": 0.6127020850379482,
+    "log_loss": 0.6528537252327209,
+    "rmse": 0.4801165939723068
+   },
+   "Learner's running accuracy": {
+    "n": 35443,
+    "auc": 0.5777874784120862,
+    "accuracy": 0.6122224416669018,
+    "log_loss": 0.6936797633208395,
+    "rmse": 0.49602186684757066
+   },
+   "BKT (hand-set parameters)": {
+    "n": 35443,
+    "auc": 0.6704262636456624,
+    "accuracy": 0.6465028355387523,
+    "log_loss": 0.6324917956925329,
+    "rmse": 0.4700099802685044
+   },
+   "BKT (fitted)": {
+    "n": 35443,
+    "auc": 0.6695878302095593,
+    "accuracy": 0.6331856784132269,
+    "log_loss": 0.6396390295213369,
+    "rmse": 0.47317272688050793
+   }
+  },
+  "diagnosis": {
+   "fitted": {
+    "Study what you got wrong (status quo)": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.31374643874643876,
+     "recommendation_is_unmastered": 0.9078039927404719,
+     "missed_gap_rate": 0.018874643874643875,
+     "false_alarm_rate": 0.6197691197691197,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.07372793354101766,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9148494288681205,
+     "gap_precision": 0.6744410487373331,
+     "gap_recall": 0.931157006440151,
+     "gap_f1": 0.782276119402985
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.28739316239316237,
+     "recommendation_is_unmastered": 0.9201070336391437,
+     "missed_gap_rate": 0.06837606837606838,
+     "false_alarm_rate": 0.4004329004329004,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.04984423676012461,
+     "hidden_prereq_stopped_at_assessed_concept": 0.8805815160955348,
+     "gap_precision": 0.729479340374282,
+     "gap_recall": 0.8743060182100821,
+     "gap_f1": 0.7953535353535354
+    },
+    "BKT + prerequisite walk": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.49893162393162394,
+     "recommendation_is_unmastered": 0.5959480122324159,
+     "missed_gap_rate": 0.06837606837606838,
+     "false_alarm_rate": 0.4004329004329004,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.5233644859813084,
+     "hidden_prereq_stopped_at_assessed_concept": 0.05970924195223261,
+     "gap_precision": 0.729479340374282,
+     "gap_recall": 0.8743060182100821,
+     "gap_f1": 0.7953535353535354
+    },
+    "_mastery_estimates": {
+     "n": 7630,
+     "auc": 0.7879196266199536,
+     "brier": 0.18214989281266897,
+     "mean_abs_error": 0.3729403331308708,
+     "share_truly_mastered": 0.409829619921363
+    }
+   },
+   "hand_set": {
+    "Study what you got wrong (status quo)": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.31374643874643876,
+     "recommendation_is_unmastered": 0.9078039927404719,
+     "missed_gap_rate": 0.018874643874643875,
+     "false_alarm_rate": 0.6197691197691197,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.07372793354101766,
+     "hidden_prereq_stopped_at_assessed_concept": 0.9148494288681205,
+     "gap_precision": 0.6744410487373331,
+     "gap_recall": 0.931157006440151,
+     "gap_f1": 0.782276119402985
+    },
+    "BKT, recommend the assessed concept": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.306980056980057,
+     "recommendation_is_unmastered": 0.9358081979891725,
+     "missed_gap_rate": 0.07905982905982906,
+     "false_alarm_rate": 0.2893217893217893,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.08878504672897196,
+     "hidden_prereq_stopped_at_assessed_concept": 0.8977154724818276,
+     "gap_precision": 0.7790983606557377,
+     "gap_recall": 0.8443260048856318,
+     "gap_f1": 0.8104017904721303
+    },
+    "BKT + prerequisite walk": {
+     "points": 4194,
+     "with_true_gap": 2808,
+     "recommendation_is_true_blocker": 0.4700854700854701,
+     "recommendation_is_unmastered": 0.5843000773395205,
+     "missed_gap_rate": 0.07905982905982906,
+     "false_alarm_rate": 0.2893217893217893,
+     "hidden_prereq_cases": 1926,
+     "hidden_prereq_blocker_hit": 0.48753894080996885,
+     "hidden_prereq_stopped_at_assessed_concept": 0.1059190031152648,
+     "gap_precision": 0.7790983606557377,
+     "gap_recall": 0.8443260048856318,
+     "gap_f1": 0.8104017904721303
+    },
+    "_mastery_estimates": {
+     "n": 7630,
+     "auc": 0.8316753049755907,
+     "brier": 0.17401284244246218,
+     "mean_abs_error": 0.3603969123195827,
+     "share_truly_mastered": 0.409829619921363
+    }
+   }
+  },
+  "fitted_params": {
+   "safety": {
+    "p_init": 0.6219614221996291,
+    "p_learn": 0.017426047638093894,
+    "p_slip": 0.3,
+    "p_guess": 0.35
+   },
+   "quantities": {
+    "p_init": 0.20891352397024607,
+    "p_learn": 0.12625424520008044,
+    "p_slip": 0.3,
+    "p_guess": 0.2631760475352971
+   },
+   "ohm": {
+    "p_init": 0.06702903111455895,
+    "p_learn": 0.08768823627519143,
+    "p_slip": 0.3,
+    "p_guess": 0.2642714926786672
+   },
+   "symbols": {
+    "p_init": 0.1015568375512334,
+    "p_learn": 0.10397332313802089,
+    "p_slip": 0.3,
+    "p_guess": 0.22466910990153457
+   },
+   "wiring": {
+    "p_init": 0.10185351205902439,
+    "p_learn": 0.10887180826373288,
+    "p_slip": 0.3,
+    "p_guess": 0.2568940007424139
+   },
+   "multimeter": {
+    "p_init": 0.1269313234217779,
+    "p_learn": 0.1256914794366286,
+    "p_slip": 0.21195172995418504,
+    "p_guess": 0.25047727697112204
+   },
+   "series_parallel": {
+    "p_init": 0.05622895095692852,
+    "p_learn": 0.12585827224838256,
+    "p_slip": 0.3,
+    "p_guess": 0.24016469287627404
+   },
+   "diagrams": {
+    "p_init": 0.016350378709447208,
+    "p_learn": 0.06677623337840975,
+    "p_slip": 0.2811495441492627,
+    "p_guess": 0.24042706591772542
+   },
+   "earthing": {
+    "p_init": 0.07682389798818894,
+    "p_learn": 0.2082553824651878,
+    "p_slip": 0.3,
+    "p_guess": 0.16929341453927338
+   },
+   "fault": {
+    "p_init": 0.0237909152504822,
+    "p_learn": 0.17180900550708866,
+    "p_slip": 0.3,
+    "p_guess": 0.21689087181885697
+   }
+  }
+ }
+]

@@ -45,11 +45,12 @@ def test_saved_files_are_identical_for_the_same_seed(tmp_path):
     assert dataset.verify_files(a) == []
 
 
-def test_round_trip_through_files_keeps_everything(tmp_path):
-    original = dataset.generate(80, seed=2)
+@pytest.mark.parametrize("sim", ["sprint2", "barabari"])
+def test_round_trip_through_files_keeps_everything(tmp_path, sim):
+    original = dataset.generate(80, 2, sim)
     dataset.save(original, tmp_path)
     loaded = dataset.load(tmp_path)
-    assert loaded.split == original.split and loaded.seed == 2
+    assert loaded.split == original.split and loaded.seed == 2 and loaded.simulator == sim
     assert dataset.validate(loaded) == []
     for x, y in zip(original.learners, loaded.learners):
         assert x.experience == y.experience and x.responses == y.responses and x.assess_points == y.assess_points
@@ -79,4 +80,15 @@ def test_the_committed_dataset_is_intact_and_valid():
     assert dataset.verify_files(COMMITTED) == []
     loaded = dataset.load(COMMITTED)
     assert dataset.validate(loaded) == []
-    assert dataset.generate(len(loaded.learners), loaded.seed).split == loaded.split
+    assert loaded.simulator == "barabari"
+    assert dataset.generate(len(loaded.learners), loaded.seed, loaded.simulator).split == loaded.split
+
+
+def test_validation_catches_broken_barabari_fields():
+    broken = dataset.generate(60, 1, "barabari")
+    sa = next(r for lr in broken.learners for r in lr.responses if r.question_type == "short_answer")
+    sa.score = None
+    mc = next(r for lr in broken.learners for r in lr.responses if r.question_type == "multiple_choice")
+    mc.score = 0.5
+    problems = " ".join(dataset.validate(broken))
+    assert "needs a score" in problems and "only short answers carry a score" in problems

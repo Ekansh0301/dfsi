@@ -23,8 +23,9 @@ import numpy as np
 from . import bkt
 from .bkt import BKTParams
 
-# One answer: (question id, concept tags, correct, "I'm not sure" chosen)
-Step = tuple[str, tuple, int, bool]
+# One answer: (question id, concept tags, correct, "I'm not sure" chosen), optionally followed by
+# (question type, partial-credit score or None, attempt number) for Barabari-style data.
+Step = tuple
 Seq = Sequence[Step]
 
 
@@ -38,7 +39,7 @@ class GlobalMean:
     def fit(self, train: Iterable[Seq]) -> "GlobalMean":
         n = k = 0
         for seq in train:
-            for _, _, y, _ in seq:
+            for _, _, y, *_ in seq:
                 n += 1
                 k += y
         self.p = k / max(n, 1)
@@ -59,7 +60,7 @@ class ItemMean:
         k: dict[str, int] = defaultdict(int)
         tn = tk = 0
         for seq in train:
-            for q, _, y, _ in seq:
+            for q, _, y, *_ in seq:
                 n[q] += 1
                 k[q] += y
                 tn += 1
@@ -70,7 +71,7 @@ class ItemMean:
 
     def predict(self, seq: Seq) -> np.ndarray:
         return np.array(
-            [_clip((self.k.get(q, 0) + self.a * self.prior) / (self.n.get(q, 0) + self.a)) for q, _, _, _ in seq]
+            [_clip((self.k.get(q, 0) + self.a * self.prior) / (self.n.get(q, 0) + self.a)) for q, *_ in seq]
         )
 
 
@@ -83,7 +84,7 @@ class RunningAccuracy:
     def fit(self, train: Iterable[Seq]) -> "RunningAccuracy":
         n = k = 0
         for seq in train:
-            for _, _, y, _ in seq:
+            for _, _, y, *_ in seq:
                 n += 1
                 k += y
         self.prior = k / max(n, 1)
@@ -93,7 +94,7 @@ class RunningAccuracy:
         n: dict[str, int] = defaultdict(int)
         k: dict[str, int] = defaultdict(int)
         out = np.empty(len(seq))
-        for i, (_, tags, y, _) in enumerate(seq):
+        for i, (_, tags, y, *_) in enumerate(seq):
             ps = [(k[c] + self.a * self.prior) / (n[c] + self.a) for c in tags] or [self.prior]
             out[i] = _clip(sum(ps) / len(ps))
             for c in tags:
@@ -123,7 +124,7 @@ class BKTPredictor:
         per_concept: dict[str, list[np.ndarray]] = defaultdict(list)
         for seq in train:
             local: dict[str, list[int]] = defaultdict(list)
-            for _, tags, y, _ in seq:
+            for _, tags, y, *_ in seq:
                 for c in self._tags(tags):
                     local[c].append(y)
             for c, ys in local.items():
@@ -144,7 +145,8 @@ class BKTPredictor:
     def predict(self, seq: Seq) -> np.ndarray:
         state: dict[str, float] = {}
         out = np.empty(len(seq))
-        for i, (_, tags, y, unsure) in enumerate(seq):
+        for i, (_, tags, y, unsure, *extra) in enumerate(seq):
+            qtype, score, attempt = (tuple(extra) + ("multiple_choice", None, 1)[len(extra):])[:3]
             tags = self._tags(tags)
             ps = [state.get(c, self.params_for(c).p_init) for c in tags]
             pr = [self.params_for(c) for c in tags]
@@ -155,12 +157,12 @@ class BKTPredictor:
                 # Every tagged concept must be mastered to answer without guessing.
                 p_all = float(np.prod(ps))
                 slip = sum(p.p_slip for p in pr) / len(pr)
-                guess = sum(p.p_guess for p in pr) / len(pr)
+                guess = sum(bkt.guess_for(p, qtype) for p in pr) / len(pr)
                 out[i] = _clip(p_all * (1 - slip) + (1 - p_all) * guess)
             else:  # "mean": average the per-concept predictions
-                out[i] = _clip(sum(bkt.predict_correct(p, q) for p, q in zip(ps, pr)) / len(tags))
+                out[i] = _clip(sum(bkt.predict_correct(p, q, qtype) for p, q in zip(ps, pr)) / len(tags))
             for c, p in zip(tags, ps):
-                state[c] = bkt.update(p, bool(y), self.params_for(c), unsure)
+                state[c] = bkt.update(p, bool(y), self.params_for(c), unsure, score=score, question_type=qtype, attempt=attempt)
         return out
 
 

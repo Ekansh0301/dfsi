@@ -1,8 +1,9 @@
 {
   "generator": "circuit_coach.simulate",
+  "simulator": "barabari",
   "seed": 0,
   "n_learners": 500,
-  "n_responses": 14935,
+  "n_responses": 21877,
   "split": {
     "train": 350,
     "test": 150,
@@ -21,9 +22,9 @@
     "fault"
   ],
   "sha256": {
-    "items.csv": "641095df31d7c3e629add4468235e94c34c24e7a01d016729c469304ef18a691",
-    "learners.csv": "62cbe2218bf429e72e73782bc387436b4b86e670b5af5e5f2fc1ee8509dcb2ea",
-    "responses.csv": "590b5ddceedc081f1bc434723ee42ca728e40ebee11d7f5770c7166a3aad7bba",
-    "ground_truth.csv": "9bdd698878aed8abd2c8d731537c5d36aa9e5924f7d08a1e843efa44aa6300b3"
+    "items.csv": "021a0858bd1765435bbd492498147fa7e00f1dcd2cbb7d1eaec839c34d683005",
+    "learners.csv": "b44043456e8b160eeb68bf662f080889a3e863ae0378c51e6109e35703ed26ad",
+    "responses.csv": "c111d2b59e76daa36f01a6556d18cd3dd6e72954500ade49857e73a18884c0bd",
+    "ground_truth.csv": "763ad5948e50a9a31e1762956afff576594d926df5d3b4b2e60c842c361c3ea8"
   }
 }

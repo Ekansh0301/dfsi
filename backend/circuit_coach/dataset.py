@@ -6,11 +6,15 @@ committed and re-read, keeps the hidden ground truth next to the answers, splits
 
 Files written to one directory:
 
-    items.csv         item_id, concepts (joined with "|"), slip, guess
+    items.csv         item_id, concepts (joined with "|"), slip, guess, question_type, points, difficulty
     learners.csv      learner_id, experience, split ("train" or "test"), n_responses
-    responses.csv     learner_id, step, item_id, concepts, correct, unsure, module
+    responses.csv     learner_id, step, item_id, concepts, correct, unsure, module,
+                      question_type, score (partial credit, empty if none), attempt, points
     ground_truth.csv  learner_id, module, n_responses, assessed, <one 0/1 column per concept>
-    manifest.json     seed, sizes, split, checksums of the other files
+    manifest.json     simulator, seed, sizes, split, checksums of the other files
+
+Files written before Sprint 3 lack the newer columns; `load` reads them with the defaults
+(multiple choice, first attempt, one point).
 """
 
 from __future__ import annotations
@@ -24,7 +28,8 @@ from pathlib import Path
 import numpy as np
 
 from .curriculum import CONCEPT_ORDER, CONCEPTS, MODULES
-from .simulate import AssessPoint, Item, Response, SimLearner, simulate
+from .bkt import QUESTION_TYPES
+from .simulate import AssessPoint, Item, Response, SimConfig, SimLearner, simulate
 
 TRAIN_SHARE = 0.7
 FILES = ("items.csv", "learners.csv", "responses.csv", "ground_truth.csv")
@@ -36,6 +41,7 @@ class Dataset:
     bank: dict[str, list[Item]]
     split: dict[int, str]  # learner id -> "train" or "test"
     seed: int
+    simulator: str = "sprint2"
 
     @property
     def train(self) -> list[SimLearner]:
@@ -54,9 +60,9 @@ def split_learners(n: int, seed: int, train_share: float = TRAIN_SHARE) -> dict[
     return {i: ("train" if i in train else "test") for i in range(n)}
 
 
-def generate(n_learners: int, seed: int = 0) -> Dataset:
-    learners, bank = simulate(n_learners, seed)
-    return Dataset(learners, bank, split_learners(len(learners), seed), seed)
+def generate(n_learners: int, seed: int = 0, simulator: str = "sprint2") -> Dataset:
+    learners, bank = simulate(n_learners, seed, SimConfig.named(simulator))
+    return Dataset(learners, bank, split_learners(len(learners), seed), seed, simulator)
 
 
 # ---- writing -----------------------------------------------------------------------------
@@ -76,7 +82,11 @@ def _write_csv(path: Path, header: list[str], rows) -> None:
 def save(ds: Dataset, out: Path) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     items = [i for c in CONCEPT_ORDER for i in ds.bank[c]]
-    _write_csv(out / "items.csv", ["item_id", "concepts", "slip", "guess"], ([i.id, "|".join(i.concepts), f"{i.slip:.4f}", f"{i.guess:.4f}"] for i in items))
+    _write_csv(
+        out / "items.csv",
+        ["item_id", "concepts", "slip", "guess", "question_type", "points", "difficulty"],
+        ([i.id, "|".join(i.concepts), f"{i.slip:.4f}", f"{i.guess:.4f}", i.question_type, f"{i.points:g}", f"{i.difficulty:.4f}"] for i in items),
+    )
     _write_csv(
         out / "learners.csv",
         ["learner_id", "experience", "split", "n_responses"],
@@ -84,8 +94,12 @@ def save(ds: Dataset, out: Path) -> dict:
     )
     _write_csv(
         out / "responses.csv",
-        ["learner_id", "step", "item_id", "concepts", "correct", "unsure", "module"],
-        ([lr.id, k, r.item_id, "|".join(r.concepts), int(r.correct), int(r.unsure), r.module] for lr in ds.learners for k, r in enumerate(lr.responses)),
+        ["learner_id", "step", "item_id", "concepts", "correct", "unsure", "module", "question_type", "score", "attempt", "points"],
+        (
+            [lr.id, k, r.item_id, "|".join(r.concepts), int(r.correct), int(r.unsure), r.module, r.question_type, "" if r.score is None else f"{r.score:g}", r.attempt, f"{r.points:g}"]
+            for lr in ds.learners
+            for k, r in enumerate(lr.responses)
+        ),
     )
     _write_csv(
         out / "ground_truth.csv",
@@ -98,6 +112,7 @@ def save(ds: Dataset, out: Path) -> dict:
     )
     manifest = {
         "generator": "circuit_coach.simulate",
+        "simulator": ds.simulator,
         "seed": ds.seed,
         "n_learners": len(ds.learners),
         "n_responses": sum(len(lr.responses) for lr in ds.learners),
@@ -122,7 +137,17 @@ def load(directory: Path) -> Dataset:
     bank: dict[str, list[Item]] = {c: [] for c in CONCEPT_ORDER}
     for row in _read(directory / "items.csv"):
         tags = tuple(row["concepts"].split("|"))
-        bank[tags[0]].append(Item(row["item_id"], tags, float(row["slip"]), float(row["guess"])))
+        bank[tags[0]].append(
+            Item(
+                row["item_id"],
+                tags,
+                float(row["slip"]),
+                float(row["guess"]),
+                row.get("question_type") or "multiple_choice",
+                float(row.get("points") or 1),
+                float(row.get("difficulty") or 0),
+            )
+        )
     learners: dict[int, SimLearner] = {}
     split: dict[int, str] = {}
     for row in _read(directory / "learners.csv"):
@@ -131,13 +156,23 @@ def load(directory: Path) -> Dataset:
         split[lid] = row["split"]
     for row in _read(directory / "responses.csv"):
         learners[int(row["learner_id"])].responses.append(
-            Response(row["item_id"], tuple(row["concepts"].split("|")), bool(int(row["correct"])), bool(int(row["unsure"])), row["module"])
+            Response(
+                row["item_id"],
+                tuple(row["concepts"].split("|")),
+                bool(int(row["correct"])),
+                bool(int(row["unsure"])),
+                row["module"],
+                row.get("question_type") or "multiple_choice",
+                float(row["score"]) if row.get("score") else None,
+                int(row.get("attempt") or 1),
+                float(row.get("points") or 1),
+            )
         )
     for row in _read(directory / "ground_truth.csv"):
         learners[int(row["learner_id"])].assess_points.append(
             AssessPoint(row["module"], int(row["n_responses"]), row["assessed"].split("|"), {c: bool(int(row[c])) for c in CONCEPT_ORDER})
         )
-    return Dataset([learners[i] for i in sorted(learners)], bank, split, manifest["seed"])
+    return Dataset([learners[i] for i in sorted(learners)], bank, split, manifest["seed"], manifest.get("simulator", "sprint2"))
 
 
 # ---- validation --------------------------------------------------------------------------
@@ -161,8 +196,12 @@ def validate(ds: Dataset) -> list[str]:
     for it in items.values():
         if not set(it.concepts) <= set(CONCEPTS):
             problems.append(f"item {it.id} has an unknown concept")
-        if not (0 < it.slip < 0.5 and 0 < it.guess < 0.5):
-            problems.append(f"item {it.id} has slip or guess outside (0, 0.5)")
+        if not (0 < it.slip < 1 and 0 < it.guess < 1 and it.slip + it.guess < 1):
+            problems.append(f"item {it.id} has slip or guess outside (0, 1), or slip + guess of 1 or more")
+        if it.question_type not in QUESTION_TYPES:
+            problems.append(f"item {it.id} has unknown question type {it.question_type}")
+        if it.points <= 0:
+            problems.append(f"item {it.id} has no points")
     for lr in ds.learners:
         if not lr.responses:
             problems.append(f"learner {lr.id} has no responses")
@@ -176,6 +215,15 @@ def validate(ds: Dataset) -> list[str]:
                 problems.append(f"learner {lr.id}: concepts of {r.item_id} differ from the item bank")
             if r.unsure and r.correct:
                 problems.append(f"learner {lr.id}: an unsure answer marked correct")
+            if it is not None and r.question_type != it.question_type:
+                problems.append(f"learner {lr.id}: question type of {r.item_id} differs from the item bank")
+            if r.question_type == "short_answer":
+                if r.score is None or not 0 <= r.score <= 1 or r.correct != (r.score >= 0.5):
+                    problems.append(f"learner {lr.id}: short answer {r.item_id} needs a score from 0 to 1 that matches correct")
+            elif r.score is not None:
+                problems.append(f"learner {lr.id}: only short answers carry a score")
+            if r.attempt < 1:
+                problems.append(f"learner {lr.id}: attempt numbers start at 1")
             if r.module not in MODULES:
                 problems.append(f"learner {lr.id}: unknown module {r.module}")
         last = 0

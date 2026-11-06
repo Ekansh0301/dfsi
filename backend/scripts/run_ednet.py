@@ -38,7 +38,7 @@ def main() -> None:
     train = [seqs[i] for i in order[:cut]]
     test = [seqs[i] for i in order[cut:]]
     n_answers = sum(len(s) for s in test)
-    all_tags = {c for s in seqs for _, tags, _, _ in s for c in tags}
+    all_tags = {c for s in seqs for _, tags, *_ in s for c in tags}
     print(f"train {len(train)} students, test {len(test)} students ({n_answers} test answers), {len(all_tags)} concept tags", flush=True)
 
     fast = dict(max_fit_sequences=3000, max_fit_len=100, n_random_starts=1)

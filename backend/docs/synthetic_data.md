@@ -21,6 +21,21 @@ For each learner, with all randomness drawn from one seeded generator (`numpy.ra
 
 The limits of this story (for example that a multi-concept question needs all its concepts) are written at the top of `simulate.py`. Results on made-up data only reflect these assumptions.
 
+## Barabari's quiz format (Sprint 3)
+
+`SimConfig()` (named `barabari`) adds the parts of Barabari's quiz format that change the algorithm ([barabari_format.md](barabari_format.md)). `SimConfig.sprint2()` switches them all off and draws exactly the same random numbers as before, so the Sprint 2 results and dataset are reproduced byte for byte (`tests/test_simulate.py::test_sprint2_config_reproduces_the_sprint2_simulator_exactly`).
+
+| Part | Barabari simulator |
+|---|---|
+| Question types | 70% multiple choice, 20% true/false (guess 0.5), 10% short answer marked by an instructor in quarters (mean mark 0.85 if the concepts are mastered, 0.2 if not) |
+| Difficulty | Each item gets a difficulty d drawn from a normal distribution with spread 0.8 on the logit scale: harder items slip more and are guessed less often |
+| Points | 20 for a hard item (d above 0.5), 10 otherwise |
+| Retakes | A quick check passes at 60% of its points. A failed check is retaken with probability 0.8, up to 4 attempts, on the same items |
+| Answers from memory | Right/wrong feedback helps on attempts 2 and 3 (probability 0.15 of answering right without mastery); after 3 attempts the answers are revealed (probability 0.6) |
+| Ground truth | Stored after the last attempt of each quick check |
+
+Pick the simulator with `--sim` in `scripts/generate_dataset.py` (default `barabari`) and `scripts/run_synthetic.py` (default `sprint2`, which keeps the published Sprint 2 results and the service's fitted parameters).
+
 ## Reproducible runs and the 70:30 split
 
 ```bash
@@ -33,15 +48,15 @@ python scripts/generate_dataset.py --check datasets/synthetic_seed0
 
 ## Saved dataset
 
-`backend/datasets/synthetic_seed0/` is committed (500 learners, 14,935 answers, mean 29.9 answers per learner, 350 train and 150 test). It is small on purpose; the evaluation scripts regenerate larger runs in memory (3,000 learners per run).
+`backend/datasets/synthetic_seed0/` is committed, made with the Barabari simulator: 500 learners, 21,877 answers (mean 43.8 per learner), 350 train and 150 test. 17,526 answers are multiple choice, 2,702 true/false and 1,649 short answers; 1,417 of 2,341 quick checks were retaken at least once (12,533 first attempts, 4,827 second, 2,816 third, 1,701 fourth). It is small on purpose; the evaluation scripts regenerate larger runs in memory (3,000 learners per run).
 
 | File | Content |
 |---|---|
-| `items.csv` | `item_id, concepts, slip, guess` (concepts joined with `\|`) |
+| `items.csv` | `item_id, concepts, slip, guess, question_type, points, difficulty` (concepts joined with `\|`) |
 | `learners.csv` | `learner_id, experience, split, n_responses` |
-| `responses.csv` | `learner_id, step, item_id, concepts, correct, unsure, module` in answer order |
+| `responses.csv` | `learner_id, step, item_id, concepts, correct, unsure, module, question_type, score, attempt, points` in answer order (`score` only for short answers) |
 | `ground_truth.csv` | `learner_id, module, n_responses, assessed`, then one 0/1 column per concept (true mastery at the end of that quick check) |
-| `manifest.json` | seed, sizes, split sizes, SHA-256 of every file |
+| `manifest.json` | simulator, seed, sizes, split sizes, SHA-256 of every file |
 
 `datasets/.gitattributes` turns line-ending conversion off so the checksums hold on every operating system.
 
@@ -52,9 +67,10 @@ Load it with `circuit_coach.dataset.load(path)`; it returns the learners (with a
 `dataset.validate(ds)` returns a list of problems, empty when the data is consistent. It checks:
 
 - learner ids are unique and the split covers exactly the learners with only `train` and `test`, with a 70% train share;
-- every item has known concepts and slip and guess strictly between 0 and 0.5;
+- every item has known concepts, a known question type, positive points, and slip and guess between 0 and 1 that add up to less than 1;
 - every learner has answers and at least one assessment point;
-- every answer refers to a known item, carries that item's concepts, belongs to a known module, and is never both unsure and correct;
+- every answer refers to a known item, carries that item's concepts and question type, belongs to a known module, and is never both unsure and correct;
+- a short answer carries a score from 0 to 1 that matches `correct` (a score of 0.5 or more), other answers carry none, and attempts start at 1;
 - assessment points are in order, cover all 10 concepts, and assess exactly the concepts of their module;
 - the hidden states respect prerequisites: no more than 10% of (concept, assessment point) pairs are mastered with an unmastered prerequisite (it is about 4% in the committed dataset).
 

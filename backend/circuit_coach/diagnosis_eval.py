@@ -32,7 +32,7 @@ def true_blockers(truth: dict[str, bool], gap: str) -> set[str]:
 
 
 def _events(learner: SimLearner, n: int) -> list[Event]:
-    return [Event(r.concepts, r.correct, r.unsure) for r in learner.responses[:n]]
+    return [Event(r.concepts, r.correct, r.unsure, r.question_type, r.score, r.attempt) for r in learner.responses[:n]]
 
 
 def _check_responses(learner: SimLearner, module: str, n: int):

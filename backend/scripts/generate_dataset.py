@@ -1,6 +1,6 @@
 """Generate, save and validate a made-up learner dataset.
 
-    python scripts/generate_dataset.py [--learners 500] [--seed 0] [--out datasets/synthetic_seed0]
+    python scripts/generate_dataset.py [--learners 500] [--seed 0] [--sim barabari|sprint2] [--out datasets/synthetic_seed0]
     python scripts/generate_dataset.py --check datasets/synthetic_seed0
 
 The same seed always gives byte-identical files. `--check` re-reads a saved dataset, verifies
@@ -30,6 +30,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--learners", type=int, default=500)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--sim", choices=["barabari", "sprint2"], default="barabari", help="simulator: with Barabari's quiz format, or the Sprint 2 one")
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--check", type=Path, default=None, help="validate an existing dataset directory and exit")
     args = ap.parse_args()
@@ -37,7 +38,7 @@ def main() -> int:
         return check(args.check)
 
     out = args.out or ROOT / "datasets" / f"synthetic_seed{args.seed}"
-    ds = dataset.generate(args.learners, args.seed)
+    ds = dataset.generate(args.learners, args.seed, args.sim)
     problems = dataset.validate(ds)
     if problems:
         print("\n".join(problems[:20]))
