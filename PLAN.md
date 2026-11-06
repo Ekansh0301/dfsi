@@ -101,7 +101,9 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 | S4-3 | Done: `backend/results/calibration.md` (mastery estimates run about 10 points high in the middle range) |
 | S4-4, S4-5 | Done in Sprint 3 |
 | S4-6 | Done: `backend/docs/Technical_Design_Doc.md` (Sprint 4), `backend/docs/demo_plan.md`; earlier version archived |
-| S4-7 | Open: freezing the model and tagging `v0.9` is a team decision; the EdNet rerun and the missed-gaps target are still open |
+| S4-7 | Done: model frozen and tagged `v0.9`. The baseline stays the service default; the improved model stays selectable. Known limits at the freeze: missed gaps on the Sprint 2 simulator 3.5% (target 2.6%) |
+
+**Future work:** rerun the EdNet comparison for the improved model (download EdNet KT1 into `backend/data/raw/`, then `python scripts/compare_models.py`) and decide the promotion with it.
 
 ## 5. How we work
 

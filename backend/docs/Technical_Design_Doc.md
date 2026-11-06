@@ -141,7 +141,7 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 3. Mastery estimates are over-confident in the middle range.
 4. Concept tags in Barabari's data do not exist yet; unit-level tags put several concepts on every question, the case first-tag credit handles worst.
 
-**Promotion decision.** The improved model is not the default yet because of points 1 and 2. It is fully available and tested; the decision is recorded in `docs/evaluation.md`.
+**Promotion decision.** The improved model is not the default yet because of points 1 and 2. It is fully available and tested; the decision is recorded in `docs/evaluation.md`. The model is frozen at tag `v0.9`; the EdNet comparison is future work.
 
 ## 8. POC v0.9 status
 
@@ -153,7 +153,8 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 | Made-up learners in two formats, Barabari sample, EdNet loader | Working |
 | Evaluation: model comparison, robustness, calibration, failure analysis | Reproducible, reports in `backend/results/` |
 | Demo plan | `docs/demo_plan.md` |
-| Voice support, demo video, EdNet rerun | Open |
+| Voice support, demo video | Open |
+| EdNet comparison of the improved model | Future work (after the `v0.9` freeze) |
 
 ## 9. Limitations
 

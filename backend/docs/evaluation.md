@@ -102,7 +102,7 @@ The improved model beats the baseline on 13 of 14 measures on made-up learners. 
 1. **Missed gaps on the Sprint 2 simulator rose from 2.6% to 3.5%**, against the plan's target of no more than 2.6% (the baseline's own run-to-run spread is plus or minus 1.9 points).
 2. **The EdNet comparison has not been run**: the raw files are not in the repository. The promotion rule also asks the improved model to narrow the EdNet gap to per-question accuracy.
 
-Until both are settled the service default stays `baseline`. The improved model is available per request (`?model=improved`), for the whole service (`CIRCUIT_COACH_MODEL=improved`) and for the prototype (`VITE_ENGINE_MODEL=improved`). To finish the check: download EdNet into `backend/data/raw/` (see README) and rerun `python scripts/compare_models.py`, which adds the EdNet table.
+The model was frozen at tag `v0.9` with the baseline as the default; the EdNet comparison is future work. Until both are settled the service default stays `baseline`. The improved model is available per request (`?model=improved`), for the whole service (`CIRCUIT_COACH_MODEL=improved`) and for the prototype (`VITE_ENGINE_MODEL=improved`). To finish the check: download EdNet into `backend/data/raw/` (see README) and rerun `python scripts/compare_models.py`, which adds the EdNet table.
 
 ## Sprint 4: robustness, calibration and failure analysis
 
