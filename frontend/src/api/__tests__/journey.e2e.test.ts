@@ -11,6 +11,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const API: string | undefined = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.E2E_API_URL;
+/** The model the service is asked for (VITE_ENGINE_MODEL); the browser engine is always the baseline. */
+const MODEL: string | undefined = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.VITE_ENGINE_MODEL;
 const DEAD = "http://127.0.0.1:9"; // nothing listens here
 
 const PLACEMENT = ["q_x_saf4", "q_x_q3", "q_x_ohm2", "q_x_sym2", "q_x_wir2", "q_x_mm2"];
@@ -22,9 +24,9 @@ const M3_DIAGRAM_GAP = [
   { question_id: "q_w4", chosen: 2 },
   { question_id: "q_w5", chosen: 0 },
 ];
-/** Module 3 with the symbols question also wrong. */
+/** Module 3 with the symbols question also wrong (the app's \"rootcause\" preset). */
 const M3_SYMBOL_ROOT = [
-  { question_id: "q_w1", chosen: 0 },
+  { question_id: "q_w1", chosen: 1 },
   { question_id: "q_w2", chosen: 0 },
   { question_id: "q_w3", chosen: null },
   { question_id: "q_w4", chosen: 2 },
@@ -106,7 +108,8 @@ describe.skipIf(!API)("demo scenarios through the real service", () => {
   });
 });
 
-describe.skipIf(!API)("service and browser engine agree", () => {
+// The browser engine implements the baseline model only, so it is compared with a baseline service.
+describe.skipIf(!API || (MODEL && MODEL !== "baseline"))("service and browser engine agree", () => {
   for (const scenario of ["direct", "hidden", "clean"] as const) {
     it(`${scenario}: same recommendation and mastery`, async () => {
       const viaApi = await app(API);

@@ -11,7 +11,7 @@
  *   4. Exactly one content item is resolved, skipping anything already tried.
  * The Sprint 2 FastAPI service replaces this module behind the same `mockServer` API.
  */
-import type { ConceptId, L, LearnerState, Recommendation } from "../api/types";
+import type { ConceptId, L, LearnerState, QuestionType, Recommendation } from "../api/types";
 import { CONCEPTS, CONCEPT_ORDER } from "../data/curriculum";
 import { contentFor } from "../data/content";
 
@@ -21,11 +21,19 @@ export const STRONG = 0.8;
 /** P(L) below this is treated as a gap. */
 export const WEAK = 0.6;
 
-export function bktUpdate(pL: number, correct: boolean, unsure = false): number {
+/** Chance of a lucky guess by question type (same values as the service, `bkt.TYPE_GUESS`). */
+export const TYPE_GUESS: Partial<Record<QuestionType, number>> = { true_false: 0.5, short_answer: 0.05 };
+
+export function bktUpdate(pL: number, correct: boolean, unsure = false, type: QuestionType = "multiple_choice", score?: number): number {
   const { pLearn, pSlip, pGuess } = BKT;
   // "I'm not sure" is evidence of non-mastery but without the chance of a lucky guess.
-  const guess = unsure ? 0.02 : pGuess;
-  const posterior = correct ? (pL * (1 - pSlip)) / (pL * (1 - pSlip) + (1 - pL) * guess) : (pL * pSlip) / (pL * pSlip + (1 - pL) * (1 - guess));
+  const base = TYPE_GUESS[type] ?? pGuess;
+  const guess = unsure ? Math.min(base, 0.02) : base;
+  const right = (pL * (1 - pSlip)) / (pL * (1 - pSlip) + (1 - pL) * guess);
+  const wrong = (pL * pSlip) / (pL * pSlip + (1 - pL) * (1 - guess));
+  // A marked short answer is partial credit: mix the two posteriors by the mark (as in bkt.evidence).
+  const s = score === undefined ? (correct ? 1 : 0) : Math.min(1, Math.max(0, score));
+  const posterior = s * right + (1 - s) * wrong;
   return clamp(posterior + (1 - posterior) * pLearn);
 }
 

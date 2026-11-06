@@ -83,14 +83,14 @@ describe("with VITE_API_URL", () => {
 
     await store.finishOnboarding("new", [{ question_id: "q_x_sym2", chosen: null }]);
     expect(calls[0].url).toBe(API + "/v1/onboarding");
-    expect(calls[0].body).toEqual({ experience: "new", events: [{ concept_tags: ["symbols"], is_correct: false, unsure: true }] });
+    expect(calls[0].body).toEqual({ experience: "new", events: [{ concept_tags: ["symbols"], is_correct: false, unsure: true, question_type: "multiple_choice" }] });
     expect(me().currentModule).toBe("m3");
     expect(me().mastery).toEqual(state.mastery);
     expect(client.getEngineMode()).toBe("api");
 
     const res = await store.submitQuiz("m3", [{ question_id: "q_w3", chosen: null }]);
     expect(calls[1].url).toBe(API + "/v1/quiz-result");
-    expect(calls[1].body).toMatchObject({ module_id: "m3", events: [{ concept_tags: ["diagrams", "symbols"], is_correct: false, unsure: true }] });
+    expect(calls[1].body).toMatchObject({ module_id: "m3", events: [{ concept_tags: ["diagrams", "symbols"], is_correct: false, unsure: true, question_type: "multiple_choice" }] });
     expect(calls[1].body.state).toHaveProperty("mastery");
     expect(calls[1].body.recheck_concept).toBeUndefined();
     expect(res.recommendation?.diagnostic_text.en).toBe("from the service");
@@ -114,6 +114,26 @@ describe("with VITE_API_URL", () => {
     await store.submitQuiz("m4", [{ question_id: "q_p1", chosen: 0 }, { question_id: rc.question_id, chosen: null }]);
     const quiz = calls.filter((c) => c.url.endsWith("/v1/quiz-result")).pop()!;
     expect(quiz.body.recheck_concept).toBe(rc.concept_id);
+  });
+});
+
+describe("Barabari question types", () => {
+  it("sends a true/false answer with its question type", async () => {
+    vi.stubGlobal("fetch", serviceFetch(() => ({ state: { mastery: {}, observations: {}, tried: {} }, recommendation: null })));
+    const { store } = await load(API);
+    store.applyPreset("onboarded");
+    await store.submitQuiz("m1", [{ question_id: "q_s4", chosen: 1 }]);
+    const quiz = calls.find((c) => c.url.endsWith("/v1/quiz-result"))!;
+    expect(quiz.body.events).toEqual([{ concept_tags: ["safety"], is_correct: true, unsure: false, question_type: "true_false" }]);
+  });
+
+  it("asks the service for the model in VITE_ENGINE_MODEL", async () => {
+    vi.stubGlobal("fetch", serviceFetch(() => ({ state: { mastery: {}, observations: {}, tried: {} }, start_module_id: "m1" })));
+    vi.stubEnv("VITE_ENGINE_MODEL", "improved");
+    const { store, client } = await load(API);
+    await store.finishOnboarding("new", []);
+    expect(calls[0].url).toBe(API + "/v1/onboarding?model=improved");
+    expect(client.MODEL).toBe("improved");
   });
 });
 

@@ -68,13 +68,13 @@ export const CONCEPT_ORDER: ConceptId[] = [
 ];
 
 export const MODULES: Module[] = [
-  { id: "m1", number: 1, title: { en: "Safety first", hi: "पहले सुरक्षा" }, concepts: ["safety"], quiz: ["q_s1", "q_s2", "q_s3"], minutes: 2 },
+  { id: "m1", number: 1, title: { en: "Safety first", hi: "पहले सुरक्षा" }, concepts: ["safety"], quiz: ["q_s1", "q_s2", "q_s3", "q_s4"], minutes: 2 },
   {
     id: "m2",
     number: 2,
     title: { en: "Electricity basics", hi: "बिजली की बुनियादी बातें" },
     concepts: ["quantities", "ohm"],
-    quiz: ["q_q1", "q_q2", "q_o1"],
+    quiz: ["q_q1", "q_q2", "q_o1", "q_o2"],
     minutes: 2,
   },
   {
@@ -106,7 +106,7 @@ export const MODULES: Module[] = [
     number: 6,
     title: { en: "Protection & fault finding", hi: "सुरक्षा उपकरण और फॉल्ट ढूँढना" },
     concepts: ["earthing", "fault"],
-    quiz: ["q_e1", "q_f1", "q_f2"],
+    quiz: ["q_e1", "q_e2", "q_f1", "q_f2"],
     minutes: 2,
   },
 ];
@@ -161,6 +161,19 @@ const Q: Question[] = [
       hi: "उन्हें छूने से करंट आपको भी लगेगा। पहले सर्किट तोड़ें।",
     },
   },
+  {
+    id: "q_s4",
+    type: "true_false",
+    points: 5,
+    concepts: ["safety"],
+    prompt: { en: "It is safe to touch a live wire if your hands are dry.", hi: "हाथ सूखे हों तो चालू तार को छूना सुरक्षित है।" },
+    options: [
+      { text: { en: "True", hi: "सही" } },
+      { text: { en: "False", hi: "गलत" } },
+    ],
+    correct: 1,
+    why: { en: "Dry skin still lets current through. Switch off the supply first.", hi: "सूखी त्वचा से भी करंट जाता है। पहले सप्लाई बंद करें।" },
+  },
   // ── Module 2 · Basics ────────────────────────────────────────────────
   {
     id: "q_q1",
@@ -196,6 +209,22 @@ const Q: Question[] = [
     options: [{ text: { en: "2 A", hi: "2 A" } }, { text: { en: "72 A", hi: "72 A" } }, { text: { en: "0.5 A", hi: "0.5 A" } }],
     correct: 0,
     why: { en: "Current = Voltage ÷ Resistance = 12 ÷ 6 = 2 A.", hi: "करंट = वोल्टेज ÷ रेज़िस्टेंस = 12 ÷ 6 = 2 A।" },
+  },
+  {
+    id: "q_o2",
+    type: "short_answer",
+    points: 20,
+    concepts: ["ohm"],
+    prompt: {
+      en: "In your own words: the voltage stays the same and the resistance goes up. What happens to the current, and why?",
+      hi: "अपने शब्दों में: वोल्टेज वही रहता है और रेज़िस्टेंस बढ़ता है। करंट का क्या होगा, और क्यों?",
+    },
+    options: [],
+    correct: -1,
+    why: {
+      en: "The current goes down: current = voltage ÷ resistance, so a bigger resistance lets less current through.",
+      hi: "करंट कम होगा: करंट = वोल्टेज ÷ रेज़िस्टेंस, इसलिए ज़्यादा रेज़िस्टेंस कम करंट जाने देता है।",
+    },
   },
   // ── Module 3 · Wiring basics ─────────────────────────────────────────
   {
@@ -365,6 +394,22 @@ const Q: Question[] = [
     },
   },
   {
+    id: "q_e2",
+    type: "true_false",
+    points: 5,
+    concepts: ["earthing"],
+    prompt: { en: "The earth wire carries current all the time when a lamp is on.", hi: "बल्ब जलते समय अर्थ तार में हर समय करंट बहता है।" },
+    options: [
+      { text: { en: "True", hi: "सही" } },
+      { text: { en: "False", hi: "गलत" } },
+    ],
+    correct: 1,
+    why: {
+      en: "Earth carries current only when there is a fault, so the fault current goes safely to ground.",
+      hi: "अर्थ तार में करंट सिर्फ़ फॉल्ट होने पर बहता है, ताकि फॉल्ट करंट सुरक्षित रूप से ज़मीन में जाए।",
+    },
+  },
+  {
     id: "q_f1",
     concepts: ["fault", "multimeter", "diagrams"],
     prompt: {
@@ -530,6 +575,9 @@ const Q: Question[] = [
 ];
 
 export const QUESTIONS: Record<string, Question> = Object.fromEntries(Q.map((q) => [q.id, q]));
+
+/** Points for a question (Barabari sets points per question; 10 unless given). */
+export const questionPoints = (q: Question) => q.points ?? 10;
 
 export const moduleById = (id: string) => MODULES.find((m) => m.id === id)!;
 export const moduleForConcept = (c: ConceptId) => MODULES.find((m) => m.concepts.includes(c))!;

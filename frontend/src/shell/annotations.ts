@@ -18,7 +18,8 @@ export type ScreenKey =
   | "messages"
   | "e-queue"
   | "e-case"
-  | "e-resolved";
+  | "e-resolved"
+  | "e-marking";
 
 export type Flow = "learner" | "educator" | "onboarding" | "recheck";
 
@@ -223,5 +224,14 @@ export const ANNOTATIONS: Record<ScreenKey, Annotation> = {
     why: "Keeps a light record of what worked. This becomes evaluation data: which interventions resolve which gaps.",
     route: "/educator/resolved",
     preset: "resolved",
+  },
+  "e-marking": {
+    code: "E4",
+    name: "Short answers to mark",
+    flow: "educator",
+    stage: "Instructor review",
+    why: "Barabari grades short answers by hand. The trainer's mark becomes partial credit in the learner's model, so a written answer counts like any other evidence.",
+    api: "POST /v1/marked-answer",
+    route: "/educator/marking",
   },
 };

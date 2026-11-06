@@ -45,8 +45,15 @@ export interface Option {
   text: L;
 }
 
+/** Barabari's question types. Short answers are marked by a trainer (not in this prototype yet). */
+export type QuestionType = "multiple_choice" | "true_false" | "short_answer";
+
 export interface Question {
   id: string;
+  /** Defaults to multiple choice. True/false keeps its options in order (True, then False). */
+  type?: QuestionType;
+  /** Points, as in Barabari's quizzes. Defaults to 10. */
+  points?: number;
   concepts: ConceptId[];
   prompt: L;
   figure?: FigureId;
@@ -176,7 +183,23 @@ export interface LearnerState {
   /** Content already tried per concept, so the same fix is never recommended the same fix twice. */
   tried: Partial<Record<ConceptId, string[]>>;
   rechecks: Recheck[];
-  lastQuiz?: { module_id: string; answers: { question_id: string; chosen: number | null; correct: boolean }[] };
+  lastQuiz?: { module_id: string; answers: { question_id: string; chosen: number | null; correct: boolean; pending?: boolean }[] };
+}
+
+/** A written (short-answer) reply waiting for, or marked by, a trainer. */
+export interface MarkRequest {
+  id: string;
+  learner_id: string;
+  module_id: string;
+  question_id: string;
+  concepts: ConceptId[];
+  text: string;
+  at: number;
+  status: "waiting" | "marked";
+  /** The trainer's mark as a share of the question's points: 0, 0.25, 0.5, 0.75 or 1. */
+  score?: number;
+  comment?: string;
+  marked_at?: number;
 }
 
 export interface DB {
@@ -186,5 +209,7 @@ export interface DB {
   learners: Record<string, LearnerState>;
   escalations: Escalation[];
   messages: Message[];
+  /** Short answers for the trainer to mark (Barabari's instructor review). */
+  marks: MarkRequest[];
   activeLearnerId: string;
 }

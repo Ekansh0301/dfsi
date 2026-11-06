@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { ConceptId, Recommendation } from "./types";
+import type { ConceptId, QuestionType, Recommendation } from "./types";
 
 /**
  * Optional connection to the engine service in `backend/`.
@@ -11,6 +11,8 @@ import type { ConceptId, Recommendation } from "./types";
  *   VITE_API_URL=http://localhost:8000 npm run dev
  */
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
+/** Optional engine model on the service: "baseline" or "improved" (VITE_ENGINE_MODEL). */
+export const MODEL = (import.meta.env.VITE_ENGINE_MODEL as string | undefined) || undefined;
 
 export type EngineMode = "local" | "api" | "fallback";
 let mode: EngineMode = BASE ? "api" : "local";
@@ -40,6 +42,7 @@ export interface EngineEvent {
   concept_tags: ConceptId[];
   is_correct: boolean;
   unsure: boolean;
+  question_type: QuestionType;
 }
 
 async function post<T>(path: string, body: unknown): Promise<T | null> {
@@ -47,7 +50,7 @@ async function post<T>(path: string, body: unknown): Promise<T | null> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 4000);
   try {
-    const res = await fetch(BASE + path, {
+    const res = await fetch(BASE + path + (MODEL ? `?model=${encodeURIComponent(MODEL)}` : ""), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -71,6 +74,12 @@ export const remoteQuizResult = (req: { state: EngineState; module_id: string; e
   post<{ state: EngineState; recommendation: (Omit<Recommendation, "strong_concept_id"> & { strong_concept_id: ConceptId | null }) | null }>(
     "/v1/quiz-result",
     req,
+  );
+
+export const remoteMarkedAnswer = (state: EngineState, concept_tags: ConceptId[], score: number, now: number) =>
+  post<{ state: EngineState; recommendation: (Omit<Recommendation, "strong_concept_id"> & { strong_concept_id: ConceptId | null }) | null }>(
+    "/v1/marked-answer",
+    { state, concept_tags, score, now },
   );
 
 export const remoteGotIt = (state: EngineState, concept_id: ConceptId) => post<{ state: EngineState }>("/v1/got-it", { state, concept_id });

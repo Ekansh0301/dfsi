@@ -5,7 +5,7 @@ export const COHORT = "Electrician batch B · Sep 2026";
 export const EDUCATOR = { name: "Kavitha M.", role: "Trainer" };
 export const ACTIVE_ID = "asha";
 /** Bump when seed data or the DB shape changes, so stale browser data is replaced. */
-export const DB_VERSION = 5;
+export const DB_VERSION = 6;
 
 const H = 3600_000;
 
@@ -142,5 +142,17 @@ export function seedDB(now: number): DB {
 
   const learners: DB["learners"] = { [ACTIVE_ID]: freshLearner() };
   for (const l of others) learners[l.id] = l;
-  return { version: DB_VERSION, clockOffset: 0, learners, escalations, messages: [], activeLearnerId: ACTIVE_ID };
+  const marks: DB["marks"] = [
+    {
+      id: "mark_sandeep",
+      learner_id: "sandeep",
+      module_id: "m2",
+      question_id: "q_o2",
+      concepts: ["ohm"],
+      text: "current also goes up because resistance is more",
+      at: now - 3 * H,
+      status: "waiting",
+    },
+  ];
+  return { version: DB_VERSION, clockOffset: 0, learners, escalations, messages: [], marks, activeLearnerId: ACTIVE_ID };
 }
