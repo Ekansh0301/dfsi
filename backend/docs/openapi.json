@@ -158,10 +158,397 @@
           }
         }
       }
+    },
+    "/v1/barabari/quiz-attempt": {
+      "post": {
+        "summary": "Barabari Quiz Attempt",
+        "description": "Trace one attempt from Barabari's LMS and return the recommendation and the quiz score.",
+        "operationId": "barabari_quiz_attempt_v1_barabari_quiz_attempt_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BarabariAttemptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BarabariAttemptResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "BarabariAnswer": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "selected_option_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Id"
+          },
+          "text_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Answer"
+          },
+          "points_earned": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Earned",
+            "description": "Instructor's mark for a short answer; null while awaiting review"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_id"
+        ],
+        "title": "BarabariAnswer"
+      },
+      "BarabariAttempt": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "quiz_id": {
+            "type": "string",
+            "title": "Quiz Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "attempt_number": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Attempt Number",
+            "default": 1
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/BarabariAnswer"
+            },
+            "type": "array",
+            "title": "Answers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "quiz_id",
+          "student_id",
+          "answers"
+        ],
+        "title": "BarabariAttempt",
+        "description": "One row of `quiz_attempts` (the shape we assume until Barabari shares theirs)."
+      },
+      "BarabariAttemptRequest": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "quiz": {
+            "$ref": "#/components/schemas/BarabariQuiz"
+          },
+          "attempt": {
+            "$ref": "#/components/schemas/BarabariAttempt"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BarabariTags"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Concept tags; defaults to the service's barabari_tags.json"
+          },
+          "now": {
+            "type": "integer",
+            "title": "Now",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "quiz",
+          "attempt"
+        ],
+        "title": "BarabariAttemptRequest"
+      },
+      "BarabariAttemptResponse": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecommendationModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "score": {
+            "$ref": "#/components/schemas/BarabariScore"
+          },
+          "assessed_concepts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assessed Concepts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "recommendation",
+          "score",
+          "assessed_concepts"
+        ],
+        "title": "BarabariAttemptResponse"
+      },
+      "BarabariOption": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "option_text": {
+            "type": "string",
+            "title": "Option Text",
+            "default": ""
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "BarabariOption"
+      },
+      "BarabariQuestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "question_text": {
+            "type": "string",
+            "title": "Question Text",
+            "default": ""
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "true_false",
+              "short_answer"
+            ],
+            "title": "Question Type"
+          },
+          "points": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Points"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation",
+            "default": ""
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/BarabariOption"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "question_type",
+          "points"
+        ],
+        "title": "BarabariQuestion"
+      },
+      "BarabariQuiz": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "unit_id": {
+            "type": "string",
+            "title": "Unit Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "default": ""
+          },
+          "passing_score": {
+            "type": "number",
+            "title": "Passing Score",
+            "default": 60
+          },
+          "max_score": {
+            "type": "number",
+            "title": "Max Score",
+            "default": 100
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/BarabariQuestion"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Questions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "unit_id",
+          "questions"
+        ],
+        "title": "BarabariQuiz",
+        "description": "A quiz as stored in Barabari's `quizzes` and `quiz_questions` tables."
+      },
+      "BarabariScore": {
+        "properties": {
+          "points": {
+            "type": "number",
+            "title": "Points"
+          },
+          "max_score": {
+            "type": "number",
+            "title": "Max Score"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent"
+          },
+          "passed": {
+            "type": "boolean",
+            "title": "Passed"
+          },
+          "awaiting_review_points": {
+            "type": "number",
+            "title": "Awaiting Review Points",
+            "description": "Points of short answers not marked yet; they are left out of the model"
+          },
+          "answers_revealed": {
+            "type": "boolean",
+            "title": "Answers Revealed",
+            "description": "True from the third attempt, when Barabari shows correct answers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "points",
+          "max_score",
+          "percent",
+          "passed",
+          "awaiting_review_points",
+          "answers_revealed"
+        ],
+        "title": "BarabariScore"
+      },
+      "BarabariTags": {
+        "properties": {
+          "units": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Units",
+            "description": "unit_id to concept ids"
+          },
+          "questions": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Questions",
+            "description": "question id (or quiz id/question id) to concept ids; wins over the unit"
+          }
+        },
+        "type": "object",
+        "title": "BarabariTags"
+      },
       "ConceptModel": {
         "properties": {
           "name": {
@@ -237,6 +624,38 @@
             "title": "Unsure",
             "description": "The learner chose \"I'm not sure\"",
             "default": false
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "true_false",
+              "short_answer"
+            ],
+            "title": "Question Type",
+            "description": "Barabari question type; sets the chance of a lucky guess",
+            "default": "multiple_choice"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score",
+            "description": "Partial credit from 0 to 1 (points earned / points). Overrides is_correct"
+          },
+          "attempt_number": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Attempt Number",
+            "description": "1 for the first try at this quiz; retakes count for less",
+            "default": 1
           }
         },
         "type": "object",

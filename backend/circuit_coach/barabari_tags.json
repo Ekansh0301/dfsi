@@ -1,0 +1,18 @@
+{
+  "_note": "Concept tags for Barabari quizzes. Barabari's data has no concept tags, so each unit carries its concepts and a trainer can override single questions (key: question id, or quiz id/question id). Question tags win over unit tags.",
+  "units": {
+    "unit_m1": ["safety"],
+    "unit_m2": ["quantities", "ohm"],
+    "unit_m3": ["symbols", "wiring", "diagrams"],
+    "unit_m4": ["series_parallel", "diagrams"],
+    "unit_m5": ["multimeter"],
+    "unit_m6": ["earthing", "fault"]
+  },
+  "questions": {
+    "quiz_unit_m3_wiring_basics/q_01": ["symbols"],
+    "quiz_unit_m3_wiring_basics/q_02": ["wiring", "safety"],
+    "quiz_unit_m3_wiring_basics/q_03": ["wiring"],
+    "quiz_unit_m3_wiring_basics/q_04": ["diagrams", "symbols"],
+    "quiz_unit_m3_wiring_basics/q_05": ["diagrams"]
+  }
+}

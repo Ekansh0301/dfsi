@@ -56,6 +56,9 @@ class Event:
     concept_tags: tuple[str, ...]
     is_correct: bool
     unsure: bool = False
+    question_type: str = "multiple_choice"  # multiple_choice, true_false or short_answer
+    score: float | None = None  # partial credit 0 to 1 (points earned / points); overrides is_correct
+    attempt_number: int = 1  # 1 = first try at this quiz; retakes count for less
 
 
 class Engine:
@@ -76,7 +79,15 @@ class Engine:
             for c in ev.concept_tags:
                 if c not in self.params:
                     continue
-                out.mastery[c] = bkt.update(self.mastery_of(out, c), ev.is_correct, self.params[c], ev.unsure)
+                out.mastery[c] = bkt.update(
+                    self.mastery_of(out, c),
+                    ev.is_correct,
+                    self.params[c],
+                    ev.unsure,
+                    score=ev.score,
+                    question_type=ev.question_type,
+                    attempt=ev.attempt_number,
+                )
                 out.observations[c] = out.observations.get(c, 0) + 1
         return out
 

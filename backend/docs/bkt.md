@@ -29,6 +29,9 @@ The clamp keeps one answer from ever making the model certain.
 
 | Case | Handling | Code |
 |---|---|---|
+| Question type (Barabari) | Guess rate 0.5 for true/false and 0.05 for a short answer; multiple choice keeps the concept's own | `bkt.guess_for` |
+| Partial credit | A score from 0 to 1 (points earned / points) mixes the right-answer and wrong-answer posteriors | `bkt.evidence(..., score=)` |
+| Retake | Attempt k moves the estimate only 0.5 to the power k minus 1 of the way | `bkt.retake_weight` |
 | "I'm not sure" | Treated as a wrong answer, but with guess set to `min(guess, 0.02)`: the learner showed they do not know, without the chance of a lucky guess. It lowers mastery more than a plain wrong answer | `bkt.posterior(..., unsure=True)` |
 | Question tagged with several concepts | Every tagged concept is updated with its own parameters, and its observation count goes up by one (naive credit assignment) | `Engine.trace` |
 | Unknown concept tag | Ignored by the tracer; the API rejects it with 422 before that | `Engine.trace`, `api.py` |

@@ -1,0 +1,37 @@
+{
+  "_note": "Made-up, anonymised attempts in the shape we assume for Barabari's quiz_attempts table until they share theirs. points_earned is the instructor's mark for a short answer (null while awaiting review).",
+  "attempts": [
+    { "id": "att_001", "quiz_id": "quiz_unit_m3_wiring_basics", "student_id": "usr_a_anon", "attempt_number": 1, "submitted_at": "2026-11-02T10:05:00Z",
+      "answers": [
+        { "question_id": "q_01", "selected_option_id": "opt_1a" },
+        { "question_id": "q_02", "selected_option_id": "opt_2a" },
+        { "question_id": "q_03", "selected_option_id": "opt_3b" },
+        { "question_id": "q_04", "selected_option_id": "opt_4b" },
+        { "question_id": "q_05", "text_answer": "Both lamps light because the battery is connected", "points_earned": 4 }
+      ] },
+    { "id": "att_002", "quiz_id": "quiz_unit_m3_wiring_basics", "student_id": "usr_b_anon", "attempt_number": 1, "submitted_at": "2026-11-02T10:07:00Z",
+      "answers": [
+        { "question_id": "q_01", "selected_option_id": "opt_1b" },
+        { "question_id": "q_02", "selected_option_id": "opt_2a" },
+        { "question_id": "q_03", "selected_option_id": "opt_3b" },
+        { "question_id": "q_04", "selected_option_id": "opt_4b" },
+        { "question_id": "q_05", "text_answer": "L1 because S1 is closed", "points_earned": 12 }
+      ] },
+    { "id": "att_003", "quiz_id": "quiz_unit_m3_wiring_basics", "student_id": "usr_b_anon", "attempt_number": 2, "submitted_at": "2026-11-03T09:30:00Z",
+      "answers": [
+        { "question_id": "q_01", "selected_option_id": "opt_1a" },
+        { "question_id": "q_02", "selected_option_id": "opt_2a" },
+        { "question_id": "q_03", "selected_option_id": "opt_3b" },
+        { "question_id": "q_04", "selected_option_id": "opt_4a" },
+        { "question_id": "q_05", "text_answer": "Only L1, S1 closes its branch, L2 is open at S2", "points_earned": null }
+      ] },
+    { "id": "att_004", "quiz_id": "quiz_unit_m3_wiring_basics", "student_id": "usr_c_anon", "attempt_number": 1, "submitted_at": "2026-11-02T11:00:00Z",
+      "answers": [
+        { "question_id": "q_01", "selected_option_id": "opt_1a" },
+        { "question_id": "q_02", "selected_option_id": "opt_2a" },
+        { "question_id": "q_03", "selected_option_id": "opt_3b" },
+        { "question_id": "q_04", "selected_option_id": "opt_4a" },
+        { "question_id": "q_05", "text_answer": "L1 only, S1 completes L1's loop and S2 is still open", "points_earned": 20 }
+      ] }
+  ]
+}

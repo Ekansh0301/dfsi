@@ -27,6 +27,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `circuit_coach/api.py` | FastAPI service (stateless: the caller sends the learner state) |
 | `circuit_coach/prediction.py` | Next-answer prediction: BKT against simple baselines |
 | `circuit_coach/simulate.py` | Made-up learners with hidden mastery |
+| `circuit_coach/barabari.py` | Reads Barabari's quiz format and turns attempts into engine events |
 | `circuit_coach/dataset.py` | Save, load, split (70:30) and validate a made-up dataset |
 | `circuit_coach/diagnosis_eval.py` | Does the engine find the right gap and the right lesson? |
 | `circuit_coach/ednet.py` | Loader for the real EdNet dataset |
@@ -38,6 +39,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 
 ## Docs
 
+- [Barabari's quiz format](docs/barabari_format.md): question types, partial credit, retakes, concept tags and the adapter endpoint
 - [Technical design document (revised)](docs/Technical_Design_Doc.md): architecture, implementation, evaluation, baseline results, POC v0.1 status
 - [Architecture and data flow](docs/architecture.md)
 - [API contract](docs/api_contract.md) and the generated [OpenAPI schema](docs/openapi.json)

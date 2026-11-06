@@ -23,6 +23,16 @@ P_MIN, P_MAX = 0.01, 0.99
 # "I'm not sure" is evidence of not knowing the concept without the chance of a lucky guess.
 UNSURE_GUESS = 0.02
 
+# Question types used by Barabari's LMS (quiz_questions.question_type). A learner who does not
+# know the concept still gets a true/false question right half the time, and almost never writes
+# a correct short answer by chance. Multiple choice uses the concept's own guess parameter.
+QUESTION_TYPES = ("multiple_choice", "true_false", "short_answer")
+TYPE_GUESS = {"true_false": 0.5, "short_answer": 0.05}
+
+# Barabari allows retakes and reveals answers after 3 attempts, so a later attempt at the same
+# quiz says less about mastery: attempt k counts with weight RETAKE_DECAY ** (k - 1).
+RETAKE_DECAY = 0.5
+
 
 @dataclass(frozen=True)
 class BKTParams:
@@ -47,9 +57,21 @@ def _clamp(x: float) -> float:
     return min(P_MAX, max(P_MIN, x))
 
 
-def posterior(p: float, correct: bool, params: BKTParams, unsure: bool = False) -> float:
+def guess_for(params: BKTParams, question_type: str = "multiple_choice") -> float:
+    """Chance of a right answer without mastery, for this kind of question."""
+    return TYPE_GUESS.get(question_type, params.p_guess)
+
+
+def retake_weight(attempt: int) -> float:
+    """How much an answer on attempt `attempt` (1 = first try) counts."""
+    return RETAKE_DECAY ** (max(attempt, 1) - 1)
+
+
+def posterior(p: float, correct: bool, params: BKTParams, unsure: bool = False, guess: float | None = None) -> float:
     """P(mastered | this answer), before applying the learning step."""
-    guess = min(params.p_guess, UNSURE_GUESS) if unsure else params.p_guess
+    guess = params.p_guess if guess is None else guess
+    if unsure:
+        guess = min(guess, UNSURE_GUESS)
     s = params.p_slip
     if correct:
         num = p * (1 - s)
@@ -58,9 +80,43 @@ def posterior(p: float, correct: bool, params: BKTParams, unsure: bool = False) 
     return num / (num + (1 - p) * (1 - guess))
 
 
-def update(p: float, correct: bool, params: BKTParams, unsure: bool = False) -> float:
+def evidence(
+    p: float,
+    correct: bool,
+    params: BKTParams,
+    unsure: bool = False,
+    *,
+    score: float | None = None,
+    question_type: str = "multiple_choice",
+    attempt: int = 1,
+) -> float:
+    """P(mastered | this answer) for any of Barabari's answer kinds, before learning.
+
+    `score` (0 to 1) is partial credit, for example a short answer marked 6 out of 10: the
+    posterior is the score-weighted mix of the right-answer and wrong-answer posteriors. It
+    replaces `correct` when given. A retake moves the estimate only part of the way.
+    """
+    g = guess_for(params, question_type)
+    if score is None:
+        post = posterior(p, correct, params, unsure, g)
+    else:
+        s = min(1.0, max(0.0, score))
+        post = s * posterior(p, True, params, False, g) + (1 - s) * posterior(p, False, params, False, g)
+    return p + retake_weight(attempt) * (post - p)
+
+
+def update(
+    p: float,
+    correct: bool,
+    params: BKTParams,
+    unsure: bool = False,
+    *,
+    score: float | None = None,
+    question_type: str = "multiple_choice",
+    attempt: int = 1,
+) -> float:
     """One full BKT step: condition on the answer, then apply the learning transition."""
-    post = posterior(p, correct, params, unsure)
+    post = evidence(p, correct, params, unsure, score=score, question_type=question_type, attempt=attempt)
     return _clamp(post + (1 - post) * params.p_learn)
 
 
@@ -69,8 +125,8 @@ def learn_step(p: float, params: BKTParams) -> float:
     return _clamp(p + (1 - p) * params.p_learn)
 
 
-def predict_correct(p_mastered: float, params: BKTParams) -> float:
-    return p_mastered * (1 - params.p_slip) + (1 - p_mastered) * params.p_guess
+def predict_correct(p_mastered: float, params: BKTParams, question_type: str = "multiple_choice") -> float:
+    return p_mastered * (1 - params.p_slip) + (1 - p_mastered) * guess_for(params, question_type)
 
 
 # --------------------------------------------------------------------------------------

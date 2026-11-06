@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import __version__
+from . import __version__, barabari
 from .curriculum import CONCEPTS, CONTENT, MODULES
 from .engine import _PARAMS_FILE, Engine, Event, LearnerState
 
@@ -51,12 +51,19 @@ class EventModel(BaseModel):
     concept_tags: list[str] = Field(min_length=1)
     is_correct: bool
     unsure: bool = Field(default=False, description='The learner chose "I\'m not sure"')
+    question_type: Literal["multiple_choice", "true_false", "short_answer"] = Field(
+        default="multiple_choice", description="Barabari question type; sets the chance of a lucky guess"
+    )
+    score: float | None = Field(
+        default=None, ge=0, le=1, description="Partial credit from 0 to 1 (points earned / points). Overrides is_correct"
+    )
+    attempt_number: int = Field(default=1, ge=1, description="1 for the first try at this quiz; retakes count for less")
 
     def to_event(self) -> Event:
         unknown = set(self.concept_tags) - set(CONCEPTS)
         if unknown:
             raise HTTPException(422, f"Unknown concepts: {sorted(unknown)}")
-        return Event(tuple(self.concept_tags), self.is_correct, self.unsure)
+        return Event(tuple(self.concept_tags), self.is_correct, self.unsure, self.question_type, self.score, self.attempt_number)
 
 
 class OnboardingRequest(BaseModel):
@@ -176,3 +183,106 @@ def got_it(req: GotItRequest) -> GotItResponse:
     if req.concept_id not in CONCEPTS:
         raise HTTPException(422, f"Unknown concept {req.concept_id}")
     return GotItResponse(state=StateModel.of(engine.got_it(req.state.to_state(), req.concept_id)))
+
+
+# ---- Barabari adapter --------------------------------------------------------------------
+# Barabari's LMS can send a quiz attempt in its own format; the service tags it with concepts,
+# traces it and returns the same recommendation as /v1/quiz-result.
+
+
+class BarabariOption(BaseModel):
+    id: str
+    option_text: str = ""
+    is_correct: bool = False
+
+
+class BarabariQuestion(BaseModel):
+    id: str
+    question_text: str = ""
+    question_type: Literal["multiple_choice", "true_false", "short_answer"]
+    points: float = Field(gt=0)
+    explanation: str = ""
+    options: list[BarabariOption] = Field(default_factory=list)
+
+
+class BarabariQuiz(BaseModel):
+    """A quiz as stored in Barabari's `quizzes` and `quiz_questions` tables."""
+
+    id: str
+    unit_id: str
+    title: str = ""
+    passing_score: float = 60
+    max_score: float = 100
+    questions: list[BarabariQuestion] = Field(min_length=1)
+
+
+class BarabariAnswer(BaseModel):
+    question_id: str
+    selected_option_id: str | None = None
+    text_answer: str | None = None
+    points_earned: float | None = Field(default=None, ge=0, description="Instructor's mark for a short answer; null while awaiting review")
+
+
+class BarabariAttempt(BaseModel):
+    """One row of `quiz_attempts` (the shape we assume until Barabari shares theirs)."""
+
+    id: str
+    quiz_id: str
+    student_id: str
+    attempt_number: int = Field(default=1, ge=1)
+    submitted_at: str | None = None
+    answers: list[BarabariAnswer]
+
+
+class BarabariTags(BaseModel):
+    units: dict[str, list[str]] = Field(default_factory=dict, description="unit_id to concept ids")
+    questions: dict[str, list[str]] = Field(default_factory=dict, description="question id (or quiz id/question id) to concept ids; wins over the unit")
+
+
+class BarabariScore(BaseModel):
+    points: float
+    max_score: float
+    percent: float
+    passed: bool
+    awaiting_review_points: float = Field(description="Points of short answers not marked yet; they are left out of the model")
+    answers_revealed: bool = Field(description="True from the third attempt, when Barabari shows correct answers")
+
+
+class BarabariAttemptRequest(BaseModel):
+    state: StateModel
+    quiz: BarabariQuiz
+    attempt: BarabariAttempt
+    tags: BarabariTags | None = Field(default=None, description="Concept tags; defaults to the service's barabari_tags.json")
+    now: int = 0
+
+
+class BarabariAttemptResponse(BaseModel):
+    state: StateModel
+    recommendation: RecommendationModel | None
+    score: BarabariScore
+    assessed_concepts: list[str]
+
+
+@app.post("/v1/barabari/quiz-attempt", response_model=BarabariAttemptResponse)
+def barabari_quiz_attempt(req: BarabariAttemptRequest) -> BarabariAttemptResponse:
+    """Trace one attempt from Barabari's LMS and return the recommendation and the quiz score."""
+    quiz = barabari.parse_quiz(req.quiz.model_dump())
+    attempt = barabari.parse_attempt(req.attempt.model_dump())
+    problems = barabari.validate_quiz(quiz)
+    if attempt.quiz_id != quiz.id:
+        problems.append(f"attempt is for quiz {attempt.quiz_id}, not {quiz.id}")
+    unknown = sorted({a.question_id for a in attempt.answers} - {q.id for q in quiz.questions})
+    if unknown:
+        problems.append(f"answers to unknown questions {unknown}")
+    tags = barabari.TagMap.from_dict(req.tags.model_dump()) if req.tags else barabari.TagMap.load()
+    problems += tags.problems()
+    if problems:
+        raise HTTPException(422, problems)
+    assessed = barabari.quiz_concepts(quiz, tags)
+    if not assessed:
+        raise HTTPException(422, f"No concept tags for unit {quiz.unit_id}; add it to the tag map")
+    state = engine.trace(req.state.to_state(), barabari.attempt_events(quiz, attempt, tags))
+    rec = engine.recommend(state, assessed, req.now)
+    return BarabariAttemptResponse(
+        state=StateModel.of(state), recommendation=rec, score=barabari.attempt_score(quiz, attempt), assessed_concepts=assessed
+    )

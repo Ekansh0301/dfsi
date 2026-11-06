@@ -9,6 +9,7 @@ The engine service exposes five endpoints. All bodies are JSON. The machine-read
 | POST | `/v1/onboarding` | Seed a new learner from stated experience and the placement quiz |
 | POST | `/v1/quiz-result` | Update the model from a quick check, return at most one recommendation |
 | POST | `/v1/got-it` | Apply a learning step after the learner taps "Got it!" |
+| POST | `/v1/barabari/quiz-attempt` | Diagnose one quiz attempt sent in Barabari's own quiz format |
 
 The frontend side of the contract is `frontend/src/api/engineClient.ts` (request and response types) and `frontend/src/api/types.ts` (`Recommendation`).
 
@@ -33,6 +34,9 @@ One answered question.
 | `concept_tags` | list of concept ids, at least one | Every tag is updated (naive credit assignment) |
 | `is_correct` | boolean | |
 | `unsure` | boolean, default `false` | The learner chose "I'm not sure" |
+| `question_type` | `"multiple_choice"` (default), `"true_false"` or `"short_answer"` | Barabari's question types; sets the chance of a lucky guess (0.5 for true/false, 0.05 for a short answer) |
+| `score` | number 0 to 1 or `null` (default) | Partial credit, such as points earned on a marked short answer. Replaces `is_correct` when set |
+| `attempt_number` | integer, at least 1 (default 1) | Retakes count for less: attempt k has weight 0.5 to the power k minus 1 |
 
 ### `Recommendation`
 
@@ -169,6 +173,16 @@ Response: `{ "state": State }` with one BKT learning step applied to that concep
 ```json
 { "state": { "mastery": { "symbols": 0.356 }, "observations": { "symbols": 3 }, "tried": { "symbols": ["ct_sym_cards"] } } }
 ```
+
+### `POST /v1/barabari/quiz-attempt`
+
+For Barabari's LMS: the quiz and the attempt are sent in Barabari's own shape ([barabari_format.md](barabari_format.md)).
+
+Request: `state`, `quiz` (`id`, `unit_id`, `title`, `passing_score`, `max_score`, `questions` with `question_type`, `points`, `options` with `is_correct`), `attempt` (`id`, `quiz_id`, `student_id`, `attempt_number`, `answers` with `selected_option_id`, `text_answer`, `points_earned`), optional `tags` (`units`, `questions`) and `now`.
+
+Response: `state`, `recommendation` (same as `/v1/quiz-result`), `score` (`points`, `max_score`, `percent`, `passed`, `awaiting_review_points`, `answers_revealed`) and `assessed_concepts`.
+
+422 when the quiz breaks Barabari's rules (for example a multiple-choice question without exactly one correct option), the attempt is for another quiz, an answer names an unknown question, or the quiz has no concept tags.
 
 ## Errors
 
