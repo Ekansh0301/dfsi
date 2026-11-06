@@ -1,0 +1,458 @@
+[
+ {
+  "Correct tags and graph": {
+   "baseline": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.42984014209591476,
+    "recommendation_is_unmastered": 0.5043709616115546,
+    "missed_gap_rate": 0.06536412078152753,
+    "false_alarm_rate": 0.4020245842371656,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.4567436861902203,
+    "hidden_prereq_stopped_at_assessed_concept": 0.05910800644814616,
+    "gap_precision": 0.7234631714971387,
+    "gap_recall": 0.8749720919848181,
+    "gap_f1": 0.792037186742118
+   },
+   "improved": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.5598579040852576,
+    "recommendation_is_unmastered": 0.7332567929582855,
+    "missed_gap_rate": 0.07175843694493783,
+    "false_alarm_rate": 0.2935647143890094,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.5980655561526061,
+    "hidden_prereq_stopped_at_assessed_concept": 0.11875335840945728,
+    "gap_precision": 0.7608063578212831,
+    "gap_recall": 0.8763116767135521,
+    "gap_f1": 0.8144843328491388
+   }
+  },
+  "10% of items mis-tagged": {
+   "baseline": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.35879218472468916,
+    "recommendation_is_unmastered": 0.4094843808806925,
+    "missed_gap_rate": 0.056127886323268206,
+    "false_alarm_rate": 0.43673174258857556,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.3906501880709296,
+    "hidden_prereq_stopped_at_assessed_concept": 0.03653949489521763,
+    "gap_precision": 0.6827562681221218,
+    "gap_recall": 0.8937262781870954,
+    "gap_f1": 0.7741249274801779
+   },
+   "improved": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.4937833037300178,
+    "recommendation_is_unmastered": 0.6879655037240298,
+    "missed_gap_rate": 0.09378330373001777,
+    "false_alarm_rate": 0.2950108459869848,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.5470177324019344,
+    "hidden_prereq_stopped_at_assessed_concept": 0.10048361096184846,
+    "gap_precision": 0.7284507042253521,
+    "gap_recall": 0.8660415271265908,
+    "gap_f1": 0.7913096695226438
+   }
+  },
+  "25% of items mis-tagged": {
+   "baseline": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.31687388987566606,
+    "recommendation_is_unmastered": 0.36836363636363634,
+    "missed_gap_rate": 0.023090586145648313,
+    "false_alarm_rate": 0.5762834417932032,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.322944653412144,
+    "hidden_prereq_stopped_at_assessed_concept": 0.06179473401397098,
+    "gap_precision": 0.6628918430986378,
+    "gap_recall": 0.9017637865594998,
+    "gap_f1": 0.7640938327657965
+   },
+   "improved": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.40781527531083483,
+    "recommendation_is_unmastered": 0.5723633564280216,
+    "missed_gap_rate": 0.07708703374777975,
+    "false_alarm_rate": 0.39190166305133767,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.4062332079527136,
+    "hidden_prereq_stopped_at_assessed_concept": 0.12197743148844707,
+    "gap_precision": 0.698961937716263,
+    "gap_recall": 0.8568876981469078,
+    "gap_f1": 0.7699097291875627
+   }
+  },
+  "3 prerequisite links missing": {
+   "baseline": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.38650088809946714,
+    "recommendation_is_unmastered": 0.6142151273280122,
+    "missed_gap_rate": 0.06536412078152753,
+    "false_alarm_rate": 0.4020245842371656,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.3487372380440623,
+    "hidden_prereq_stopped_at_assessed_concept": 0.24073078989790436,
+    "gap_precision": 0.7234631714971387,
+    "gap_recall": 0.8749720919848181,
+    "gap_f1": 0.792037186742118
+   },
+   "improved": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.48774422735346357,
+    "recommendation_is_unmastered": 0.7919385796545105,
+    "missed_gap_rate": 0.07460035523978685,
+    "false_alarm_rate": 0.28994938539407084,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.44707146695325095,
+    "hidden_prereq_stopped_at_assessed_concept": 0.29661472326706073,
+    "gap_precision": 0.76313709996049,
+    "gap_recall": 0.8624693011832999,
+    "gap_f1": 0.8097683680955876
+   }
+  },
+  "3 wrong prerequisite links": {
+   "baseline": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.4099467140319716,
+    "recommendation_is_unmastered": 0.49372862029646525,
+    "missed_gap_rate": 0.06536412078152753,
+    "false_alarm_rate": 0.4020245842371656,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.44223535733476627,
+    "hidden_prereq_stopped_at_assessed_concept": 0.03492745835572273,
+    "gap_precision": 0.7234631714971387,
+    "gap_recall": 0.8749720919848181,
+    "gap_f1": 0.792037186742118
+   },
+   "improved": {
+    "points": 4198,
+    "with_true_gap": 2815,
+    "recommendation_is_true_blocker": 0.536056838365897,
+    "recommendation_is_unmastered": 0.7259854573287409,
+    "missed_gap_rate": 0.07175843694493783,
+    "false_alarm_rate": 0.2950108459869848,
+    "hidden_prereq_cases": 1861,
+    "hidden_prereq_blocker_hit": 0.5754970445996775,
+    "hidden_prereq_stopped_at_assessed_concept": 0.09725953788285868,
+    "gap_precision": 0.7573430600883087,
+    "gap_recall": 0.8807769591426657,
+    "gap_f1": 0.8144095788604458
+   }
+  }
+ },
+ {
+  "Correct tags and graph": {
+   "baseline": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.44905008635578586,
+    "recommendation_is_unmastered": 0.5414222873900293,
+    "missed_gap_rate": 0.05768566493955095,
+    "false_alarm_rate": 0.39589235127478756,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.45882962195753496,
+    "hidden_prereq_stopped_at_assessed_concept": 0.07198342827550493,
+    "gap_precision": 0.7400768245838668,
+    "gap_recall": 0.8663811563169165,
+    "gap_f1": 0.7982637861300187
+   },
+   "improved": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.5309153713298791,
+    "recommendation_is_unmastered": 0.7011834319526628,
+    "missed_gap_rate": 0.06597582037996545,
+    "false_alarm_rate": 0.3052407932011331,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.5686172967374418,
+    "hidden_prereq_stopped_at_assessed_concept": 0.09114448472294148,
+    "gap_precision": 0.7551168266618367,
+    "gap_recall": 0.8927194860813704,
+    "gap_f1": 0.8181728976547933
+   }
+  },
+  "10% of items mis-tagged": {
+   "baseline": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.40207253886010363,
+    "recommendation_is_unmastered": 0.4486151603498542,
+    "missed_gap_rate": 0.05215889464594128,
+    "false_alarm_rate": 0.45325779036827196,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.42257897462454685,
+    "hidden_prereq_stopped_at_assessed_concept": 0.027446918694976695,
+    "gap_precision": 0.7076948981309985,
+    "gap_recall": 0.9,
+    "gap_f1": 0.792346121217834
+   },
+   "improved": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.49637305699481865,
+    "recommendation_is_unmastered": 0.7119464086341645,
+    "missed_gap_rate": 0.07184801381692574,
+    "false_alarm_rate": 0.32790368271954673,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.5126877265665458,
+    "hidden_prereq_stopped_at_assessed_concept": 0.12428793371310203,
+    "gap_precision": 0.7375361271676301,
+    "gap_recall": 0.874304068522484,
+    "gap_f1": 0.8001175778953556
+   }
+  },
+  "25% of items mis-tagged": {
+   "baseline": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.322279792746114,
+    "recommendation_is_unmastered": 0.36630434782608695,
+    "missed_gap_rate": 0.046632124352331605,
+    "false_alarm_rate": 0.5184135977337111,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.33661315380631796,
+    "hidden_prereq_stopped_at_assessed_concept": 0.03728638011393061,
+    "gap_precision": 0.6768118379014629,
+    "gap_recall": 0.8618843683083511,
+    "gap_f1": 0.758217952340586
+   },
+   "improved": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.459412780656304,
+    "recommendation_is_unmastered": 0.664301717699776,
+    "missed_gap_rate": 0.07495682210708117,
+    "false_alarm_rate": 0.36756373937677056,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.4754013464526152,
+    "hidden_prereq_stopped_at_assessed_concept": 0.14396685655100985,
+    "gap_precision": 0.7262400605831124,
+    "gap_recall": 0.8214132762312634,
+    "gap_f1": 0.7709003215434084
+   }
+  },
+  "3 prerequisite links missing": {
+   "baseline": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.4172711571675302,
+    "recommendation_is_unmastered": 0.6429618768328446,
+    "missed_gap_rate": 0.05768566493955095,
+    "false_alarm_rate": 0.39589235127478756,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.3588814085965821,
+    "hidden_prereq_stopped_at_assessed_concept": 0.25375453133091663,
+    "gap_precision": 0.7400768245838668,
+    "gap_recall": 0.8663811563169165,
+    "gap_f1": 0.7982637861300187
+   },
+   "improved": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.47564766839378236,
+    "recommendation_is_unmastered": 0.7584415584415585,
+    "missed_gap_rate": 0.0690846286701209,
+    "false_alarm_rate": 0.3009915014164306,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.4515794924909373,
+    "hidden_prereq_stopped_at_assessed_concept": 0.24805800103573278,
+    "gap_precision": 0.7581214033785038,
+    "gap_recall": 0.8745182012847966,
+    "gap_f1": 0.812170627423685
+   }
+  },
+  "3 wrong prerequisite links": {
+   "baseline": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.413126079447323,
+    "recommendation_is_unmastered": 0.5439882697947214,
+    "missed_gap_rate": 0.05768566493955095,
+    "false_alarm_rate": 0.39589235127478756,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.42516830657690313,
+    "hidden_prereq_stopped_at_assessed_concept": 0.035732780942516834,
+    "gap_precision": 0.7400768245838668,
+    "gap_recall": 0.8663811563169165,
+    "gap_f1": 0.7982637861300187
+   },
+   "improved": {
+    "points": 4307,
+    "with_true_gap": 2895,
+    "recommendation_is_true_blocker": 0.5036269430051813,
+    "recommendation_is_unmastered": 0.6993343195266272,
+    "missed_gap_rate": 0.06597582037996545,
+    "false_alarm_rate": 0.3052407932011331,
+    "hidden_prereq_cases": 1931,
+    "hidden_prereq_blocker_hit": 0.5401346452615226,
+    "hidden_prereq_stopped_at_assessed_concept": 0.08285862247540135,
+    "gap_precision": 0.7531041929098434,
+    "gap_recall": 0.8961456102783726,
+    "gap_f1": 0.8184218245819889
+   }
+  }
+ },
+ {
+  "Correct tags and graph": {
+   "baseline": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.46102992345163535,
+    "recommendation_is_unmastered": 0.5635009310986965,
+    "missed_gap_rate": 0.06576200417536535,
+    "false_alarm_rate": 0.34253731343283583,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.4978165938864629,
+    "hidden_prereq_stopped_at_assessed_concept": 0.060589519650655024,
+    "gap_precision": 0.7369305451829724,
+    "gap_recall": 0.8711101302140808,
+    "gap_f1": 0.7984221705269545
+   },
+   "improved": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.5330549756437022,
+    "recommendation_is_unmastered": 0.7272386661671038,
+    "missed_gap_rate": 0.07132915796798886,
+    "false_alarm_rate": 0.29328358208955224,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.5360262008733624,
+    "hidden_prereq_stopped_at_assessed_concept": 0.13100436681222707,
+    "gap_precision": 0.7642150203764797,
+    "gap_recall": 0.8691238137276539,
+    "gap_f1": 0.8133002891367205
+   }
+  },
+  "10% of items mis-tagged": {
+   "baseline": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.3942240779401531,
+    "recommendation_is_unmastered": 0.45923217550274226,
+    "missed_gap_rate": 0.04836464857341684,
+    "false_alarm_rate": 0.39104477611940297,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.45906113537117904,
+    "hidden_prereq_stopped_at_assessed_concept": 0.04639737991266375,
+    "gap_precision": 0.6995272281561898,
+    "gap_recall": 0.8817038181416905,
+    "gap_f1": 0.7801210701034953
+   },
+   "improved": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.477035490605428,
+    "recommendation_is_unmastered": 0.6283452695062194,
+    "missed_gap_rate": 0.07689631176061239,
+    "false_alarm_rate": 0.33134328358208953,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.540938864628821,
+    "hidden_prereq_stopped_at_assessed_concept": 0.0927947598253275,
+    "gap_precision": 0.7233237202595529,
+    "gap_recall": 0.8856764511145443,
+    "gap_f1": 0.7963091576545293
+   }
+  },
+  "25% of items mis-tagged": {
+   "baseline": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.34481558803061935,
+    "recommendation_is_unmastered": 0.4103600293901543,
+    "missed_gap_rate": 0.05288796102992345,
+    "false_alarm_rate": 0.49029850746268655,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.3930131004366812,
+    "hidden_prereq_stopped_at_assessed_concept": 0.06168122270742358,
+    "gap_precision": 0.6754448398576512,
+    "gap_recall": 0.8377841536084749,
+    "gap_f1": 0.7479066101861885
+   },
+   "improved": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.3966597077244259,
+    "recommendation_is_unmastered": 0.5596116504854369,
+    "missed_gap_rate": 0.10403618649965206,
+    "false_alarm_rate": 0.3194029850746269,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.45360262008733626,
+    "hidden_prereq_stopped_at_assessed_concept": 0.10262008733624454,
+    "gap_precision": 0.711501719526175,
+    "gap_recall": 0.8218936217170603,
+    "gap_f1": 0.7627240143369175
+   }
+  },
+  "3 prerequisite links missing": {
+   "baseline": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.4164926931106472,
+    "recommendation_is_unmastered": 0.6472998137802607,
+    "missed_gap_rate": 0.06576200417536535,
+    "false_alarm_rate": 0.34253731343283583,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.3941048034934498,
+    "hidden_prereq_stopped_at_assessed_concept": 0.22543668122270744,
+    "gap_precision": 0.7369305451829724,
+    "gap_recall": 0.8711101302140808,
+    "gap_f1": 0.7984221705269545
+   },
+   "improved": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.46798886569241477,
+    "recommendation_is_unmastered": 0.7844536237326324,
+    "missed_gap_rate": 0.07341684064022269,
+    "false_alarm_rate": 0.2880597014925373,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.39792576419213976,
+    "hidden_prereq_stopped_at_assessed_concept": 0.3182314410480349,
+    "gap_precision": 0.7670555665414277,
+    "gap_recall": 0.8561024056499669,
+    "gap_f1": 0.809136420525657
+   }
+  },
+  "3 wrong prerequisite links": {
+   "baseline": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.43806541405706334,
+    "recommendation_is_unmastered": 0.5776536312849162,
+    "missed_gap_rate": 0.06576200417536535,
+    "false_alarm_rate": 0.34253731343283583,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.4808951965065502,
+    "hidden_prereq_stopped_at_assessed_concept": 0.04148471615720524,
+    "gap_precision": 0.7369305451829724,
+    "gap_recall": 0.8711101302140808,
+    "gap_f1": 0.7984221705269545
+   },
+   "improved": {
+    "points": 4214,
+    "with_true_gap": 2874,
+    "recommendation_is_true_blocker": 0.5201809324982603,
+    "recommendation_is_unmastered": 0.7375514788468738,
+    "missed_gap_rate": 0.07063326374391092,
+    "false_alarm_rate": 0.29328358208955224,
+    "hidden_prereq_cases": 1832,
+    "hidden_prereq_blocker_hit": 0.5349344978165939,
+    "hidden_prereq_stopped_at_assessed_concept": 0.11189956331877729,
+    "gap_precision": 0.7615665194855059,
+    "gap_recall": 0.8755241668505849,
+    "gap_f1": 0.8145790554414786
+   }
+  }
+ }
+]

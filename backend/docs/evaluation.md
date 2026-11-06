@@ -104,6 +104,32 @@ The improved model beats the baseline on 13 of 14 measures on made-up learners. 
 
 Until both are settled the service default stays `baseline`. The improved model is available per request (`?model=improved`), for the whole service (`CIRCUIT_COACH_MODEL=improved`) and for the prototype (`VITE_ENGINE_MODEL=improved`). To finish the check: download EdNet into `backend/data/raw/` (see README) and rerun `python scripts/compare_models.py`, which adds the EdNet table.
 
+## Sprint 4: robustness, calibration and failure analysis
+
+Scripts: `scripts/robustness.py`, `scripts/calibration.py`, `scripts/failure_analysis.py`. Tables: `results/robustness.md`, `results/calibration.md` (plot `results/calibration.png`), `results/failure_analysis.md`. All on made-up learners.
+
+### Robustness (S4-2)
+
+- **Fitted parameters are stable across seeds**: their standard deviation is about 0.01 to 0.03. With every tag credited, 16% to 21% of fitted values sit on a fitting bound (mostly slip at 0.30); with first-tag credit only 4% to 6% do.
+- **Mis-tagged questions** (a question's main concept swapped for a random one, in the data the model is fitted and traced on, as unit-level tags in Barabari's data might cause): with 10% of items mis-tagged the improved model finds 5 points fewer true blockers and raises 2 points more false alarms; with 25%, 12 points fewer and 6 more. It stays ahead of the baseline at every level of noise, but at 25% it falls just below a clean baseline (42.1% against 44.7% true blockers).
+- **A wrong concept graph**: three missing prerequisite links cost 13.5 points of hidden blockers found (the walk cannot follow a link it does not know); three wrong extra links cost only about 2 points, because the walk follows a prerequisite only when it was observed and is weak.
+- **What we do about it**: concept tags and the graph must be checked by a trainer (the tag map allows per-question overrides), and missing links matter more than extra ones, so when in doubt a link should be kept.
+
+### Calibration (S4-3)
+
+| Quantity | Baseline ECE | Improved ECE |
+|---|---|---|
+| Next answer (predicted chance of a right answer) | 0.034 | 0.022 |
+| Mastery (estimated P(mastered) against the hidden truth) | 0.067 | 0.068 |
+
+- Next-answer probabilities are well calibrated; the improved model's are closer to the diagonal.
+- **Mastery estimates run about 10 points high between 0.2 and 0.7**: of learners the engine puts at 0.55 to 0.65, only about half truly know the concept. So the 0.6 gap threshold flags a concept when roughly half the learners at that estimate have mastered it. Above 0.8 the estimates are slightly low (0.85 predicted, 0.89 observed).
+- The ranking of learners is what drives recommendations, and it is good (mastery AUC 0.79 to 0.85); a recalibration step (for example isotonic regression on the mastery estimate) is the simple fix if trainers are shown the numbers.
+
+### Failure analysis
+
+In hidden-prerequisite cases the improved model cuts lessons on a concept the learner already knew from 20.2% to 13.0% (Sprint 2 simulator) and from 41.8% to 18.4% (Barabari simulator). The cost is more blockers that looked fine on the answers seen (8.5% to 9.8%, and 4.2% to 14.9%), because second tags no longer count as evidence about a prerequisite. Asking about each prerequisite directly would close that gap.
+
 ## Limits
 
 - Made-up learners follow the simulator's assumptions (`docs/synthetic_data.md`); results there say how the engine behaves when those assumptions hold.

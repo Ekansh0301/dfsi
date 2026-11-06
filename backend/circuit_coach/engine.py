@@ -102,12 +102,15 @@ class Engine:
         use_prerequisites: bool = True,
         options: ModelOptions = BASELINE,
         item_difficulty: dict[str, float] | None = None,
+        prereqs: dict[str, list[str]] | None = None,
     ):
         self.params = params or load_params()
         # Switching this off gives the "no root-cause walk" variant used in the evaluation.
         self.use_prerequisites = use_prerequisites
         self.options = options
         self.item_difficulty = item_difficulty or {}
+        # The concept graph the engine believes; the robustness check (S4-2) gives it a wrong one.
+        self.prereqs = prereqs or {c: d["prereqs"] for c, d in CONCEPTS.items()}
 
     # ---- tracing ---------------------------------------------------------------------
 
@@ -145,7 +148,7 @@ class Engine:
         if f >= 1.0:
             return None
         ready = 1.0
-        for p in CONCEPTS[concept]["prereqs"]:
+        for p in self.prereqs.get(concept, []):
             if state.observations.get(p):
                 ready *= self.mastery_of(state, p)
         return self.params[concept].p_learn * (f + (1 - f) * ready)
@@ -193,7 +196,7 @@ class Engine:
             return [concept]
         weak = [
             p
-            for p in CONCEPTS[concept]["prereqs"]
+            for p in self.prereqs.get(concept, [])
             if p not in seen and self.mastery_of(state, p) < WEAK and state.observations.get(p, 0) > 0
         ]
         weak.sort(key=lambda p: self.mastery_of(state, p))
