@@ -40,6 +40,8 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 
 ## Docs
 
+- [Test spec (Sprint 3)](docs/test_spec.md): every change, its tests, its measured effect and what is still weak
+- [Model comparison](results/model_comparison.md): the improved model against the baseline (`python scripts/compare_models.py`)
 - [Barabari's quiz format](docs/barabari_format.md): question types, partial credit, retakes, concept tags and the adapter endpoint
 - [Technical design document (revised)](docs/Technical_Design_Doc.md): architecture, implementation, evaluation, baseline results, POC v0.1 status
 - [Architecture and data flow](docs/architecture.md)

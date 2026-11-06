@@ -75,6 +75,23 @@ Fix the top remaining issues, polish the demo flow, run all tests, capture the f
 | S5-5 | Moodle submission | Final technical design doc, slides, poster and video uploaded |
 | S5-6 | Defense preparation | Answers ready for: why BKT, what the results do and do not show, what happens without real learner data |
 
+## 4b. Status on 6 November 2026
+
+Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec.md`, `backend/docs/evaluation.md`, `backend/docs/barabari_format.md`.
+
+| ID | State |
+|---|---|
+| S3-1 | Done. The Barabari simulator (true/false, short answers, points, difficulty, retakes) is the new default for the saved dataset; the Sprint 2 simulator is still reproduced byte for byte |
+| S3-2, S3-3, S3-5, S3-6 | Done as options of one improved model. On made-up learners it beats the baseline on 13 of 14 measures; missed gaps on the Sprint 2 simulator rose from 2.6% to 3.5% (target: not above 2.6%) |
+| S3-4 | Done: question types, partial credit, retake discount, Barabari quiz importer and adapter endpoint |
+| S3-7 | Model switch done (`?model=`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`). Promotion not decided: EdNet comparison still to run (raw files needed) and the missed-gaps target above |
+| S3-8 | Done: true/false questions and points in the quick checks; the top bar shows the model |
+| S3-9 | Open: voice service still to choose |
+| S3-10 | Done: `backend/docs/test_spec.md` |
+| S3-11 | Open: demo video |
+| S4-4 | Done: optional SQLite or PostgreSQL storage |
+| S4-5 | Done: short answers go to a To mark list; the trainer's mark becomes partial credit |
+
 ## 5. How we work
 
 - **Branches:** one branch per task, named by its ID (for example `s3-2-first-tag-credit`), and a short review before merging into `main`.
