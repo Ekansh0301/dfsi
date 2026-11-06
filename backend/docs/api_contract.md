@@ -10,6 +10,8 @@ The engine service exposes five endpoints. All bodies are JSON. The machine-read
 | POST | `/v1/quiz-result` | Update the model from a quick check, return at most one recommendation |
 | POST | `/v1/got-it` | Apply a learning step after the learner taps "Got it!" |
 | POST | `/v1/barabari/quiz-attempt` | Diagnose one quiz attempt sent in Barabari's own quiz format |
+| POST | `/v1/marked-answer` | A trainer marked a short answer: trace the mark as partial credit |
+| GET | `/v1/learners/{learner_id}/state` | A learner's saved state (only with storage on) |
 
 The frontend side of the contract is `frontend/src/api/engineClient.ts` (request and response types) and `frontend/src/api/types.ts` (`Recommendation`).
 
@@ -183,6 +185,15 @@ Request: `state`, `quiz` (`id`, `unit_id`, `title`, `passing_score`, `max_score`
 Response: `state`, `recommendation` (same as `/v1/quiz-result`), `score` (`points`, `max_score`, `percent`, `passed`, `awaiting_review_points`, `answers_revealed`) and `assessed_concepts`.
 
 422 when the quiz breaks Barabari's rules (for example a multiple-choice question without exactly one correct option), the attempt is for another quiz, an answer names an unknown question, or the quiz has no concept tags.
+
+### `POST /v1/marked-answer`
+
+Request: `state`, `concept_tags`, `score` (the trainer's mark from 0 to 1), optional `attempt_number` and `now`. Response: like `/v1/quiz-result`, with a recommendation only for the marked answer's concepts.
+
+### Choosing the model and storing learners
+
+- Every POST that changes the model accepts `?model=baseline` or `?model=improved` (default: the service's `CIRCUIT_COACH_MODEL`, `baseline` unless set). `GET /health` reports `model` and `models`.
+- With storage on (`CIRCUIT_COACH_DB`), every POST also accepts `learner_id`. An empty `state` then starts from the learner's saved state, and the result is saved. For `/v1/barabari/quiz-attempt` it defaults to the attempt's `student_id`.
 
 ## Errors
 

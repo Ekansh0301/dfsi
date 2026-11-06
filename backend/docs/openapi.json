@@ -356,6 +356,46 @@
           }
         }
       }
+    },
+    "/v1/learners/{learner_id}/state": {
+      "get": {
+        "summary": "Learner State",
+        "description": "A learner's saved state (storage must be on: CIRCUIT_COACH_DB).",
+        "operationId": "learner_state_v1_learners__learner_id__state_get",
+        "parameters": [
+          {
+            "name": "learner_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Learner Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -483,6 +523,19 @@
             "type": "integer",
             "title": "Now",
             "default": 0
+          },
+          "learner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learner Id",
+            "description": "Defaults to the attempt's student_id when storage is on"
           }
         },
         "type": "object",
@@ -832,6 +885,19 @@
           "concept_id": {
             "type": "string",
             "title": "Concept Id"
+          },
+          "learner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learner Id",
+            "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
           }
         },
         "type": "object",
@@ -946,6 +1012,19 @@
             "type": "integer",
             "title": "Now",
             "default": 0
+          },
+          "learner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learner Id",
+            "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
           }
         },
         "type": "object",
@@ -994,6 +1073,19 @@
             },
             "type": "array",
             "title": "Events"
+          },
+          "learner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learner Id",
+            "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
           }
         },
         "type": "object",
@@ -1052,6 +1144,19 @@
             "title": "Now",
             "description": "Timestamp (ms) stored on the recommendation",
             "default": 0
+          },
+          "learner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learner Id",
+            "description": "With storage on: load this learner's saved state when `state` is empty, and save the result"
           }
         },
         "type": "object",

@@ -70,7 +70,16 @@ The service is **stateless**. Each request carries the learner's model state and
 | `observations` | concept id to integer | Answers seen per concept |
 | `tried` | concept id to list of lesson ids | Lessons the learner has already opened |
 
-Everything else (answers, re-check schedule, escalations, messages) is kept by the frontend store. Persistence on the server (SQLite first, PostgreSQL by changing the connection URL) is planned but not built, so nothing is stored server side today.
+Everything else (answers, re-check schedule, escalations, messages, short answers waiting to be marked) is kept by the frontend store.
+
+**Optional server storage (Sprint 3).** Set `CIRCUIT_COACH_DB` to a database URL (`sqlite:///circuit_coach.db`, or `postgresql://...` like Barabari's database) and the service also keeps state (`circuit_coach/storage.py`, SQLAlchemy):
+
+| Table | Holds |
+|---|---|
+| `learner_states` | Each learner's latest `mastery`, `observations` and `tried` (JSON) |
+| `model_steps` | Every model step: learner, endpoint, model, the request and the recommendation (an audit log, like Barabari's `quiz_attempts`) |
+
+A request with a `learner_id` and an empty `state` starts from the saved state; a request that sends a state works exactly as before, so the stateless mode is unchanged. `GET /v1/learners/{learner_id}/state` reads a saved state. Without `CIRCUIT_COACH_DB` nothing is stored.
 
 ## 3. Data flow for one learner
 

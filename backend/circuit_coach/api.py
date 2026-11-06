@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import __version__, barabari
+from .storage import Storage
 from .curriculum import CONCEPTS, CONTENT, MODULES
 from .engine import _PARAMS_FILE, MODELS, Engine, Event, LearnerState, load_params
 
@@ -40,6 +41,27 @@ engine = engines[DEFAULT_MODEL]
 
 def pick(model: str | None) -> Engine:
     return engines[model or DEFAULT_MODEL]
+
+
+# Optional storage (PLAN S4-4): set CIRCUIT_COACH_DB to a database URL to keep learner state.
+store: Storage | None = Storage.from_env()
+LEARNER_ID = Field(default=None, max_length=128, description="With storage on: load this learner's saved state when `state` is empty, and save the result")
+
+
+def start_state(req) -> LearnerState:
+    """The request's state, or the learner's stored state when the request sends none."""
+    state = req.state.to_state() if hasattr(req, "state") else LearnerState()
+    learner_id = getattr(req, "learner_id", None)
+    if store and learner_id and not (state.mastery or state.observations or state.tried):
+        return store.load(learner_id) or state
+    return state
+
+
+def remember(req, step: str, model: str | None, state: LearnerState, rec: dict | None = None) -> None:
+    learner_id = getattr(req, "learner_id", None)
+    if store and learner_id:
+        store.save(learner_id, state)
+        store.log(learner_id, step, model or DEFAULT_MODEL, req.model_dump(mode="json"), rec)
 
 
 MODEL_QUERY = Query(default=None, description="Engine model for this request: baseline or improved. Defaults to the service setting")
@@ -83,6 +105,7 @@ class EventModel(BaseModel):
 class OnboardingRequest(BaseModel):
     experience: Literal["new", "some", "experienced"]
     events: list[EventModel] = Field(default_factory=list)
+    learner_id: str | None = LEARNER_ID
 
 
 class OnboardingResponse(BaseModel):
@@ -96,6 +119,7 @@ class QuizResultRequest(BaseModel):
     events: list[EventModel]
     recheck_concept: str | None = Field(default=None, description="Set when a spaced re-check was answered wrongly")
     now: int = Field(default=0, description="Timestamp (ms) stored on the recommendation")
+    learner_id: str | None = LEARNER_ID
 
 
 class TextModel(BaseModel):
@@ -122,6 +146,7 @@ class QuizResultResponse(BaseModel):
 class GotItRequest(BaseModel):
     state: StateModel
     concept_id: str
+    learner_id: str | None = LEARNER_ID
 
 
 class GotItResponse(BaseModel):
@@ -178,6 +203,7 @@ def onboarding(req: OnboardingRequest, model: ModelName | None = MODEL_QUERY) ->
     """Seed a new learner's model from their stated experience and the placement quiz."""
     engine = pick(model)
     state, start = engine.onboard(req.experience, [e.to_event() for e in req.events])
+    remember(req, "onboarding", model, state)
     return OnboardingResponse(state=StateModel.of(state), start_module_id=start)
 
 
@@ -191,13 +217,14 @@ def quiz_result(req: QuizResultRequest, model: ModelName | None = MODEL_QUERY) -
     if req.module_id not in MODULES:
         raise HTTPException(404, f"Unknown module {req.module_id}")
     engine = pick(model)
-    state = engine.trace(req.state.to_state(), [e.to_event() for e in req.events])
+    state = engine.trace(start_state(req), [e.to_event() for e in req.events])
     if req.recheck_concept:
         if req.recheck_concept not in CONCEPTS:
             raise HTTPException(422, f"Unknown concept {req.recheck_concept}")
         rec = engine.recommend_repeat(state, req.recheck_concept, req.now)
     else:
         rec = engine.recommend(state, MODULES[req.module_id]["concepts"], req.now)
+    remember(req, "quiz-result", model, state, rec)
     return QuizResultResponse(state=StateModel.of(state), recommendation=rec)
 
 
@@ -207,7 +234,9 @@ def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItRes
     if req.concept_id not in CONCEPTS:
         raise HTTPException(422, f"Unknown concept {req.concept_id}")
     engine = pick(model)
-    return GotItResponse(state=StateModel.of(engine.got_it(req.state.to_state(), req.concept_id)))
+    state = engine.got_it(start_state(req), req.concept_id)
+    remember(req, "got-it", model, state)
+    return GotItResponse(state=StateModel.of(state))
 
 
 
@@ -217,6 +246,7 @@ class MarkedAnswerRequest(BaseModel):
     score: float = Field(ge=0, le=1, description="The trainer's mark as a share of the question's points")
     attempt_number: int = Field(default=1, ge=1)
     now: int = 0
+    learner_id: str | None = LEARNER_ID
 
 
 @app.post("/v1/marked-answer", response_model=QuizResultResponse)
@@ -228,8 +258,9 @@ def marked_answer(req: MarkedAnswerRequest, model: ModelName | None = MODEL_QUER
     """
     ev = EventModel(concept_tags=req.concept_tags, is_correct=req.score >= 0.5, question_type="short_answer", score=req.score, attempt_number=req.attempt_number)
     engine = pick(model)
-    state = engine.trace(req.state.to_state(), [ev.to_event()])
+    state = engine.trace(start_state(req), [ev.to_event()])
     rec = engine.recommend(state, [c for c in CONCEPTS if c in req.concept_tags], req.now)
+    remember(req, "marked-answer", model, state, rec)
     return QuizResultResponse(state=StateModel.of(state), recommendation=rec)
 
 # ---- Barabari adapter --------------------------------------------------------------------
@@ -301,6 +332,7 @@ class BarabariAttemptRequest(BaseModel):
     attempt: BarabariAttempt
     tags: BarabariTags | None = Field(default=None, description="Concept tags; defaults to the service's barabari_tags.json")
     now: int = 0
+    learner_id: str | None = Field(default=None, max_length=128, description="Defaults to the attempt's student_id when storage is on")
 
 
 class BarabariAttemptResponse(BaseModel):
@@ -329,8 +361,23 @@ def barabari_quiz_attempt(req: BarabariAttemptRequest, model: ModelName | None =
     if not assessed:
         raise HTTPException(422, f"No concept tags for unit {quiz.unit_id}; add it to the tag map")
     engine = pick(model)
-    state = engine.trace(req.state.to_state(), barabari.attempt_events(quiz, attempt, tags))
+    if req.learner_id is None:
+        req.learner_id = attempt.student_id
+    state = engine.trace(start_state(req), barabari.attempt_events(quiz, attempt, tags))
     rec = engine.recommend(state, assessed, req.now)
+    remember(req, "barabari-quiz-attempt", model, state, rec)
     return BarabariAttemptResponse(
         state=StateModel.of(state), recommendation=rec, score=barabari.attempt_score(quiz, attempt), assessed_concepts=assessed
     )
+
+
+
+@app.get("/v1/learners/{learner_id}/state", response_model=StateModel)
+def learner_state(learner_id: str) -> StateModel:
+    """A learner's saved state (storage must be on: CIRCUIT_COACH_DB)."""
+    if store is None:
+        raise HTTPException(404, "Storage is off: set CIRCUIT_COACH_DB to keep learner state")
+    state = store.load(learner_id)
+    if state is None:
+        raise HTTPException(404, f"No saved state for learner {learner_id}")
+    return StateModel.of(state)

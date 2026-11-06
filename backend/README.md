@@ -28,6 +28,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `circuit_coach/prediction.py` | Next-answer prediction: BKT against simple baselines |
 | `circuit_coach/simulate.py` | Made-up learners with hidden mastery |
 | `circuit_coach/barabari.py` | Reads Barabari's quiz format and turns attempts into engine events |
+| `circuit_coach/storage.py` | Optional learner storage (SQLite or PostgreSQL via `CIRCUIT_COACH_DB`) |
 | `circuit_coach/dataset.py` | Save, load, split (70:30) and validate a made-up dataset |
 | `circuit_coach/diagnosis_eval.py` | Does the engine find the right gap and the right lesson? |
 | `circuit_coach/ednet.py` | Loader for the real EdNet dataset |

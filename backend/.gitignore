@@ -5,3 +5,4 @@ __pycache__/
 data/
 *.zip
 *.egg-info/
+*.db
