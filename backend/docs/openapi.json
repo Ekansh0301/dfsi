@@ -231,6 +231,69 @@
         }
       }
     },
+    "/v1/marked-answer": {
+      "post": {
+        "summary": "Marked Answer",
+        "description": "A trainer marked a short answer: trace it as partial credit and recheck its concepts.\n\nShort answers wait for a trainer, so they reach the model after the quick check. The\nrecommendation covers only the marked answer's concepts (null when they look fine).",
+        "operationId": "marked_answer_v1_marked_answer_post",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "baseline",
+                    "improved"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Engine model for this request: baseline or improved. Defaults to the service setting",
+              "title": "Model"
+            },
+            "description": "Engine model for this request: baseline or improved. Defaults to the service setting"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkedAnswerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizResultResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/barabari/quiz-attempt": {
       "post": {
         "summary": "Barabari Quiz Attempt",
@@ -852,6 +915,46 @@
           "models"
         ],
         "title": "HealthResponse"
+      },
+      "MarkedAnswerRequest": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/StateModel"
+          },
+          "concept_tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Concept Tags"
+          },
+          "score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "description": "The trainer's mark as a share of the question's points"
+          },
+          "attempt_number": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Attempt Number",
+            "default": 1
+          },
+          "now": {
+            "type": "integer",
+            "title": "Now",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "concept_tags",
+          "score"
+        ],
+        "title": "MarkedAnswerRequest"
       },
       "ModuleModel": {
         "properties": {

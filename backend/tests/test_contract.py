@@ -26,7 +26,7 @@ def test_committed_contract_is_up_to_date():
 
 def test_contract_lists_every_endpoint():
     paths = app.openapi()["paths"]
-    assert {"/health", "/v1/concepts", "/v1/onboarding", "/v1/quiz-result", "/v1/got-it", "/v1/barabari/quiz-attempt"} <= set(paths)
+    assert {"/health", "/v1/concepts", "/v1/onboarding", "/v1/quiz-result", "/v1/got-it", "/v1/marked-answer", "/v1/barabari/quiz-attempt"} <= set(paths)
 
 
 def _keys(name: str) -> set[str]:

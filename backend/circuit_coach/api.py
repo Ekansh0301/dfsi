@@ -210,6 +210,28 @@ def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItRes
     return GotItResponse(state=StateModel.of(engine.got_it(req.state.to_state(), req.concept_id)))
 
 
+
+class MarkedAnswerRequest(BaseModel):
+    state: StateModel
+    concept_tags: list[str] = Field(min_length=1)
+    score: float = Field(ge=0, le=1, description="The trainer's mark as a share of the question's points")
+    attempt_number: int = Field(default=1, ge=1)
+    now: int = 0
+
+
+@app.post("/v1/marked-answer", response_model=QuizResultResponse)
+def marked_answer(req: MarkedAnswerRequest, model: ModelName | None = MODEL_QUERY) -> QuizResultResponse:
+    """A trainer marked a short answer: trace it as partial credit and recheck its concepts.
+
+    Short answers wait for a trainer, so they reach the model after the quick check. The
+    recommendation covers only the marked answer's concepts (null when they look fine).
+    """
+    ev = EventModel(concept_tags=req.concept_tags, is_correct=req.score >= 0.5, question_type="short_answer", score=req.score, attempt_number=req.attempt_number)
+    engine = pick(model)
+    state = engine.trace(req.state.to_state(), [ev.to_event()])
+    rec = engine.recommend(state, [c for c in CONCEPTS if c in req.concept_tags], req.now)
+    return QuizResultResponse(state=StateModel.of(state), recommendation=rec)
+
 # ---- Barabari adapter --------------------------------------------------------------------
 # Barabari's LMS can send a quiz attempt in its own format; the service tags it with concepts,
 # traces it and returns the same recommendation as /v1/quiz-result.

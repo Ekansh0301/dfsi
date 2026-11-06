@@ -3,7 +3,7 @@ import { Link, Navigate, useLocation, useNavigate, useParams } from "react-route
 import { ArrowRight, BookOpenCheck, Check, ChevronDown, CircleCheckBig, Clock3, Hand, MessageCircle, Sparkles, Trophy, X } from "lucide-react";
 import { getDB, quizFor, submitQuiz, type Answer, type QuizResult } from "../api/mockServer";
 import type { ContentItem } from "../api/types";
-import { CONCEPTS, MODULES, QUESTIONS, moduleById } from "../data/curriculum";
+import { CONCEPTS, MODULES, QUESTIONS, moduleById, questionPoints } from "../data/curriculum";
 import { CONTENT } from "../data/content";
 import { EDUCATOR } from "../data/seed";
 import { useT } from "../lib/i18n";
@@ -159,8 +159,11 @@ export function Results() {
   const last = me.lastQuiz;
   if (!last) return <Navigate to="/learner/home" replace />;
   const m = moduleById(last.module_id);
-  const scored = last.answers.filter((a) => m.quiz.includes(a.question_id));
+  const scored = last.answers.filter((a) => m.quiz.includes(a.question_id) && !a.pending);
+  const waiting = last.answers.some((a) => a.pending);
   const correct = scored.filter((a) => a.correct).length;
+  const points = scored.reduce((s, a) => s + (a.correct ? questionPoints(QUESTIONS[a.question_id]) : 0), 0);
+  const maxPoints = scored.reduce((s, a) => s + questionPoints(QUESTIONS[a.question_id]), 0);
   const result = loc.state?.result;
   const rec = me.recommendation;
   const recheck = result?.recheck;
@@ -218,8 +221,17 @@ export function Results() {
             </span>
           ))}
         </div>
-        <span className="small muted">{t("results_score", { c: correct, t: scored.length })}</span>
+        <span className="small muted">
+          {t("results_score", { c: correct, t: scored.length })} · {t("results_points", { p: points, t: maxPoints })}
+        </span>
       </div>
+
+      {waiting && (
+        <div className="banner banner-blue" role="status">
+          <Clock3 size={20} aria-hidden />
+          <span>{t("results_waiting_mark")}</span>
+        </div>
+      )}
 
       {recheck && (
         <div className={"banner " + (recheck.passed ? "banner-teal" : "banner-rust")} role="status">

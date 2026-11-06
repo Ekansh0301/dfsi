@@ -620,3 +620,34 @@
     height: 36px;
   }
 }
+
+/* E4 · Short answers to mark */
+.mark-list {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.mark-card {
+  display: grid;
+  gap: 12px;
+}
+.mark-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mark-who > div {
+  display: grid;
+}
+.mark-q {
+  font-weight: 600;
+  margin: 0;
+}
+.mark-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mark-card .btn {
+  justify-self: start;
+}

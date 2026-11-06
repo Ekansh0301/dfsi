@@ -10,14 +10,15 @@ import {
   Lightbulb,
   ListChecks,
   MessageSquareText,
+  PenLine,
   RotateCcw,
   Send,
   TriangleAlert,
   Users,
 } from "lucide-react";
-import { cohortGaps, now, priorityOf, resolveEscalation } from "../api/mockServer";
+import { cohortGaps, markAnswer, now, priorityOf, resolveEscalation } from "../api/mockServer";
 import type { DB, Escalation, StuckReason } from "../api/types";
-import { CONCEPTS, moduleById } from "../data/curriculum";
+import { CONCEPTS, QUESTIONS, moduleById } from "../data/curriculum";
 import { CONTENT, contentFor } from "../data/content";
 import { COHORT, EDUCATOR } from "../data/seed";
 import { confidence, masteryOf, rootCause } from "../engine/engine";
@@ -50,6 +51,7 @@ function ago(ms: number) {
 
 export function EducatorApp() {
   const open = useDB((d) => d.escalations.filter((e) => e.status === "open").length);
+  const toMark = useDB((d) => d.marks.filter((m) => m.status === "waiting").length);
   return (
     <div className="edu">
       <aside className="edu-rail">
@@ -68,6 +70,10 @@ export function EducatorApp() {
             <Inbox size={18} aria-hidden /> Needs you
             {open > 0 && <span className="count">{open}</span>}
           </NavLink>
+          <NavLink to="/educator/marking" className={({ isActive }) => (isActive ? "active" : "")}>
+            <PenLine size={18} aria-hidden /> To mark
+            {toMark > 0 && <span className="count">{toMark}</span>}
+          </NavLink>
           <NavLink to="/educator/resolved" className={({ isActive }) => (isActive ? "active" : "")}>
             <ListChecks size={18} aria-hidden /> Resolved
           </NavLink>
@@ -84,11 +90,118 @@ export function EducatorApp() {
         <Routes>
           <Route index element={<Queue />} />
           <Route path="case/:id" element={<Case />} />
+          <Route path="marking" element={<Marking />} />
           <Route path="resolved" element={<Resolved />} />
           <Route path="*" element={<Navigate to="/educator" replace />} />
         </Routes>
       </main>
     </div>
+  );
+}
+
+// ─── E4 · Short answers to mark (Barabari's instructor review) ────────────────
+
+const MARKS = [
+  { score: 0, label: "0" },
+  { score: 0.25, label: "1/4" },
+  { score: 0.5, label: "1/2" },
+  { score: 0.75, label: "3/4" },
+  { score: 1, label: "Full" },
+];
+
+function Marking() {
+  useMarkScreen("e-marking");
+  const d = useDB();
+  const waiting = d.marks.filter((m) => m.status === "waiting");
+  const marked = d.marks.filter((m) => m.status === "marked").slice(0, 5);
+  return (
+    <div className="edu-page">
+      <header className="edu-head">
+        <div>
+          <h1>To mark</h1>
+          <p className="muted">Written answers from quick checks. Your mark counts as partial credit in the learner's model.</p>
+        </div>
+      </header>
+      {waiting.length === 0 ? (
+        <div className="edu-card empty">
+          <BadgeCheck size={28} aria-hidden />
+          <p>Nothing to mark right now.</p>
+        </div>
+      ) : (
+        <div className="mark-list">
+          {waiting.map((m) => (
+            <MarkCard key={m.id} id={m.id} />
+          ))}
+        </div>
+      )}
+      {marked.length > 0 && (
+        <section className="edu-card">
+          <h2 className="card-h">Recently marked</h2>
+          <ul className="plain-list">
+            {marked.map((m) => (
+              <li key={m.id}>
+                <strong>{d.learners[m.learner_id].name}</strong> · {CONCEPTS[m.concepts[0]].name.en} ·{" "}
+                {MARKS.find((x) => x.score === m.score)?.label ?? m.score} marks
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function MarkCard({ id }: { id: string }) {
+  const d = useDB();
+  const m = d.marks.find((x) => x.id === id)!;
+  const q = QUESTIONS[m.question_id];
+  const l = d.learners[m.learner_id];
+  const [score, setScore] = useState<number | null>(null);
+  const [comment, setComment] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <article className="edu-card mark-card" data-mark={m.id}>
+      <div className="mark-who">
+        <span className="avatar">{initials(l.name)}</span>
+        <div>
+          <strong>{l.name}</strong>
+          <span className="muted small">
+            {moduleById(m.module_id).title.en} · {CONCEPTS[m.concepts[0]].name.en} · {ago(now(d) - m.at)}
+          </span>
+        </div>
+      </div>
+      <p className="mark-q">{q.prompt.en}</p>
+      <blockquote className="quote">{m.text}</blockquote>
+      <p className="small muted">
+        <Lightbulb size={14} aria-hidden /> Model answer: {q.why.en}
+      </p>
+      <div className="mark-scale" role="radiogroup" aria-label="Mark">
+        {MARKS.map((x) => (
+          <button
+            key={x.label}
+            type="button"
+            role="radio"
+            aria-checked={score === x.score}
+            className={"suggest" + (score === x.score ? " on" : "")}
+            onClick={() => setScore(x.score)}
+          >
+            {x.label}
+          </button>
+        ))}
+      </div>
+      <textarea className="textarea" rows={2} placeholder="Optional note to the learner" value={comment} onChange={(e) => setComment(e.target.value)} aria-label="Note to the learner" />
+      <button
+        type="button"
+        className="btn btn-primary"
+        disabled={score === null || busy}
+        onClick={async () => {
+          setBusy(true);
+          await markAnswer(m.id, score!, comment.trim());
+        }}
+      >
+        <Send size={16} aria-hidden /> Save mark
+      </button>
+    </article>
   );
 }
 

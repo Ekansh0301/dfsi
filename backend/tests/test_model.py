@@ -165,3 +165,19 @@ def test_every_engine_endpoint_accepts_the_model(client):
     assert client.post("/v1/onboarding?model=improved", json={"experience": "new", "events": []}).status_code == 200
     assert client.post("/v1/got-it?model=improved", json={"state": {}, "concept_id": "ohm"}).status_code == 200
 
+
+# ---- S4-5: trainer marks for short answers --------------------------------------------------
+
+
+def test_a_marked_short_answer_updates_by_its_mark(client):
+    state = {"mastery": {"ohm": 0.5}, "observations": {"ohm": 2}}
+    low = client.post("/v1/marked-answer", json={"state": state, "concept_tags": ["ohm"], "score": 0.25}).json()
+    high = client.post("/v1/marked-answer", json={"state": state, "concept_tags": ["ohm"], "score": 1.0}).json()
+    assert low["state"]["mastery"]["ohm"] < 0.5 < high["state"]["mastery"]["ohm"]
+    assert low["state"]["observations"]["ohm"] == 3
+    assert low["recommendation"]["concept_id"] == "ohm" and high["recommendation"] is None
+
+
+def test_marks_outside_zero_to_one_are_rejected(client):
+    assert client.post("/v1/marked-answer", json={"state": {}, "concept_tags": ["ohm"], "score": 1.2}).status_code == 422
+    assert client.post("/v1/marked-answer", json={"state": {}, "concept_tags": ["nope"], "score": 0.5}).status_code == 422

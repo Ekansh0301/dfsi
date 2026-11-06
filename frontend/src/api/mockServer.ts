@@ -10,7 +10,7 @@
 import type { ConceptId, DB, Escalation, Lang, LearnerState, Recommendation, Resolution, StuckReason } from "./types";
 import { CONCEPTS, MODULES, PLACEMENT, QUESTIONS, moduleById } from "../data/curriculum";
 import { ACTIVE_ID, DB_VERSION, EDUCATOR, seedDB } from "../data/seed";
-import { remoteGotIt, remoteOnboarding, remoteQuizResult, type EngineEvent, type EngineState } from "./engineClient";
+import { remoteGotIt, remoteMarkedAnswer, remoteOnboarding, remoteQuizResult, type EngineEvent, type EngineState } from "./engineClient";
 import { BKT, WEAK, bktUpdate, diagnostic, learnStep, masteryOf, pickContent, recommend } from "../engine/engine";
 
 const KEY = "circuit-coach.db";
@@ -72,10 +72,29 @@ export interface Answer {
   question_id: string;
   /** null = "I'm not sure" */
   chosen: number | null;
+  /** The learner's own words, for a short-answer question. */
+  text?: string;
 }
+
+const isWritten = (questionId: string) => QUESTIONS[questionId].type === "short_answer";
 
 function record(d: DB, l: LearnerState, moduleId: string, a: Answer) {
   const q = QUESTIONS[a.question_id];
+  if (q.type === "short_answer" && a.chosen !== null && a.text?.trim()) {
+    // Written answers wait for the trainer; the model sees them once marked (markSync).
+    // "I'm not sure" on a short answer is traced at once, like any other unsure answer.
+    d.marks.unshift({
+      id: "mark_" + uid(),
+      learner_id: l.id,
+      module_id: moduleId,
+      question_id: q.id,
+      concepts: q.concepts,
+      text: a.text.trim(),
+      at: now(d),
+      status: "waiting",
+    });
+    return false;
+  }
   const correct = a.chosen === q.correct;
   const unsure = a.chosen === null;
   const attempt = l.responses.filter((r) => r.question_id === q.id).length + 1;
@@ -90,7 +109,7 @@ function record(d: DB, l: LearnerState, moduleId: string, a: Answer) {
     timestamp: now(d),
   });
   for (const c of q.concepts) {
-    l.mastery[c] = bktUpdate(masteryOf(l, c), correct, unsure);
+    l.mastery[c] = bktUpdate(masteryOf(l, c), correct, unsure, q.type);
     l.observations[c] = (l.observations[c] ?? 0) + 1;
   }
   return correct;
@@ -149,7 +168,7 @@ function submitQuizSync(d: DB, moduleId: string, answers: Answer[], remote?: Rem
 
   for (const a of answers) {
     const ok = record(d, l, moduleId, a);
-    graded.push({ question_id: a.question_id, chosen: a.chosen, correct: ok });
+    graded.push({ question_id: a.question_id, chosen: a.chosen, correct: ok, pending: isWritten(a.question_id) && a.chosen !== null && !!a.text?.trim() });
     const rc = m.quiz.includes(a.question_id) ? undefined : l.rechecks.find((r) => r.status === "scheduled" && r.question_id === a.question_id);
     if (rc) {
       rc.status = ok ? "passed" : "failed";
@@ -300,7 +319,7 @@ const engineState = (l: LearnerState): EngineState => ({ mastery: l.mastery, obs
 
 const toEvent = (a: Answer): EngineEvent => {
   const q = QUESTIONS[a.question_id];
-  return { concept_tags: q.concepts, is_correct: a.chosen === q.correct, unsure: a.chosen === null };
+  return { concept_tags: q.concepts, is_correct: a.chosen === q.correct, unsure: a.chosen === null, question_type: q.type ?? "multiple_choice" };
 };
 
 // ─── Public API (one function per planned endpoint) ──────────────────────────
@@ -310,7 +329,7 @@ export const setLang = (lang: Lang) => mutate((d) => void (me(d).lang = lang));
 
 /** POST /learners/{id}/onboarding → { start_module_id } */
 export async function finishOnboarding(experience: LearnerState["experience"], answers: Answer[]) {
-  const remote = await remoteOnboarding(experience ?? "some", answers.map(toEvent));
+  const remote = await remoteOnboarding(experience ?? "some", answers.filter((a) => !isWritten(a.question_id)).map(toEvent));
   if (!remote) await latency(900);
   return mutate((d) => onboardSync(d, experience, answers, remote ?? undefined));
 }
@@ -328,12 +347,63 @@ export async function submitQuiz(moduleId: string, answers: Answer[]) {
   const remote = await remoteQuizResult({
     state: engineState(before),
     module_id: moduleId,
-    events: answers.map(toEvent),
+    events: answers.filter((a) => !isWritten(a.question_id) || a.chosen === null || !a.text?.trim()).map(toEvent),
     recheck_concept: failedConcept || undefined,
     now: now(),
   });
   if (!remote) await latency(250);
   return mutate((d) => submitQuizSync(d, moduleId, answers, remote ?? undefined));
+}
+
+/** A trainer marked a short answer: trace it as partial credit, tell the learner, and recommend if it shows a gap. */
+function markSync(d: DB, markId: string, score: number, comment: string, remote?: Awaited<ReturnType<typeof remoteMarkedAnswer>>) {
+  const mark = d.marks.find((m) => m.id === markId);
+  if (!mark || mark.status !== "waiting") return;
+  const l = d.learners[mark.learner_id];
+  const q = QUESTIONS[mark.question_id];
+  const t = now(d);
+  l.responses.push({
+    learner_id: l.id,
+    module_id: mark.module_id,
+    question_id: q.id,
+    concept_tags: q.concepts,
+    is_correct: score >= 0.5,
+    unsure: false,
+    attempt_number: l.responses.filter((r) => r.question_id === q.id).length + 1,
+    timestamp: t,
+  });
+  for (const c of q.concepts) {
+    l.mastery[c] = bktUpdate(masteryOf(l, c), score >= 0.5, false, "short_answer", score);
+    l.observations[c] = (l.observations[c] ?? 0) + 1;
+  }
+  let rec = recommend(l, q.concepts, t);
+  if (remote) {
+    l.mastery = remote.state.mastery;
+    l.observations = remote.state.observations;
+    rec = remote.recommendation ? { ...remote.recommendation, strong_concept_id: remote.recommendation.strong_concept_id ?? undefined } : undefined;
+  }
+  if (rec && !l.recommendation) l.recommendation = rec;
+  Object.assign(mark, { status: "marked", score, comment: comment || undefined, marked_at: t });
+  const quarters = ["0", "1/4", "1/2", "3/4", "full"][Math.round(score * 4)];
+  d.messages.unshift({
+    id: "msg_" + uid(),
+    learner_id: l.id,
+    from: EDUCATOR.name,
+    text: `Your written answer got ${quarters} marks.${comment ? " " + comment : ""}`,
+    concept_id: q.concepts[0],
+    at: t,
+    read: false,
+  });
+}
+
+/** POST /v1/marked-answer: the trainer's mark for a short answer, as partial credit. */
+export async function markAnswer(markId: string, score: number, comment = "") {
+  const mark = db.marks.find((m) => m.id === markId);
+  if (!mark) return;
+  const l = db.learners[mark.learner_id];
+  const remote = await remoteMarkedAnswer(engineState(l), mark.concepts, score, now());
+  if (!remote) await latency(300);
+  mutate((d) => markSync(d, markId, score, comment, remote ?? undefined));
 }
 
 /** POST /content/{id}/start */
@@ -438,7 +508,7 @@ const M3_DIAGRAM_GAP: Answer[] = [
 ];
 /** Module 3 with the symbol question also wrong → root cause is a prerequisite. */
 const M3_SYMBOL_ROOT: Answer[] = [
-  { question_id: "q_w1", chosen: 0 },
+  { question_id: "q_w1", chosen: 1 },
   { question_id: "q_w2", chosen: 0 },
   { question_id: "q_w3", chosen: null },
   { question_id: "q_w4", chosen: 2 },
