@@ -1,6 +1,6 @@
 [project]
 name = "circuit-coach"
-version = "0.1.0"
+version = "1.0.0"
 description = "Knowledge tracing and recommendation service for Circuit Coach (DFSI Problem 3B)"
 requires-python = ">=3.11"
 dependencies = [
