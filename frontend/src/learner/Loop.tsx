@@ -149,6 +149,7 @@ export function Results() {
   const loc = useLocation() as { state?: { result?: QuizResult; moduleId?: string } };
   const [analysing, setAnalysing] = useState(!!loc.state?.result);
   const [showAnswers, setShowAnswers] = useState(false);
+  const marks = useDB((d) => d.marks.filter((mk) => mk.learner_id === me.id));
 
   useEffect(() => {
     if (!analysing) return;
@@ -252,6 +253,36 @@ export function Results() {
         <ul className="answer-list">
           {last.answers.map((a) => {
             const q = QUESTIONS[a.question_id];
+            if (q.type === "short_answer") {
+              // Written answers have no options: show what was written and the trainer's mark, if any.
+              const mark = marks.find((mk) => mk.question_id === q.id && mk.module_id === last.module_id);
+              const marked = mark?.status === "marked" && mark.score !== undefined;
+              const cls = marked ? (mark!.score! >= 0.5 ? "ok" : "miss") : a.chosen === null ? "miss" : "wait";
+              return (
+                <li key={a.question_id} className={cls}>
+                  <span className="al-icon" aria-hidden>
+                    {cls === "ok" ? <Check size={14} /> : cls === "miss" ? <X size={14} /> : <Clock3 size={14} />}
+                  </span>
+                  <div>
+                    <p className="al-q">{tx(q.prompt)}</p>
+                    {a.chosen === null || !mark ? (
+                      <p className="small muted">{t("you_unsure")}</p>
+                    ) : (
+                      <>
+                        <p className="small muted">
+                          {t("you_wrote")}: <q>{mark.text}</q>
+                        </p>
+                        <p className="small">
+                          <strong>{marked ? t("mark_given", { m: Math.round(mark.score! * 4) }) : t("mark_waiting")}</strong>
+                          {marked && mark.comment ? ` · ${mark.comment}` : ""}
+                        </p>
+                      </>
+                    )}
+                    <p className="small">{tx(q.why)}</p>
+                  </div>
+                </li>
+              );
+            }
             return (
               <li key={a.question_id} className={a.correct ? "ok" : "miss"}>
                 <span className="al-icon" aria-hidden>
@@ -261,8 +292,13 @@ export function Results() {
                   <p className="al-q">{tx(q.prompt)}</p>
                   {!a.correct && (
                     <p className="small muted">
-                      {a.chosen === null ? t("you_unsure") : `${t("you_chose")}: ${tx(q.options[a.chosen].text)}`} · {t("correct_answer")}:{" "}
-                      <strong>{tx(q.options[q.correct].text)}</strong>
+                      {a.chosen === null || !q.options[a.chosen] ? t("you_unsure") : `${t("you_chose")}: ${tx(q.options[a.chosen].text)}`}
+                      {q.options[q.correct] && (
+                        <>
+                          {" "}
+                          · {t("correct_answer")}: <strong>{tx(q.options[q.correct].text)}</strong>
+                        </>
+                      )}
                     </p>
                   )}
                   <p className="small">{tx(q.why)}</p>

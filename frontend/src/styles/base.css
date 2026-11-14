@@ -251,3 +251,17 @@ a {
   fill: var(--wire-live);
   fill-opacity: 0.35;
 }
+
+/* Shown in place of a screen that failed to render */
+.screen-error {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+}

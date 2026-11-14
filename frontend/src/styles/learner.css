@@ -603,6 +603,10 @@
   background: var(--rust-soft);
   color: var(--rust-ink);
 }
+.answer-list .wait .al-icon {
+  background: var(--surface-3);
+  color: var(--ink-2);
+}
 .al-q {
   font-weight: 600;
   margin-bottom: 4px;

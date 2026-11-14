@@ -6,6 +6,7 @@ import { LearnerFrame } from "./shell/LearnerFrame";
 import { SideBySide } from "./shell/SideBySide";
 import { FlowMap } from "./shell/FlowMap";
 import { TopBar } from "./shell/TopBar";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 /** `?embed=1` renders an app bare (used by the side-by-side demo iframes). */
 const embedded = new URLSearchParams(window.location.search).has("embed");
@@ -15,11 +16,13 @@ export default function App() {
     return (
       <HashRouter>
         <div className="embed">
-          <Routes>
-            <Route path="/learner/*" element={<LearnerApp />} />
-            <Route path="/educator/*" element={<EducatorApp />} />
-            <Route path="*" element={<Navigate to="/learner" replace />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/learner/*" element={<LearnerApp />} />
+              <Route path="/educator/*" element={<EducatorApp />} />
+              <Route path="*" element={<Navigate to="/learner" replace />} />
+            </Routes>
+          </ErrorBoundary>
         </div>
       </HashRouter>
     );
@@ -28,21 +31,23 @@ export default function App() {
     <HashRouter>
       <div className="shell">
         <TopBar />
-        <Routes>
-          <Route path="/" element={<Overview />} />
-          <Route path="/learner/*" element={<LearnerFrame />} />
-          <Route
-            path="/educator/*"
-            element={
-              <div className="edu-frame">
-                <EducatorApp />
-              </div>
-            }
-          />
-          <Route path="/demo" element={<SideBySide />} />
-          <Route path="/flows" element={<FlowMap />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Overview />} />
+            <Route path="/learner/*" element={<LearnerFrame />} />
+            <Route
+              path="/educator/*"
+              element={
+                <div className="edu-frame">
+                  <EducatorApp />
+                </div>
+              }
+            />
+            <Route path="/demo" element={<SideBySide />} />
+            <Route path="/flows" element={<FlowMap />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ErrorBoundary>
       </div>
     </HashRouter>
   );
