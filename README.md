@@ -17,7 +17,7 @@ This repository holds the **UI prototype** (`frontend/`) and the **knowledge-tra
 
 ![Baseline against the improved model on 3,000 simulated learners per run, Barabari's quiz format](backend/results/model_comparison.png)
 
-On simulated learners in Barabari's quiz format (hidden mastery known, 5 runs of 3,000 learners each), the improved model finds the real root cause of a gap 58% of the time (baseline 49%), sends 27% of learners to a concept they already knew (baseline 42%) and raises 31% false alarms (baseline 38%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps), see [`paired_comparison.md`](backend/results/paired_comparison.md).
+The service now answers with the improved model by default. On simulated learners in Barabari's quiz format (hidden mastery known, 5 runs of 3,000 learners each), it finds the real root cause of a gap 58% of the time (baseline 49%), sends 27% of learners to a concept they already knew (baseline 42%) and raises 31% false alarms (baseline 38%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps), see [`paired_comparison.md`](backend/results/paired_comparison.md).
 
 With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy ([`accuracy_baseline.md`](backend/results/accuracy_baseline.md)). The walk is what lifts both well above "study what you got wrong", which finds the hidden cause in under 8% of cases. On real student answers (EdNet, next-answer prediction), the improved model reaches AUC 0.729 against 0.627 for the baseline.
 
