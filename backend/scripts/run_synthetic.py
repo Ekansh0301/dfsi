@@ -1,12 +1,17 @@
 """Baseline evaluation on made-up learners with known hidden mastery.
 
     python scripts/run_synthetic.py [--learners 3000] [--seeds 5] [--sim sprint2|barabari]
+                                    [--write-service-params]
 
 `--sim sprint2` (the default) is the Sprint 2 simulator: it writes results/synthetic_results.json
-and .md and saves the fitted BKT parameters to circuit_coach/fitted_params.json (fitted on the
-first seed's training split) so the API uses them. `--sim barabari` adds Barabari's quiz format
-(true/false, short answers, points, difficulty, retakes) and writes
-results/synthetic_barabari_results.json and .md without touching the service's parameters.
+and .md, and the fitted BKT parameters (first seed's training split) to
+results/fitted_params_sprint2.json. `--sim barabari` adds Barabari's quiz format (true/false,
+short answers, points, difficulty, retakes) and writes results/synthetic_barabari_results.json
+and .md.
+
+The service's shipped parameters (circuit_coach/fitted_params.json) are only replaced with
+`--write-service-params` (Sprint 2 simulator only), and then only the baseline's `concepts`
+section: the improved model's `concepts_first_tag` section is kept.
 """
 
 from __future__ import annotations
@@ -73,6 +78,7 @@ def main() -> None:
     ap.add_argument("--learners", type=int, default=3000)
     ap.add_argument("--seeds", type=int, default=5)
     ap.add_argument("--sim", choices=["sprint2", "barabari"], default="sprint2")
+    ap.add_argument("--write-service-params", action="store_true", help="also replace the baseline parameters the service ships with")
     args = ap.parse_args()
     config = SimConfig.named(args.sim)
     stem = "synthetic_results" if args.sim == "sprint2" else "synthetic_barabari_results"
@@ -83,22 +89,21 @@ def main() -> None:
         runs.append(run_seed(seed, args.learners, config))
         print(f"seed {seed} done ({time.time() - t0:.0f}s)", flush=True)
 
-    # fitted parameters from the first seed of the Sprint 2 simulator go to the service
-    params_file = ROOT / "circuit_coach" / "fitted_params.json"
-    if args.sim == "sprint2":
-        params_file.write_text(
-            json.dumps(
-                {
-                    "source": f"EM fit on {int(0.7 * args.learners)} made-up learners (seed 0). Placeholder until real learner data exists.",
-                    "concepts": runs[0]["fitted_params"],
-                },
-                indent=2,
-            )
-            + "\n",
-            encoding="utf8",
-        )
-
+    # Fitted parameters from the first seed go to results/; the service's shipped file changes
+    # only on request, so rerunning an evaluation never alters the frozen model.
     (ROOT / "results").mkdir(exist_ok=True)
+    source = f"EM fit on {int(0.7 * args.learners)} made-up learners (seed 0). Placeholder until real learner data exists."
+    fitted = {"source": source, "concepts": runs[0]["fitted_params"]}
+    (ROOT / "results" / f"fitted_params_{args.sim}.json").write_text(json.dumps(fitted, indent=2) + "\n", encoding="utf8")
+    if args.write_service_params:
+        if args.sim != "sprint2":
+            raise SystemExit("--write-service-params uses the Sprint 2 simulator's fit; run with --sim sprint2")
+        params_file = ROOT / "circuit_coach" / "fitted_params.json"
+        shipped = json.loads(params_file.read_text(encoding="utf8")) if params_file.exists() else {}
+        shipped.update(fitted)
+        params_file.write_text(json.dumps(shipped, indent=2) + "\n", encoding="utf8")
+        print(f"updated {params_file}")
+
     (ROOT / "results" / f"{stem}.json").write_text(json.dumps(runs, indent=1) + "\n", encoding="utf8")
 
     title = "Baseline results on made-up learners" if args.sim == "sprint2" else "Baseline results on made-up learners with Barabari's quiz format"

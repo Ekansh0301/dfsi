@@ -51,7 +51,7 @@ Predicted chance of a right answer (used in evaluation): `p (1 - slip) + (1 - p)
 - The fit uses right and wrong only. "I'm not sure" counts as wrong when fitting.
 - A multi-concept answer appears in the sequence of every tagged concept, which is the source of the inflated slip rates described in `results/ablation_multitag.md`.
 
-`scripts/run_synthetic.py` fits all 10 concepts on the training learners and writes `circuit_coach/fitted_params.json`, which the service loads at start-up (`GET /health` reports `"parameters": "fitted"`). Without the file the service uses the hand-set values.
+`scripts/run_synthetic.py` fits all 10 concepts on the training learners and writes the fit to `results/fitted_params_sprint2.json`; with `--write-service-params` it also replaces the baseline section of `circuit_coach/fitted_params.json`, which the service loads at start-up (`GET /health` reports `"parameters": "fitted"`). Without the file the service uses the hand-set values.
 
 ## What the tests check
 

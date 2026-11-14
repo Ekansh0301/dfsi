@@ -42,7 +42,7 @@ python scripts/failure_analysis.py
 python scripts/run_ednet.py --users 40000                      # needs the EdNet files, see README
 ```
 
-`run_synthetic.py` writes `results/synthetic_results.md` and `.json` (mean and standard deviation over 5 seeds) and the fitted parameters used by the service. Everything is seeded: seed `k` always generates the same learners, split and fits. Run the scripts from `backend/` with the package installed (`pip install -e .`) or with `PYTHONPATH=.`.
+`run_synthetic.py` writes `results/synthetic_results.md` and `.json` (mean and standard deviation over 5 seeds) and the fitted parameters to `results/fitted_params_sprint2.json`. The parameters the service ships with (`circuit_coach/fitted_params.json`, the frozen model) change only with `--write-service-params`, and `tests/test_shipped_params.py` fails if they drift. Everything is seeded: seed `k` always generates the same learners, split and fits. Run the scripts from `backend/` with the package installed (`pip install -e .`) or with `PYTHONPATH=.`.
 
 Reruns give the same tables. On another machine or numpy build, floating point values in the JSON files can differ in the 16th digit (the committed report was regenerated on Windows with numpy 2.2.2 and every figure in the Markdown tables matched). `tests/test_evaluation.py` checks that the same seed gives the same report, that every baseline is scored on every metric, and that the committed report contains all required metrics.
 

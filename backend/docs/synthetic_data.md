@@ -34,7 +34,7 @@ The limits of this story (for example that a multi-concept question needs all it
 | Answers from memory | Right/wrong feedback helps on attempts 2 and 3 (probability 0.15 of answering right without mastery); after 3 attempts the answers are revealed (probability 0.6) |
 | Ground truth | Stored after the last attempt of each quick check |
 
-Pick the simulator with `--sim` in `scripts/generate_dataset.py` (default `barabari`) and `scripts/run_synthetic.py` (default `sprint2`, which keeps the published Sprint 2 results and the service's fitted parameters).
+Pick the simulator with `--sim` in `scripts/generate_dataset.py` (default `barabari`) and `scripts/run_synthetic.py` (default `sprint2`, which reproduces the published Sprint 2 results; the service's parameters change only with `--write-service-params`).
 
 ## Reproducible runs and the 70:30 split
 

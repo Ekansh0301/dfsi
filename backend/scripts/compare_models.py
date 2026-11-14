@@ -1,16 +1,17 @@
 """Compare the Sprint 3 model with the Sprint 2 baseline (PLAN S3-2 to S3-7).
 
-    python scripts/compare_models.py [--learners 3000] [--seeds 5]
+    python scripts/compare_models.py [--learners 3000] [--seeds 5] [--write-service-params]
 
 Runs both simulators (Sprint 2 and Barabari's quiz format) on the evaluation seeds 0 to 4 and
 adds the model changes one at a time: first-tag credit, question difficulty, prerequisite-aware
 learning, then more evidence before a lesson (the full improved model). The improved model's
 settings were chosen on a separate tuning seed (100), never on these seeds.
 
-Writes results/model_comparison.json and .md, and adds the first-tag parameters
-(`concepts_first_tag`, fitted on the Sprint 2 simulator's seed 0 training learners, like the
-baseline's) to circuit_coach/fitted_params.json for the service's improved model. If the EdNet
-files are present (see README) it also compares the two predictors on EdNet.
+Writes results/model_comparison.json and .md, and the first-tag parameters (fitted on the Sprint 2
+simulator's seed 0 training learners, like the baseline's) to results/fitted_params_first_tag.json.
+With `--write-service-params` they also replace the improved model's `concepts_first_tag` section
+in circuit_coach/fitted_params.json; without it the service's shipped parameters are untouched.
+If the EdNet files are present (see README) it also compares the two predictors on EdNet.
 """
 
 from __future__ import annotations
@@ -137,6 +138,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--learners", type=int, default=3000)
     ap.add_argument("--seeds", type=int, default=5)
+    ap.add_argument("--write-service-params", action="store_true", help="also replace the improved model's parameters the service ships with")
     args = ap.parse_args()
 
     t0 = time.time()
@@ -147,13 +149,19 @@ def main() -> None:
             all_runs[sim].append(run_seed(sim, seed, args.learners))
             print(f"{sim} seed {seed} done ({time.time() - t0:.0f}s)", flush=True)
 
-    # First-tag parameters for the service's improved model, from the same data as the baseline's.
-    params_file = ROOT / "circuit_coach" / "fitted_params.json"
-    params = json.loads(params_file.read_text(encoding="utf8"))
-    params["concepts_first_tag"] = all_runs["sprint2"][0]["params_first_tag"]
-    params_file.write_text(json.dumps(params, indent=2) + "\n", encoding="utf8")
-
+    # First-tag parameters for the improved model, from the same data as the baseline's. They go
+    # to results/; the service's shipped file changes only on request.
     (ROOT / "results").mkdir(exist_ok=True)
+    first_tag = all_runs["sprint2"][0]["params_first_tag"]
+    (ROOT / "results" / "fitted_params_first_tag.json").write_text(
+        json.dumps({"concepts_first_tag": first_tag}, indent=2) + "\n", encoding="utf8"
+    )
+    if args.write_service_params:
+        params_file = ROOT / "circuit_coach" / "fitted_params.json"
+        params = json.loads(params_file.read_text(encoding="utf8"))
+        params["concepts_first_tag"] = first_tag
+        params_file.write_text(json.dumps(params, indent=2) + "\n", encoding="utf8")
+        print(f"updated {params_file}")
     (ROOT / "results" / "model_comparison.json").write_text(json.dumps(all_runs, indent=1) + "\n", encoding="utf8")
 
     lines = [
