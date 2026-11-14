@@ -1,6 +1,6 @@
 # Evaluation and baseline comparison
 
-Code: `circuit_coach/prediction.py` (next-answer baselines), `circuit_coach/diagnosis_eval.py` (gap and lesson metrics), `scripts/run_synthetic.py`, `scripts/run_ednet.py`, `scripts/ablation_multitag.py`, `scripts/failure_analysis.py`. Reports: `results/`. Tests: `tests/test_evaluation.py`.
+Code: `circuit_coach/prediction.py` (next-answer baselines), `circuit_coach/diagnosis_eval.py` (gap and lesson metrics), `circuit_coach/accuracy_engine.py` (accuracy baseline), `scripts/run_synthetic.py`, `scripts/compare_models.py`, `scripts/paired_comparison.py`, `scripts/accuracy_baseline.py`, `scripts/run_ednet.py`, `scripts/ablation_multitag.py`, `scripts/failure_analysis.py`. Reports: `results/`. Tests: `tests/test_evaluation.py`.
 
 ## What is compared
 
@@ -39,6 +39,9 @@ Diagnosis metrics need hidden truth, so they are computed on made-up learners on
 python scripts/run_synthetic.py --learners 3000 --seeds 5     # about 2 minutes
 python scripts/ablation_multitag.py
 python scripts/failure_analysis.py
+python scripts/compare_models.py                               # both models on both simulators
+python scripts/paired_comparison.py                            # seconds: reads model_comparison.json
+python scripts/accuracy_baseline.py                            # under a minute
 python scripts/run_ednet.py --users 40000                      # needs the EdNet files, see README
 ```
 
@@ -97,9 +100,9 @@ What each change did:
 
 ### Promotion decision (S3-7)
 
-The improved model beats the baseline on 13 of 14 measures on made-up learners. It is **not** made the default yet, for two reasons:
+Paired by run (both models see the same learners in each seed; `results/paired_comparison.md`), the improved model is clearly better on 12 of 14 measures and not clearly different on the other 2 (missed gaps on both simulators). It is **not** made the default yet, for two reasons:
 
-1. **Missed gaps on the Sprint 2 simulator rose from 2.6% to 3.5%**, against the plan's target of no more than 2.6% (the baseline's own run-to-run spread is plus or minus 1.9 points).
+1. **Missed gaps on the Sprint 2 simulator.** The averages are 2.6% and 3.5%, and the 95% interval of the paired difference (-1.6 to +3.3 points) includes zero, but the improved model misses more in 4 of the 5 runs (median +1.5 points): the baseline's average comes from one run at 6.4%, and in the other four it misses 1.3% to 2.1%. The plan's target was no more than the baseline.
 2. **The EdNet comparison has not been run**: the raw files are not in the repository. The promotion rule also asks the improved model to narrow the EdNet gap to per-question accuracy.
 
 The model was frozen at tag `v0.9` with the baseline as the default; the EdNet comparison is future work. Until both are settled the service default stays `baseline`. The improved model is available per request (`?model=improved`), for the whole service (`CIRCUIT_COACH_MODEL=improved`) and for the prototype (`VITE_ENGINE_MODEL=improved`). To finish the check: download EdNet into `backend/data/raw/` (see README) and rerun `python scripts/compare_models.py`, which adds the EdNet table.
@@ -129,6 +132,12 @@ Scripts: `scripts/robustness.py`, `scripts/calibration.py`, `scripts/failure_ana
 ### Failure analysis
 
 In hidden-prerequisite cases the improved model cuts lessons on a concept the learner already knew from 20.2% to 13.0% (Sprint 2 simulator) and from 41.8% to 18.4% (Barabari simulator). The cost is more blockers that looked fine on the answers seen (8.5% to 9.8%, and 4.2% to 14.9%), because second tags no longer count as evidence about a prerequisite. Asking about each prerequisite directly would close that gap.
+
+## Hackathon 2: paired comparison and an accuracy baseline
+
+- **Paired comparison** (`scripts/paired_comparison.py`, `results/paired_comparison.md`): differences improved minus baseline within each seed, with a 95% interval over the 5 runs and the number of runs each model won. 12 of 14 measures are clearly better; missed gaps are not clearly different overall but worse in 4 of 5 Sprint 2 runs.
+- **Accuracy baseline** (`scripts/accuracy_baseline.py`, `results/accuracy_baseline.md`): the same threshold, prerequisite walk and lesson choice on top of the learner's smoothed accuracy ((right + 1) / (answers + 2)), on the same learners as the model comparison. BKT finds 12 to 24 points more true blockers and recommends 18 to 34 points fewer lessons on known concepts; accuracy misses 0 to 3 points fewer gaps. The walk on plain accuracy recovers part of the gain over "study what you got wrong", BKT the rest.
+- **Shipped parameters:** the evaluation scripts no longer touch `circuit_coach/fitted_params.json` unless run with `--write-service-params`; `tests/test_shipped_params.py` checks the file against the frozen version.
 
 ## Limits
 

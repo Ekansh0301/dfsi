@@ -2,7 +2,7 @@
 
 Knowledge tracing and recommendation service for Problem 3B. Given a learner's answers, it estimates how well they know each concept, finds the concept that is really holding them back, and picks one lesson. It is the same logic the prototype runs in the browser, as a Python service with a baseline evaluation.
 
-**Status (Sprint 2):** baseline only. Standard Bayesian Knowledge Tracing (BKT) per concept, with parameters fitted from data, plus a simple walk back through prerequisites. The prerequisite-aware model is planned for Sprint 3.
+**Status (POC v1.0):** two models. The baseline (standard Bayesian Knowledge Tracing per concept, parameters fitted from data, plus a walk back through prerequisites) is the default; the improved model (first-tag credit, question difficulty, prerequisite-aware learning, more evidence before a lesson) is selectable per request. The model is frozen since tag `v0.9`.
 
 ## Run
 
@@ -41,10 +41,11 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 ## Docs
 
 - [Demo plan](docs/demo_plan.md): the 10 minute live demo script, setup checklist and what to do if something fails
-- [Test spec (Sprint 3)](docs/test_spec.md): every change, its tests, its measured effect and what is still weak
-- [Model comparison](results/model_comparison.md): the improved model against the baseline (`python scripts/compare_models.py`)
+- [Test spec](docs/test_spec.md): every change since Sprint 3, its tests, its measured effect and what is still weak
+- [Model comparison](results/model_comparison.md): the improved model against the baseline (`python scripts/compare_models.py`), and [paired by run](results/paired_comparison.md) with 95% intervals
+- [Accuracy baseline](results/accuracy_baseline.md): BKT against plain accuracy with the same prerequisite walk
 - [Barabari's quiz format](docs/barabari_format.md): question types, partial credit, retakes, concept tags and the adapter endpoint
-- [Technical design document (Sprint 4)](docs/Technical_Design_Doc.md): changes in response to feedback, architecture, the engine, results, robustness, calibration, POC v0.9 status
+- [Technical design document (POC v1.0)](docs/Technical_Design_Doc.md): changes in response to feedback and review, architecture, the engine, results, robustness, calibration, POC v1.0 status
 - [Architecture and data flow](docs/architecture.md)
 - [API contract](docs/api_contract.md) and the generated [OpenAPI schema](docs/openapi.json)
 - [Knowledge tracing (BKT)](docs/bkt.md): update rules, "I'm not sure", multi-concept questions, EM fitting and what the tests check
