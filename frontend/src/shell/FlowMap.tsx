@@ -62,7 +62,7 @@ export function FlowMap() {
         <p className="eyebrow">Flow map</p>
         <h1>Every screen, every path</h1>
         <p className="lead">
-          Four flows from the Sprint 1 design doc, now fully clickable. Grey boxes are the system working behind the screens. Click any screen to open
+          The learner and trainer flows, fully clickable. Grey boxes are the system working behind the screens. Click any screen to open
           it with matching demo data.
         </p>
       </header>

@@ -174,7 +174,7 @@ export const ANNOTATIONS: Record<ScreenKey, Annotation> = {
     name: "Help requested",
     flow: "educator",
     stage: "Escalation",
-    why: "This closes the uncertainty for the learner: who was told, when to expect a reply, and that they can keep learning meanwhile. It fills a gap in the Sprint 1 flow, which gave no confirmation.",
+    why: "This closes the uncertainty for the learner: who was told, when to expect a reply, and that they can keep learning meanwhile. The first design gave no confirmation here.",
     route: "/learner/help-sent",
     preset: "escalated",
   },

@@ -56,7 +56,7 @@ export function Notes() {
       {a.api && (
         <div className="notes-box mono">
           <p className="nb-h">
-            <Code2 size={14} aria-hidden /> API (Sprint 2)
+            <Code2 size={14} aria-hidden /> API call
           </p>
           <code>{a.api}</code>
         </div>

@@ -45,7 +45,7 @@ export function TopBar() {
         <span>
           Circuit <em>Coach</em>
         </span>
-        <span className="tb-badge">UI prototype</span>
+        <span className="tb-badge">Prototype</span>
       </NavLink>
       <span className="tb-version" title={`Build ${__APP_COMMIT__}`}>
         v{__APP_VERSION__} · {__APP_COMMIT__}
