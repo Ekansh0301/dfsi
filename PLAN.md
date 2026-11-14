@@ -123,7 +123,7 @@ POC v1.0. Details: `backend/docs/Technical_Design_Doc.md` (final), `backend/docs
 | Live prototype on the latest `main` | Done on 14 November; redeploy after every merge | Ekansh |
 | Out-of-date documents | Done: `HANDOFF.md`, `backend/docs/e2e_results.md`, this file | Praveen's list |
 | README results summary | Done: top of `README.md` | Divesh's list |
-| README check from a fresh clone | Open | Praveen |
+| README check from a fresh clone | Done on 14 November: backend install and 216 tests, frontend install, typecheck, 42 tests and build, and the service starts, all from the README steps. The Docker steps could not be tried (no Docker on the test machine). Note: the tests need the `eval` extras, so use `pip install -e ".[eval,dev]"` | Praveen |
 | Slides, poster, demo video | Open (poster numbers: 216 backend plus 42 frontend tests, "12 of 14 measures") | Praveen, Divesh |
 | Demo rehearsal, tag `v1.0` | Open | All, Aman |
 
