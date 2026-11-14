@@ -120,7 +120,7 @@ export function Messages() {
                   </div>
                 </div>
                 {m.text && (
-                  <p className="msg-text" lang="en">
+                  <p className="msg-text" lang={/[\u0900-\u097F]/.test(m.text) ? "hi" : "en"}>
                     {m.text}
                   </p>
                 )}

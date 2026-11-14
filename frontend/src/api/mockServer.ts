@@ -168,7 +168,12 @@ function submitQuizSync(d: DB, moduleId: string, answers: Answer[], remote?: Rem
 
   for (const a of answers) {
     const ok = record(d, l, moduleId, a);
-    graded.push({ question_id: a.question_id, chosen: a.chosen, correct: ok, pending: isWritten(a.question_id) && a.chosen !== null && !!a.text?.trim() });
+    graded.push({
+      question_id: a.question_id,
+      chosen: a.chosen,
+      correct: ok,
+      pending: isWritten(a.question_id) && a.chosen !== null && !!a.text?.trim(),
+    });
     const rc = m.quiz.includes(a.question_id) ? undefined : l.rechecks.find((r) => r.status === "scheduled" && r.question_id === a.question_id);
     if (rc) {
       rc.status = ok ? "passed" : "failed";
@@ -384,12 +389,13 @@ function markSync(d: DB, markId: string, score: number, comment: string, remote?
   }
   if (rec && !l.recommendation) l.recommendation = rec;
   Object.assign(mark, { status: "marked", score, comment: comment || undefined, marked_at: t });
-  const quarters = ["0", "1/4", "1/2", "3/4", "full"][Math.round(score * 4)];
+  const marks = Math.round(score * 4);
+  const markText = l.lang === "hi" ? `आपके लिखे जवाब को 4 में से ${marks} अंक मिले।` : `Your written answer got ${marks} of 4 marks.`;
   d.messages.unshift({
     id: "msg_" + uid(),
     learner_id: l.id,
     from: EDUCATOR.name,
-    text: `Your written answer got ${quarters} marks.${comment ? " " + comment : ""}`,
+    text: `${markText}${comment ? " " + comment : ""}`,
     concept_id: q.concepts[0],
     at: t,
     read: false,
@@ -518,7 +524,17 @@ const M3_SYMBOL_ROOT: Answer[] = [
 
 export function applyPreset(p: Preset) {
   const d = seedDB(Date.now());
-  const steps: Record<Preset, number> = { fresh: 0, onboarded: 1, m1check: 1, m2check: 1, gap: 2, rootcause: 2, escalated: 3, resolved: 4, recheck: 5 };
+  const steps: Record<Preset, number> = {
+    fresh: 0,
+    onboarded: 1,
+    m1check: 1,
+    m2check: 1,
+    gap: 2,
+    rootcause: 2,
+    escalated: 3,
+    resolved: 4,
+    recheck: 5,
+  };
   const n = steps[p];
   if (n >= 1)
     onboardSync(d, "some", p === "rootcause" ? PLACEMENT_GOOD.map((a) => (a.question_id === "q_x_sym2" ? { ...a, chosen: 2 } : a)) : PLACEMENT_GOOD);

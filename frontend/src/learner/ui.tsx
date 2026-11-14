@@ -48,13 +48,13 @@ export function BottomNav() {
     { to: "/learner/messages", icon: MessageCircle, label: t("nav_messages"), badge: unread },
   ];
   return (
-    <nav className="bottomnav" aria-label="Main">
+    <nav className="bottomnav" aria-label={t("nav_main")}>
       {items.map(({ to, icon: Icon, label, badge }) => (
         <NavLink key={to} to={to} className={({ isActive }) => "bn-item" + (isActive ? " active" : "")}>
           <span className="bn-icon">
             <Icon size={24} aria-hidden />
             {!!badge && (
-              <span className="badge" aria-label={`${badge} new`}>
+              <span className="badge" aria-label={t("n_new", { n: badge })}>
                 {badge}
               </span>
             )}

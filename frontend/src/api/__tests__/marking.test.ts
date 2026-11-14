@@ -57,7 +57,17 @@ describe("short answers in the browser engine", () => {
     expect(me().mastery.ohm!).toBeLessThan(before);
     expect(store.getDB().marks.find((m) => m.id === mark.id)).toMatchObject({ status: "marked", score: 0.25, comment: "Look at I = V / R again." });
     const msg = store.getDB().messages.find((m) => m.learner_id === me().id)!;
-    expect(msg.text).toBe("Your written answer got 1/4 marks. Look at I = V / R again.");
+    expect(msg.text).toBe("Your written answer got 1 of 4 marks. Look at I = V / R again.");
+  });
+
+  it("a learner who reads Hindi gets the mark message in Hindi", async () => {
+    const { store, me } = await load();
+    store.getDB().learners[me().id].lang = "hi";
+    await store.submitQuiz("m2", [...M2_RIGHT, { question_id: "q_o2", chosen: 0, text: "करंट कम होगा" }]);
+    const mark = store.getDB().marks.find((m) => m.learner_id === me().id)!;
+    await store.markAnswer(mark.id, 0.75);
+    const msg = store.getDB().messages.find((m) => m.learner_id === me().id)!;
+    expect(msg.text).toBe("आपके लिखे जवाब को 4 में से 3 अंक मिले।");
   });
 
   it("full marks raise mastery, and a mark is saved only once", async () => {

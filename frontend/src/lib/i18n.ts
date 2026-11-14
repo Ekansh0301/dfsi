@@ -129,6 +129,8 @@ const S = {
   waiting_title: { en: "{trainer} will help with this", hi: "{trainer} इसमें मदद करेंगे" },
   waiting_body: { en: "{c}. Their reply will show up in Messages.", hi: "{c}। उनका जवाब मैसेज में दिखेगा।" },
   nav_home: { en: "Home", hi: "होम" },
+  nav_main: { en: "Main", hi: "मुख्य" },
+  n_new: { en: "{n} new", hi: "{n} नए" },
   nav_progress: { en: "Progress", hi: "प्रगति" },
   nav_messages: { en: "Messages", hi: "मैसेज" },
   progress_title: { en: "My skill path", hi: "मेरा स्किल रास्ता" },

@@ -334,29 +334,62 @@ function TriageRow({ e, p, d }: { e: Escalation; p: ReturnType<typeof priorityOf
 }
 
 // ─── E2 · Learner detail & resolution ────────────────────────────────────────
-const TIPS: Partial<Record<string, string[]>> = {
+type Two = { en: string; hi: string };
+const TIPS: Partial<Record<string, Two[]>> = {
   diagrams: [
-    "Use two fingers: one stays on +, the other walks the wire. If it can't get back to −, the lamp is off.",
-    "Redraw the circuit as a real board. Every line on paper is one wire on the board.",
+    {
+      en: "Use two fingers: one stays on +, the other walks the wire. If it can't get back to −, the lamp is off.",
+      hi: "दो उँगलियाँ लगाइए: एक + पर रहे, दूसरी तार के साथ चले। अगर वह − तक वापस न पहुँचे, तो बल्ब बंद रहेगा।",
+    },
+    {
+      en: "Redraw the circuit as a real board. Every line on paper is one wire on the board.",
+      hi: "सर्किट को असली बोर्ड की तरह फिर से बनाइए। कागज़ की हर लाइन बोर्ड का एक तार है।",
+    },
   ],
   series_parallel: [
-    "Count the paths back to the cell: one path = series, more than one = parallel.",
-    "Try the two-lamp board in the lab. Unscrew one bulb and see which one stays on.",
+    {
+      en: "Count the paths back to the cell: one path = series, more than one = parallel.",
+      hi: "सेल तक वापस जाने के रास्ते गिनिए: एक रास्ता = सीरीज़, एक से ज़्यादा = पैरेलल।",
+    },
+    {
+      en: "Try the two-lamp board in the lab. Unscrew one bulb and see which one stays on.",
+      hi: "लैब में दो बल्ब वाला बोर्ड आज़माइए। एक बल्ब खोलिए और देखिए कौन-सा जलता रहता है।",
+    },
   ],
   wiring: [
-    "Remember: the switch cuts the phase, so the holder is safe when it's OFF.",
-    "Colour check: red/brown = phase, black/blue = neutral, green = earth.",
+    {
+      en: "Remember: the switch cuts the phase, so the holder is safe when it's OFF.",
+      hi: "याद रखिए: स्विच फेज़ को काटता है, इसलिए OFF होने पर होल्डर सुरक्षित रहता है।",
+    },
+    {
+      en: "Colour check: red/brown = phase, black/blue = neutral, green = earth.",
+      hi: "रंग याद रखिए: लाल/भूरा = फेज़, काला/नीला = न्यूट्रल, हरा = अर्थ।",
+    },
   ],
   ohm: [
-    "Cover the letter you need in the V-I-R triangle. What's left is the formula.",
-    "Try it with money: ₹12 shared by 6 people = ₹2 each. Same as 12 V ÷ 6 Ω = 2 A.",
+    {
+      en: "Cover the letter you need in the V-I-R triangle. What's left is the formula.",
+      hi: "V-I-R त्रिकोण में जो अक्षर चाहिए उसे ढकिए। जो बचे, वही फ़ॉर्मूला है।",
+    },
+    {
+      en: "Try it with money: ₹12 shared by 6 people = ₹2 each. Same as 12 V ÷ 6 Ω = 2 A.",
+      hi: "पैसों से समझिए: ₹12 को 6 लोगों में बाँटें = हर एक को ₹2। वैसे ही 12 V ÷ 6 Ω = 2 A।",
+    },
   ],
   symbols: [
-    "Make flashcards: symbol on one side, real part on the other.",
-    "Find each symbol on the lab board. Touch the real part when you name it.",
+    { en: "Make flashcards: symbol on one side, real part on the other.", hi: "फ़्लैशकार्ड बनाइए: एक तरफ़ चिह्न, दूसरी तरफ़ असली पुर्ज़ा।" },
+    {
+      en: "Find each symbol on the lab board. Touch the real part when you name it.",
+      hi: "लैब बोर्ड पर हर चिह्न ढूँढिए। नाम लेते समय असली पुर्ज़े को छुइए।",
+    },
   ],
 };
-const CHECKINS = ["Today, 16:00 in the lab", "Tomorrow, 10:00 in the lab", "Next class, before the practical"];
+const DEFAULT_TIP: Two = { en: "Let's go through this together at the next class.", hi: "अगली क्लास में हम इसे साथ में समझेंगे।" };
+const CHECKINS: Two[] = [
+  { en: "Today, 16:00 in the lab", hi: "आज, 16:00 बजे लैब में" },
+  { en: "Tomorrow, 10:00 in the lab", hi: "कल, 10:00 बजे लैब में" },
+  { en: "Next class, before the practical", hi: "अगली क्लास में, प्रैक्टिकल से पहले" },
+];
 
 function Case() {
   useMarkScreen("e-case");
@@ -523,11 +556,15 @@ function Case() {
                   placeholder={`A short, practical hint for ${first}…`}
                 />
                 <div className="chips">
-                  {(TIPS[e.concept_id] ?? ["Let's go through this together at the next class."]).map((s) => (
-                    <button key={s} type="button" className="suggest" onClick={() => setTip(s)}>
-                      {s.length > 52 ? s.slice(0, 50) + "…" : s}
-                    </button>
-                  ))}
+                  {(TIPS[e.concept_id] ?? [DEFAULT_TIP]).map((two) => {
+                    // The tip is sent in the learner's language; the trainer also sees the English.
+                    const s = two[l.lang];
+                    return (
+                      <button key={two.en} type="button" className="suggest" title={two.en} onClick={() => setTip(s)}>
+                        <span lang={l.lang}>{s.length > 52 ? s.slice(0, 50) + "…" : s}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </fieldset>
 
@@ -557,17 +594,21 @@ function Case() {
               <fieldset className="rs-block">
                 <legend>3 · Plan a check-in</legend>
                 <div className="chips">
-                  {CHECKINS.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={"suggest" + (checkin === s ? " on" : "")}
-                      aria-pressed={checkin === s}
-                      onClick={() => setCheckin(checkin === s ? "" : s)}
-                    >
-                      <CalendarClock size={14} aria-hidden /> {s}
-                    </button>
-                  ))}
+                  {CHECKINS.map((two) => {
+                    const s = two[l.lang];
+                    return (
+                      <button
+                        key={two.en}
+                        type="button"
+                        className={"suggest" + (checkin === s ? " on" : "")}
+                        aria-pressed={checkin === s}
+                        title={two.en}
+                        onClick={() => setCheckin(checkin === s ? "" : s)}
+                      >
+                        <CalendarClock size={14} aria-hidden /> <span lang={l.lang}>{s}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </fieldset>
 
