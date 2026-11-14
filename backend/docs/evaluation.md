@@ -100,12 +100,12 @@ What each change did:
 
 ### Promotion decision (S3-7)
 
-Paired by run (both models see the same learners in each seed; `results/paired_comparison.md`), the improved model is clearly better on 12 of 14 measures and not clearly different on the other 2 (missed gaps on both simulators). It is **not** made the default yet, for two reasons:
+Paired by run (both models see the same learners in each seed; `results/paired_comparison.md`), the improved model is clearly better on 12 of 14 measures and not clearly different on the other 2 (missed gaps on both simulators). It is **not** made the default yet. One reason is left open (the second, EdNet, is now settled):
 
 1. **Missed gaps on the Sprint 2 simulator.** The averages are 2.6% and 3.5%, and the 95% interval of the paired difference (-1.6 to +3.3 points) includes zero, but the improved model misses more in 4 of the 5 runs (median +1.5 points): the baseline's average comes from one run at 6.4%, and in the other four it misses 1.3% to 2.1%. The plan's target was no more than the baseline.
-2. **The EdNet comparison has not been run**: the raw files are not in the repository. The promotion rule also asks the improved model to narrow the EdNet gap to per-question accuracy.
+2. **EdNet (settled in Hackathon 2).** The promotion rule asks the improved model to narrow the EdNet gap to per-question accuracy. It does more than that: next-answer AUC 0.729 against 0.627 for the baseline and 0.721 for per-question accuracy (40,000 sampled students; first-tag credit and question difficulty only, since EdNet has no prerequisite graph). Table in `results/model_comparison.md`.
 
-The model was frozen at tag `v0.9` with the baseline as the default; the EdNet comparison is future work. Until both are settled the service default stays `baseline`. The improved model is available per request (`?model=improved`), for the whole service (`CIRCUIT_COACH_MODEL=improved`) and for the prototype (`VITE_ENGINE_MODEL=improved`). To finish the check: download EdNet into `backend/data/raw/` (see README) and rerun `python scripts/compare_models.py`, which adds the EdNet table.
+The model was frozen at tag `v0.9` with the baseline as the default. With EdNet settled, only missed gaps remain open; the service default stays `baseline` until the team decides to accept that trade, and we recommend promoting the improved model. The improved model is available per request (`?model=improved`), for the whole service (`CIRCUIT_COACH_MODEL=improved`) and for the prototype (`VITE_ENGINE_MODEL=improved`). To repeat the EdNet check: download EdNet into `backend/data/raw/` (see README) and run `python scripts/compare_models.py` (about 15 minutes), which adds the EdNet table.
 
 ## Sprint 4: robustness, calibration and failure analysis
 

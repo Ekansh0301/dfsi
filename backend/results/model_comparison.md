@@ -52,9 +52,13 @@ Mean fitted slip: 0.277 ± 0.008 with every tag, 0.193 ± 0.007 with first-tag c
 | + prerequisite-aware learning | 81.9% ± 0.5 | 55.5% ± 1.9 | 58.3% ± 2.9 | 26.7% ± 1.9 | 6.2% ± 0.8 | 32.0% ± 1.3 |
 | Improved: + more evidence before a lesson | 81.9% ± 0.5 | 55.5% ± 2.0 | 58.3% ± 2.9 | 26.6% ± 2.0 | 6.3% ± 0.8 | 30.7% ± 1.3 |
 
-## EdNet
+## EdNet (real answers, no prerequisite graph)
 
-Not run: the EdNet files are not in `backend/data/raw/` (see README). The promotion check below needs this comparison.
+| Model | AUC | Accuracy | Log loss | RMSE |
+|---|---|---|---|---|
+| Baseline: BKT, fitted (all tags) | 0.627 | 0.625 | 0.645 | 0.476 |
+| Improved: first tag + question difficulty | 0.729 | 0.694 | 0.584 | 0.447 |
+| Reference: per-question accuracy | 0.721 | 0.688 | 0.590 | 0.450 |
 
 ## Promotion check (made-up learners)
 

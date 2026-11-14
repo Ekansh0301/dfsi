@@ -4,7 +4,7 @@
 **Prototype:** https://dfsi.vercel.app/ | **Code:** `backend/` and `frontend/` in the project repository
 **Document:** Final Technical Design Document (Hackathon 2, POC v1.0). Earlier versions: `docs/archive/Sprint4_Technical_Design_Doc.md` (Sprint 4, POC v0.9), `docs/archive/Sprint2_Technical_Design_Doc.md` (Sprint 2) and `docs/archive/Hack1_Technical_Design_Doc.md` (after Hackathon 1).
 
-Circuit Coach finds what a vocational learner is stuck on after each short quiz, traces it back to the real cause, and recommends one short lesson; a trainer steps in when the learner is still stuck. The engine reads Barabari's quiz format. Compared run by run on made-up learners, the improved model is clearly better than the baseline on 12 of 14 measures and not clearly different on the other 2. With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy. POC v1.0 adds reading aloud in English and Hindi, offline use and a set of fixes from a full project review.
+Circuit Coach finds what a vocational learner is stuck on after each short quiz, traces it back to the real cause, and recommends one short lesson; a trainer steps in when the learner is still stuck. The engine reads Barabari's quiz format. Compared run by run on made-up learners, the improved model is clearly better than the baseline on 12 of 14 measures and not clearly different on the other 2. With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy. On real EdNet answers the improved model predicts the next answer clearly better than the baseline (AUC 0.729 against 0.627). POC v1.0 adds reading aloud in English and Hindi, offline use and a set of fixes from a full project review.
 
 ## 1. Introduction
 
@@ -127,7 +127,15 @@ The walk on plain accuracy recovers part of the gain; BKT recovers the rest. BKT
 
 ### 6.3 Real data: EdNet (Sprint 2 result)
 
-Per-question accuracy (AUC 0.721) beats fitted BKT (0.627; 0.641 with the first tag only), because BKT ignores question difficulty. The improved model adds question difficulty, but the EdNet comparison has not been rerun: the raw files are not in the repository.
+In the Sprint 2 result, per-question accuracy (AUC 0.721) beat fitted BKT (0.627; 0.641 with the first tag only), because BKT ignores question difficulty. In Hackathon 2 we ran the comparison again with the improved model on the same kind of sample (EdNet KT1, 40,000 students sampled):
+
+| Model | AUC | Accuracy | Log loss | RMSE |
+|---|---|---|---|---|
+| Baseline: BKT, fitted (all tags) | 0.627 | 0.625 | 0.645 | 0.476 |
+| Improved: first tag + question difficulty | 0.729 | 0.694 | 0.584 | 0.447 |
+| Reference: per-question accuracy | 0.721 | 0.688 | 0.590 | 0.450 |
+
+Adding question difficulty removes the gap: the improved model's next-answer AUC is 0.10 above the baseline's and slightly above per-question accuracy's. EdNet has no prerequisite graph, so only the first two changes (first-tag credit, question difficulty) can be tested there; the prerequisite-aware learning rate and the evidence rule are tested on the made-up learners. Details: `results/model_comparison.md`.
 
 ### 6.4 Robustness (Barabari simulator)
 
@@ -172,11 +180,10 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 **Did not work, or not yet**
 
 1. The improved model misses more gaps than the baseline in most runs on the Sprint 2 simulator and under mis-tagging; the plan's target was no more than the baseline's 2.6%.
-2. The EdNet comparison for the improved model has not been run.
-3. Mastery estimates are over-confident in the middle range.
-4. Concept tags in Barabari's data do not exist yet; unit-level tags put several concepts on every question, the case first-tag credit handles worst.
+2. Mastery estimates are over-confident in the middle range.
+3. Concept tags in Barabari's data do not exist yet; unit-level tags put several concepts on every question, the case first-tag credit handles worst.
 
-**Promotion decision.** The baseline stays the service default because of points 1 and 2. The improved model is fully available and tested (`?model=improved`, `CIRCUIT_COACH_MODEL=improved`, `VITE_ENGINE_MODEL=improved`) and is our recommendation once the EdNet check is run, since with correct tags it misses about 1 to 2 points more gaps while sending far fewer learners to the wrong lesson (more gaps are missed under heavy mis-tagging, 6.4). The decision is recorded in `docs/evaluation.md`.
+**Promotion decision.** The EdNet condition of the promotion rule is now met (6.3). What remains open is point 1, missed gaps. The baseline is still the service default in this release. The improved model is fully available and tested (`?model=improved`, `CIRCUIT_COACH_MODEL=improved`, `VITE_ENGINE_MODEL=improved`), and we recommend making it the default: with correct tags it misses about 1 to 2 points more gaps while sending far fewer learners to the wrong lesson and predicting real answers much better (more gaps are missed under heavy mis-tagging, 6.4). Making it the default is a one-line setting; the decision is recorded in `docs/evaluation.md`.
 
 ## 8. POC v1.0 status
 
@@ -190,7 +197,7 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 | Continuous integration on every push | `.github/workflows/tests.yml` |
 | Demo plan | `docs/demo_plan.md` |
 | Demo video | Open |
-| EdNet comparison of the improved model | Future work |
+| EdNet comparison of the improved model | Done: AUC 0.729 against 0.627 for the baseline (6.3) |
 
 ## 9. Limitations
 
