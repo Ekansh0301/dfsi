@@ -184,7 +184,7 @@ Request: `state`, `quiz` (`id`, `unit_id`, `title`, `passing_score`, `max_score`
 
 Response: `state`, `recommendation` (same as `/v1/quiz-result`), `score` (`points`, `max_score`, `percent`, `passed`, `awaiting_review_points`, `answers_revealed`) and `assessed_concepts`.
 
-422 when the quiz breaks Barabari's rules (for example a multiple-choice question without exactly one correct option), the attempt is for another quiz, an answer names an unknown question, or the quiz has no concept tags.
+422 when the quiz breaks Barabari's rules (for example a multiple-choice question without exactly one correct option), the attempt is for another quiz, an answer names an unknown question, a question is answered more than once, or the quiz has no concept tags.
 
 ### `POST /v1/marked-answer`
 

@@ -410,6 +410,10 @@ def barabari_quiz_attempt(req: BarabariAttemptRequest, model: ModelName | None =
     unknown = sorted({a.question_id for a in attempt.answers} - {q.id for q in quiz.questions})
     if unknown:
         problems.append(f"answers to unknown questions {unknown}")
+    answered = [a.question_id for a in attempt.answers]
+    repeated = sorted({q for q in answered if answered.count(q) > 1})
+    if repeated:
+        problems.append(f"more than one answer to questions {repeated}")
     tags = barabari.TagMap.from_dict(req.tags.model_dump()) if req.tags else barabari.TagMap.load()
     problems += tags.problems()
     if problems:

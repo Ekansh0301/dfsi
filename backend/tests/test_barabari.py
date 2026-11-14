@@ -212,6 +212,7 @@ def test_endpoint_accepts_custom_tags(client):
         lambda q, a: a["answers"].append({"question_id": "q_99", "selected_option_id": "x"}),
         lambda q, a: q["questions"][0]["options"][1].update(is_correct=True),
         lambda q, a: (q.update(id="quiz_untagged", unit_id="unit_unknown"), a.update(quiz_id="quiz_untagged")),
+        lambda q, a: a["answers"].append(dict(a["answers"][0])),
     ],
 )
 def test_endpoint_rejects_inconsistent_input(client, change):
