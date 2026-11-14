@@ -84,7 +84,7 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 | S3-1 | Done. The Barabari simulator (true/false, short answers, points, difficulty, retakes) is the new default for the saved dataset; the Sprint 2 simulator is still reproduced byte for byte |
 | S3-2, S3-3, S3-5, S3-6 | Done as options of one improved model. Compared run by run on made-up learners it is clearly better on 12 of 14 measures and not clearly different on missed gaps (3.5% against 2.6% on the Sprint 2 simulator, worse in 4 of 5 runs; target: not above 2.6%) |
 | S3-4 | Done: question types, partial credit, retake discount, Barabari quiz importer and adapter endpoint |
-| S3-7 | Model switch done (`?model=`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`). Promotion not decided: EdNet comparison still to run (raw files needed) and the missed-gaps target above |
+| S3-7 | Model switch done (`?model=`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`). EdNet comparison done in Hackathon 2 (AUC 0.729 against 0.627); promotion not decided: the missed-gaps target above is the open point |
 | S3-8 | Done: true/false questions and points in the quick checks; the top bar shows the model |
 | S3-9 | Done in Hackathon 2 with the device's own voices (no audio files, no outside service); pre-recorded natural audio is future work |
 | S3-10 | Done: `backend/docs/test_spec.md` |
@@ -103,7 +103,7 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 | S4-6 | Done: `backend/docs/Technical_Design_Doc.md` (Sprint 4), `backend/docs/demo_plan.md`; earlier version archived |
 | S4-7 | Done: model frozen and tagged `v0.9`. The baseline stays the service default; the improved model stays selectable. Known limits at the freeze: missed gaps on the Sprint 2 simulator 3.5% (target 2.6%) |
 
-**Future work:** rerun the EdNet comparison for the improved model (download EdNet KT1 into `backend/data/raw/`, then `python scripts/compare_models.py`) and decide the promotion with it.
+**Update (Hackathon 2):** the EdNet comparison for the improved model was run (download EdNet KT1 into `backend/data/raw/`, then `python scripts/compare_models.py`): AUC 0.729 against 0.627 for the baseline. The promotion decision is now the team's.
 
 ## 4d. Status of Hackathon 2 on 14 November 2026
 
@@ -111,7 +111,7 @@ POC v1.0. Details: `backend/docs/Technical_Design_Doc.md` (final), `backend/docs
 
 | Task | State | Owner |
 |---|---|---|
-| Promotion decision, paired per-seed comparison with 95% intervals | Done: `results/paired_comparison.md`. Baseline stays the default; EdNet rerun is future work | Aman |
+| Promotion decision, paired per-seed comparison with 95% intervals | Done: `results/paired_comparison.md`; EdNet run (AUC 0.729 against 0.627). Baseline stays the default until the team decides | Aman |
 | Shipped model parameters protected from re-runs | Done: `--write-service-params`, `tests/test_shipped_params.py` | Aman |
 | Backend fixes: repeat gap with storage, duplicate Barabari answers, concurrent resent requests | Done, with tests | Aman |
 | API key, CORS limited to known sites, size limits | Done, `tests/test_security.py` | Aman |

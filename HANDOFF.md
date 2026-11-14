@@ -12,7 +12,7 @@ Live prototype: https://dfsi.vercel.app/
 | Clickable prototype (learner app, trainer console, side-by-side demo, flow map, English and Hindi, light and dark) with true/false and short-answer questions, points, trainer marking, a listen button, offline use and saved quiz progress | `frontend/` | Done |
 | Engine service (FastAPI, Bayesian Knowledge Tracing, prerequisite walk, one-lesson recommender; two models, baseline and improved; Barabari adapter; optional SQLite or PostgreSQL storage; optional API key and size limits) | `backend/circuit_coach/` | Done, 216 tests pass |
 | Made-up learner generator with hidden mastery, in two formats (Sprint 2 and Barabari's quiz format) | `backend/circuit_coach/simulate.py` | Done |
-| Evaluation: model comparison (also paired by run), accuracy baseline, robustness, calibration, failure analysis, EdNet loader | `backend/scripts/`, results in `backend/results/` | Done; EdNet rerun for the improved model is future work |
+| Evaluation: model comparison (also paired by run), accuracy baseline, robustness, calibration, failure analysis, EdNet loader | `backend/scripts/`, results in `backend/results/` | Done, including the EdNet comparison for the improved model |
 | Prototype connected to the engine, with fallback to the in-browser engine | `frontend/src/api/engineClient.ts`, `mockServer.ts` | Done, tested, health check on start-up |
 | Docker images and compose file; GitHub Actions workflow | `backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.yml`, `.github/workflows/tests.yml` | Written; the workflow has not run yet (see section 7) |
 | Technical design document (final, POC v1.0) | `backend/docs/Technical_Design_Doc.md` | Done |
@@ -61,7 +61,8 @@ Details and tables are in the technical design document; every figure comes from
 - **Does BKT earn its place?** With the same prerequisite walk, BKT finds 12 to 24 points more true blockers than plain accuracy. `results/accuracy_baseline.md`.
 - **Real data (EdNet, Sprint 2 result):** per-question accuracy AUC 0.721 beats fitted BKT 0.627, because BKT ignores question difficulty.
 - **Calibration:** next-answer probabilities are well calibrated; mastery estimates run about 10 points high in the middle range, so trainers see bands, not percentages.
-- **Promotion:** the baseline stays the service default. The improved model is selectable (`?model=improved`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`). It becomes the default only after the EdNet comparison is run.
+- **EdNet, improved model:** next-answer AUC 0.729 against 0.627 for the baseline and 0.721 for per-question accuracy (`results/model_comparison.md`).
+- **Promotion:** the baseline stays the service default in this release. The improved model is selectable (`?model=improved`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`). The EdNet condition is met; the open point is missed gaps (slightly more in some runs). We recommend promoting it; that is a team decision.
 
 ## 4. How we got here
 
@@ -82,7 +83,7 @@ Details and tables are in the technical design document; every figure comes from
 ## 5. Open
 
 - **Demo video:** not recorded. Steps are in `backend/docs/demo_plan.md`.
-- **EdNet comparison for the improved model**, then the decision on making it the default (`backend/docs/evaluation.md`).
+- **Decision:** make the improved model the service default or not (`backend/docs/evaluation.md`).
 - **Live site:** redeploy after every merge; the top bar shows which build is running.
 - **Voice:** the listen button uses the voices installed on the device. Pre-recorded natural English and Hindi audio is the next step.
 - **Nirmaan:** we have no format or data from them yet. **Barabari:** their real attempt records (columns) would replace our assumed shape (`backend/docs/barabari_format.md`).
