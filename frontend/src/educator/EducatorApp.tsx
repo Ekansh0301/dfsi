@@ -199,7 +199,7 @@ function MarkCard({ id }: { id: string }) {
           await markAnswer(m.id, score!, comment.trim());
         }}
       >
-        <Send size={16} aria-hidden /> Save mark
+        <Send size={16} aria-hidden /> {busy ? "Saving…" : "Save mark"}
       </button>
     </article>
   );

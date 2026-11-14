@@ -64,7 +64,7 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo, 
       bar={<AppBar back={exitTo} title={<span className="bar-tag">{tag}</span>} />}
       footer={
         <button type="button" className="btn btn-primary btn-lg btn-block btn-split" disabled={!answered || submitting} onClick={next}>
-          <span>{last ? t("submit") : t("next")}</span>
+          <span>{submitting ? t("checking_answers") : last ? t("submit") : t("next")}</span>
           <ArrowRight size={20} aria-hidden />
         </button>
       }

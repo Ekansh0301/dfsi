@@ -157,6 +157,7 @@ const S = {
   you_chose: { en: "You chose", hi: "आपने चुना" },
   you_unsure: { en: "You weren't sure", hi: "आपको पता नहीं था" },
   you_wrote: { en: "You wrote", hi: "आपने लिखा" },
+  checking_answers: { en: "Checking your answers…", hi: "आपके जवाब जाँचे जा रहे हैं…" },
   mark_waiting: { en: "Waiting for your trainer's mark", hi: "ट्रेनर के अंक का इंतज़ार" },
   mark_given: { en: "Trainer's mark: {m} of 4", hi: "ट्रेनर के अंक: 4 में से {m}" },
   new_message: { en: "New message from {trainer}", hi: "{trainer} का नया मैसेज" },

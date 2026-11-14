@@ -205,4 +205,27 @@ describe("fallback to the in-browser engine", () => {
     await store.finishOnboarding("new", []);
     expect(client.getEngineMode()).toBe("api");
   });
+
+  it("shows 'checking' until a health check answers", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ status: "ok" }), { status: 200 })));
+    let { client } = await load(API);
+    expect(client.getEngineMode()).toBe("checking");
+    expect(await client.checkHealth()).toBe("api");
+
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
+    ({ client } = await load(API));
+    expect(await client.checkHealth()).toBe("fallback");
+  });
+
+  it("while the service stays down, later steps only make a quick health check", async () => {
+    const fetch = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+    vi.stubGlobal("fetch", fetch);
+    const { client, store, me } = await load(API);
+    await store.finishOnboarding("new", []);
+    await store.finishOnboarding("new", []);
+    const urls = fetch.mock.calls.map((c) => String(c[0]));
+    expect(urls).toEqual([`${API}/v1/onboarding`, `${API}/health`]);
+    expect(client.getEngineMode()).toBe("fallback");
+    expect(me().onboarded).toBe(true);
+  });
 });

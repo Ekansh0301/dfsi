@@ -14,8 +14,9 @@ const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/
 /** Optional engine model on the service: "baseline" or "improved" (VITE_ENGINE_MODEL). */
 export const MODEL = (import.meta.env.VITE_ENGINE_MODEL as string | undefined) || undefined;
 
-export type EngineMode = "local" | "api" | "fallback";
-let mode: EngineMode = BASE ? "api" : "local";
+export type EngineMode = "local" | "checking" | "api" | "fallback";
+/** With a service configured the mode starts as "checking" until a health check or a call answers. */
+let mode: EngineMode = BASE ? "checking" : "local";
 const listeners = new Set<() => void>();
 function setMode(m: EngineMode) {
   if (m === mode) return;
@@ -45,8 +46,41 @@ export interface EngineEvent {
   question_type: QuestionType;
 }
 
+/** After a failed call, a quick health check runs first, so a service that is down costs about a
+ *  second per step instead of the full 4 second timeout. */
+const RETRY_WINDOW_MS = 60_000;
+let lastFailure = 0;
+
+async function healthy(timeoutMs: number): Promise<boolean> {
+  if (!BASE) return false;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(BASE + "/health", { signal: ctrl.signal });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Ask the service whether it is up and show the answer in the top bar. Called once on start-up. */
+export async function checkHealth(): Promise<EngineMode> {
+  if (!BASE) return mode;
+  const ok = await healthy(3000);
+  if (!ok) lastFailure = Date.now();
+  setMode(ok ? "api" : "fallback");
+  return mode;
+}
+
 async function post<T>(path: string, body: unknown): Promise<T | null> {
   if (!BASE) return null;
+  if (Date.now() - lastFailure < RETRY_WINDOW_MS && !(await healthy(1200))) {
+    lastFailure = Date.now();
+    setMode("fallback");
+    return null;
+  }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 4000);
   try {
@@ -58,8 +92,10 @@ async function post<T>(path: string, body: unknown): Promise<T | null> {
     });
     if (!res.ok) throw new Error(String(res.status));
     setMode("api");
+    lastFailure = 0;
     return (await res.json()) as T;
   } catch {
+    lastFailure = Date.now();
     setMode("fallback");
     return null;
   } finally {
