@@ -203,7 +203,7 @@ export function Placement({ experience }: { experience: LearnerState["experience
       </Screen>
     );
 
-  return <Quiz questions={PLACEMENT} tag={t("placement_title")} onSubmit={submit} exitTo="/learner/setup/experience" submitting={busy} />;
+  return <Quiz questions={PLACEMENT} tag={t("placement_title")} onSubmit={submit} exitTo="/learner/setup/experience" submitting={busy} showPoints={false} />;
 }
 
 export function StartingPoint() {

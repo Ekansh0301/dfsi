@@ -27,9 +27,11 @@ interface Props {
   submitting?: boolean;
   onSubmit: (answers: Answer[]) => void;
   exitTo: string;
+  /** Show each question's points (off for the placement check, which has no marks). */
+  showPoints?: boolean;
 }
 
-export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo }: Props) {
+export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo, showPoints = true }: Props) {
   const { t, tx } = useT();
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number | null | undefined>>({});
@@ -74,7 +76,8 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo }
           </button>
         )}
         <span className="muted small">
-          {t("q_of", { i: i + 1, n: questions.length })} · {t("q_points", { p: questionPoints(q) })}
+          {t("q_of", { i: i + 1, n: questions.length })}
+          {showPoints && <> · {t("q_points", { p: questionPoints(q) })}</>}
         </span>
       </div>
       <Progress value={i} total={questions.length} label={t("q_of", { i: i + 1, n: questions.length })} />
