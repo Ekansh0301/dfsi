@@ -412,7 +412,8 @@ export const startContent = (contentId: string, concept: ConceptId) => mutate((d
 /** POST /feedback { type: "got_it" } → schedules a spaced re-check */
 export async function gotIt() {
   const l = me(db);
-  const remote = l.recommendation ? await remoteGotIt(engineState(l), l.recommendation.concept_id) : null;
+  const rec = l.recommendation;
+  const remote = rec ? await remoteGotIt(engineState(l), rec.concept_id, rec.recommended_content_id) : null;
   if (!remote) await latency(300);
   mutate((d) => gotItSync(d, remote?.state));
 }

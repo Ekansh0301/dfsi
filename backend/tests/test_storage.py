@@ -85,3 +85,20 @@ def test_without_storage_the_service_stays_stateless(monkeypatch):
 
 def test_unknown_learner_is_404(client):
     assert client.get("/v1/learners/nobody/state").status_code == 404
+
+
+def test_a_repeat_gap_with_stored_state_gets_a_lesson_not_yet_tried(client):
+    wrong = [{"concept_tags": ["diagrams"], "is_correct": False}] * 2
+    first = client.post("/v1/quiz-result", json={"state": {}, "module_id": "m3", "events": wrong, "learner_id": "ravi"}).json()
+    lesson = first["recommendation"]["recommended_content_id"]
+    client.post("/v1/got-it", json={"state": {}, "concept_id": "diagrams", "content_id": lesson, "learner_id": "ravi"})
+    recheck = {"state": {}, "module_id": "m3", "events": wrong[:1], "recheck_concept": "diagrams", "learner_id": "ravi"}
+    again = client.post("/v1/quiz-result", json=recheck).json()["recommendation"]
+    assert again["repeat_gap"] is True
+    assert again["recommended_content_id"] != lesson
+    assert client.get("/v1/learners/ravi/state").json()["tried"]["diagrams"] == [lesson]
+
+
+def test_got_it_rejects_a_lesson_from_another_concept(client):
+    r = client.post("/v1/got-it", json={"state": {}, "concept_id": "ohm", "content_id": "ct_sym_cards"})
+    assert r.status_code == 422

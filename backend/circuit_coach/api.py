@@ -188,6 +188,9 @@ class QuizResultResponse(BaseModel):
 class GotItRequest(BaseModel):
     state: StateModel
     concept_id: str
+    content_id: str | None = Field(
+        default=None, description="The lesson the learner just finished; it is added to `tried` so a repeat gap gets a different one"
+    )
     learner_id: str | None = LEARNER_ID
     request_id: str | None = REQUEST_ID
 
@@ -282,10 +285,16 @@ def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItRes
     """The learner said "Got it!": apply a learning step. Mastery is confirmed by a later re-check."""
     if req.concept_id not in CONCEPTS:
         raise HTTPException(422, f"Unknown concept {req.concept_id}")
+    if req.content_id is not None and req.content_id not in CONTENT[req.concept_id]:
+        raise HTTPException(422, f"Unknown lesson {req.content_id} for {req.concept_id}")
     if (hit := replay(req, "got-it")) is not None:
         return hit
     engine = pick(model)
     state = engine.got_it(start_state(req), req.concept_id)
+    if req.content_id is not None:
+        done = state.tried.setdefault(req.concept_id, [])
+        if req.content_id not in done:
+            done.append(req.content_id)
     out = GotItResponse(state=StateModel.of(state))
     remember(req, "got-it", model, state, None, out)
     return out

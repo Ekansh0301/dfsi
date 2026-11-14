@@ -169,8 +169,8 @@ With `recheck_concept` set, the recommendation always exists, has `repeat_gap: t
 
 ### `POST /v1/got-it`
 
-Request: `{ "state": State, "concept_id": concept id }`.
-Response: `{ "state": State }` with one BKT learning step applied to that concept. It is not treated as proof of mastery; the frontend schedules a spaced re-check.
+Request: `{ "state": State, "concept_id": concept id, "content_id": lesson id (optional) }`.
+Response: `{ "state": State }` with one BKT learning step applied to that concept. It is not treated as proof of mastery; the frontend schedules a spaced re-check. When `content_id` is sent, that lesson is added to `tried`, so a later repeat gap on the concept gets a different lesson (this matters when the service stores the learner's state). An unknown lesson for the concept gives a 422.
 
 ```json
 { "state": { "mastery": { "symbols": 0.356 }, "observations": { "symbols": 3 }, "tried": { "symbols": ["ct_sym_cards"] } } }

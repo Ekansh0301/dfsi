@@ -118,4 +118,5 @@ export const remoteMarkedAnswer = (state: EngineState, concept_tags: ConceptId[]
     { state, concept_tags, score, now },
   );
 
-export const remoteGotIt = (state: EngineState, concept_id: ConceptId) => post<{ state: EngineState }>("/v1/got-it", { state, concept_id });
+export const remoteGotIt = (state: EngineState, concept_id: ConceptId, content_id?: string) =>
+  post<{ state: EngineState }>("/v1/got-it", { state, concept_id, content_id });

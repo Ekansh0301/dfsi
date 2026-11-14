@@ -899,6 +899,18 @@
             "type": "string",
             "title": "Concept Id"
           },
+          "content_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Id",
+            "description": "The lesson the learner just finished; it is added to `tried` so a repeat gap gets a different one"
+          },
           "learner_id": {
             "anyOf": [
               {
