@@ -12,7 +12,8 @@ let calls: Call[] = [];
 /** Load fresh copies of the client and the store, so the env var is read again. */
 async function load(apiUrl?: string) {
   vi.resetModules();
-  if (apiUrl) vi.stubEnv("VITE_API_URL", apiUrl);
+  // Always set the variable, so a local .env.local cannot switch the "without" case to API mode.
+  vi.stubEnv("VITE_API_URL", apiUrl ?? "");
   const client = await import("../engineClient");
   const store = await import("../mockServer");
   store.resetDemo();
