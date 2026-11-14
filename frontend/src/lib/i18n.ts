@@ -130,6 +130,8 @@ const S = {
   waiting_body: { en: "{c}. Their reply will show up in Messages.", hi: "{c}। उनका जवाब मैसेज में दिखेगा।" },
   nav_home: { en: "Home", hi: "होम" },
   nav_main: { en: "Main", hi: "मुख्य" },
+  listen: { en: "Listen", hi: "सुनें" },
+  listen_stop: { en: "Stop reading aloud", hi: "पढ़ना बंद करें" },
   figure_for_question: { en: "Figure for this question", hi: "इस सवाल का चित्र" },
   n_new: { en: "{n} new", hi: "{n} नए" },
   nav_progress: { en: "Progress", hi: "प्रगति" },

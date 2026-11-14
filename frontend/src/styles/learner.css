@@ -1130,3 +1130,26 @@
   display: grid;
   place-items: center;
 }
+
+/* Listen button: reads the question, lesson step or recommendation aloud */
+.listen-btn {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--ink-2);
+}
+.listen-btn[aria-pressed="true"] {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.step-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rec-tags .rec-listen {
+  margin-left: auto;
+}

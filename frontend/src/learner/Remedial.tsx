@@ -7,6 +7,7 @@ import { CONCEPTS } from "../data/curriculum";
 import { CONTENT } from "../data/content";
 import { EDUCATOR } from "../data/seed";
 import { Figure } from "../components/Figure";
+import { ListenButton } from "../components/ListenButton";
 import { useT } from "../lib/i18n";
 import { useMe } from "../lib/store";
 import { useMarkScreen } from "../shell/screenStore";
@@ -109,7 +110,10 @@ export function Learn() {
             <Figure id={fig} highlight={step.highlight} closed={step.closed} />
           </div>
         )}
-        <p className="step-count small muted">{t("step_of", { i: i + 1, n: item.steps.length })}</p>
+        <div className="step-head">
+          <p className="step-count small muted">{t("step_of", { i: i + 1, n: item.steps.length })}</p>
+          <ListenButton text={[tx(step.text), step.answer && revealed[i] ? tx(step.answer) : ""].filter(Boolean).join(". ")} />
+        </div>
         <p className="step-text">{tx(step.text)}</p>
         {step.answer && revealed[i] && (
           <div className="answer-reveal">

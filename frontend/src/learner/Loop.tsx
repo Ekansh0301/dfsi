@@ -10,6 +10,7 @@ import { useT } from "../lib/i18n";
 import { useDB, useMe } from "../lib/store";
 import { useMarkScreen } from "../shell/screenStore";
 import { Quiz } from "./Quiz";
+import { ListenButton } from "../components/ListenButton";
 import { AppBar, Screen } from "./ui";
 
 // ─── H · Home ────────────────────────────────────────────────────────────────
@@ -353,6 +354,7 @@ export function Recommendation() {
         <div className="rec-tags">
           <span className={"tag" + (rec.from_trainer ? " tag-blue" : "")}>{rec.from_trainer ? t("rec_from_trainer") : t("rec_label")}</span>
           {rec.repeat_gap && <span className="tag tag-rust">{t("repeat_gap")}</span>}
+          <ListenButton className="rec-listen" text={`${tx(rec.diagnostic_text)}. ${tx(item.title)}`} />
         </div>
         <h1 id="rec-diag" className="rec-title">
           {tx(rec.diagnostic_text)}

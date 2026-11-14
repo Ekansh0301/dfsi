@@ -3,6 +3,7 @@ import { ArrowRight, CircleQuestionMark, History } from "lucide-react";
 import type { Answer } from "../api/mockServer";
 import { QUESTIONS, questionPoints } from "../data/curriculum";
 import { Figure } from "../components/Figure";
+import { ListenButton } from "../components/ListenButton";
 import { useT } from "../lib/i18n";
 import { useMe } from "../lib/store";
 import { clearDraft, loadDraft, saveDraft } from "../lib/draft";
@@ -102,6 +103,7 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo, 
         {written && <span className="tag tag-plain">{t("short_answer")}</span>}
         <div className="q-head">
           <h2 className="q-prompt">{tx(q.prompt)}</h2>
+          <ListenButton text={[tx(q.prompt), ...opts.map((o, k) => `${"ABC"[k]}. ${tx(q.options[o].text)}`)].join(". ")} />
         </div>
         {q.figure && (
           <div className="q-figure">
