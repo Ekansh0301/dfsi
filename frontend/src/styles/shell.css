@@ -702,6 +702,13 @@ button.fnode:hover {
   }
 }
 
+.tb-version {
+  flex: none;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 .tb-engine {
   flex: none;
   font-size: 0.72rem;
@@ -723,7 +730,8 @@ button.fnode:hover {
   background: var(--rust-soft);
 }
 @media (max-width: 960px) {
-  .tb-engine {
+  .tb-engine,
+  .tb-version {
     display: none;
   }
 }

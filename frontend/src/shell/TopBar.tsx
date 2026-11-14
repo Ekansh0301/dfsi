@@ -47,6 +47,9 @@ export function TopBar() {
         </span>
         <span className="tb-badge">UI prototype</span>
       </NavLink>
+      <span className="tb-version" title={`Build ${__APP_COMMIT__}`}>
+        v{__APP_VERSION__} · {__APP_COMMIT__}
+      </span>
       <nav className="tb-tabs" aria-label="Prototype sections">
         {tabs.map((t) => (
           <NavLink key={t.to} to={t.to} end={t.end} className={({ isActive }) => "tb-tab" + (isActive ? " active" : "")}>
