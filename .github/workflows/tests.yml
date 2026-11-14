@@ -69,3 +69,26 @@ jobs:
         run: |
           npm ci
           npm run test:e2e
+
+  docker:
+    name: Docker images (build and smoke test)
+    runs-on: ubuntu-latest
+    needs: [engine, app]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start both containers
+        run: docker compose up --build -d --wait --wait-timeout 180
+      - name: Engine answers, with the fitted parameters and storage
+        run: |
+          curl -sf http://localhost:8000/health | tee health.json
+          grep -q '"parameters":"fitted"' health.json
+          curl -sf -X POST http://localhost:8000/v1/quiz-result -H 'Content-Type: application/json' \
+            -d '{"state":{},"module_id":"m3","events":[{"concept_tags":["diagrams"],"is_correct":false}],"learner_id":"ci"}'
+          curl -sf http://localhost:8000/v1/learners/ci/state
+      - name: Prototype is served
+        run: |
+          curl -sf http://localhost:8080/ | grep -q '<div id="root">'
+          curl -sf http://localhost:8080/sw.js > /dev/null
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs

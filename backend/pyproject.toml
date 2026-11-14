@@ -24,3 +24,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["circuit_coach"]
+
+[tool.setuptools.package-data]
+# Fitted parameters and the Barabari tag map ship with the package.
+circuit_coach = ["*.json"]

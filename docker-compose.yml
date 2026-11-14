@@ -1,0 +1,36 @@
+# Circuit Coach: the engine service and the prototype connected to it.
+#   docker compose up --build
+#   Prototype: http://localhost:8080   (top bar: "Engine: API")
+#   Engine API docs: http://localhost:8000/docs
+# Learner state is kept in a SQLite file on the "coach-data" volume.
+
+services:
+  engine:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      CIRCUIT_COACH_MODEL: ${CIRCUIT_COACH_MODEL:-baseline}
+      CIRCUIT_COACH_DB: sqlite:////data/circuit_coach.db
+      # The browser opens the prototype at localhost:8080 and calls the engine from there.
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+    volumes:
+      - coach-data:/data
+    restart: unless-stopped
+
+  app:
+    build:
+      context: ./frontend
+      args:
+        # The browser calls the engine on the host's port 8000.
+        VITE_API_URL: http://localhost:8000
+        VITE_ENGINE_MODEL: ${VITE_ENGINE_MODEL:-}
+    ports:
+      - "8080:80"
+    depends_on:
+      engine:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  coach-data:

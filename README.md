@@ -23,6 +23,28 @@ npm run dev
 
 Open http://localhost:5173 and use **Demo scenarios** in the top bar to jump to any point in the story.
 
+To run the knowledge-tracing steps on the engine service instead of in the browser, start it in a second terminal and point the prototype at it:
+
+```bash
+cd backend
+pip install -e ".[eval,dev]"
+python -m uvicorn circuit_coach.api:app --port 8000
+```
+
+Then set `VITE_API_URL=http://localhost:8000` in `frontend/.env.local` and restart `npm run dev`; the top bar shows **Engine: API**.
+
+## Run with Docker
+
+```bash
+docker compose up --build
+```
+
+This builds and starts both parts: the prototype at http://localhost:8080, already connected to the engine service at http://localhost:8000 (API docs at `/docs`). Learner state is kept in SQLite on a Docker volume. Each part also builds on its own: `docker build -t circuit-coach-engine backend` and `docker build -t circuit-coach-app --build-arg VITE_API_URL=http://localhost:8000 frontend`.
+
+## Tests
+
+`cd backend && pytest` for the engine, `cd frontend && npm test && npm run typecheck && npm run build` for the prototype. GitHub Actions runs both, the end-to-end journey against the running service, and a Docker build and smoke test on every push (`.github/workflows/tests.yml`).
+
 ## Deploy (Vercel)
 
 Import this repository in Vercel with:
