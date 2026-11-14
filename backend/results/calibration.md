@@ -1,6 +1,6 @@
 # Calibration of the engine's numbers
 
-Made-up learners with Barabari's quiz format, test learners of 3 runs of 3000, pooled. 10 bins of equal width; ECE is the answer-weighted mean gap between predicted and observed (0 is perfect).
+Made-up learners with Barabari's quiz format, test learners of 3 runs of 3000, pooled. 10 bins of equal width; ECE is the answer-weighted mean gap between predicted and observed (0 is perfect). The table gives the mean and spread of ECE over the runs; the plot's legend gives the ECE of all runs pooled, so the figures differ slightly (for example 0.022 and 0.020 for the improved model's next-answer probabilities).
 
 | Quantity | Baseline ECE | Improved ECE |
 |---|---|---|

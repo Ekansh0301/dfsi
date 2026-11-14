@@ -13,6 +13,20 @@ This repository holds the **UI prototype** (`frontend/`) and the **knowledge-tra
 | [`frontend/`](frontend) | Clickable prototype (React + TypeScript + Vite): learner app, trainer console, side-by-side demo, flow map |
 | [`backend/`](backend) | Engine service (Python, FastAPI): Bayesian Knowledge Tracing baseline, made-up learner generator, evaluation on made-up and real (EdNet) data |
 
+## Results at a glance
+
+![Baseline against the improved model on 3,000 simulated learners per run, Barabari's quiz format](backend/results/model_comparison.png)
+
+On simulated learners in Barabari's quiz format (hidden mastery known, 5 runs of 3,000 learners each), the improved model finds the real root cause of a gap 58% of the time (baseline 49%), sends 27% of learners to a concept they already knew (baseline 42%) and raises 31% false alarms (baseline 38%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps), see [`paired_comparison.md`](backend/results/paired_comparison.md).
+
+With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy ([`accuracy_baseline.md`](backend/results/accuracy_baseline.md)). The walk is what lifts both well above "study what you got wrong", which finds the hidden cause in under 8% of cases.
+
+![Calibration of the predicted chance of a right answer and of the mastery estimate](backend/results/calibration.png)
+
+The predicted chance of a right answer is well calibrated. The mastery estimate runs about 10 points high between 0.2 and 0.7, so the trainer console shows bands (Needs work, Getting there, Strong) instead of percentages. Details in [`calibration.md`](backend/results/calibration.md).
+
+What these results do not show: they come from simulated learners and from EdNet (next-answer prediction only), not from learners at Barabari or Nirmaan, and nothing here shows that learners learn more. Full evidence, limits and the promotion decision: [technical design document](backend/docs/Technical_Design_Doc.md).
+
 ## Run locally
 
 ```bash

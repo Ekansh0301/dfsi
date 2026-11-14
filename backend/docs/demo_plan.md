@@ -43,6 +43,13 @@ Quiz options are shuffled, so pick answers by their text, never by letter.
 | 8:00 | Results | `backend/results/model_comparison.md` | Improved model: hidden blockers found 49.0% to 58.3%, false alarms 38.2% to 30.7% on Barabari-style learners; next-answer AUC 0.672 to 0.701. |
 | 9:00 | Honest limits | | Made-up learners and EdNet only; no NGO learner data yet; mastery estimates run about 10 points high in the middle range (calibration). |
 
+## Optional extras (if time allows)
+
+- **Listen button:** on any question or lesson step, tap the speaker icon to hear it read aloud in the learner's language. It hides itself on a device with no voice for that language, so check the demo laptop first.
+- **Offline use:** on the live site (https://dfsi.vercel.app/), open it once, then turn off the network and reload: the app still opens and works with its in-browser engine.
+- **Build version:** the top bar shows the version and commit, so you can show which build is running.
+- **Trainer bands:** in "Learner escalated to trainer", the case view shows mastery as Needs work, Getting there or Strong.
+
 ## If something fails
 
 | Problem | Fix |
