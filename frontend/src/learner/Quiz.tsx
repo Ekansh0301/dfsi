@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CircleQuestionMark, History } from "lucide-react";
 import type { Answer } from "../api/mockServer";
 import { QUESTIONS, questionPoints } from "../data/curriculum";
 import { Figure } from "../components/Figure";
 import { useT } from "../lib/i18n";
+import { useMe } from "../lib/store";
+import { clearDraft, loadDraft, saveDraft } from "../lib/draft";
 import { AppBar, Progress, Screen } from "./ui";
 
 /** Stable per-question option order, so the right answer isn't always in the same slot. */
@@ -33,9 +35,16 @@ interface Props {
 
 export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo, showPoints = true }: Props) {
   const { t, tx } = useT();
-  const [i, setI] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number | null | undefined>>({});
-  const [texts, setTexts] = useState<Record<string, string>>({});
+  const learnerId = useMe().id;
+  // Pick up where the learner left off if the page was closed or reloaded mid-quiz.
+  const [draft] = useState(() => loadDraft(learnerId, questions));
+  const [i, setI] = useState(draft?.i ?? 0);
+  const [answers, setAnswers] = useState<Record<string, number | null | undefined>>(draft?.answers ?? {});
+  const [texts, setTexts] = useState<Record<string, string>>(draft?.texts ?? {});
+  useEffect(() => {
+    const kept = Object.fromEntries(Object.entries(answers).filter(([, v]) => v !== undefined)) as Record<string, number | null>;
+    if (Object.keys(kept).length || Object.keys(texts).length) saveDraft(learnerId, questions, { i, answers: kept, texts });
+  }, [learnerId, questions, i, answers, texts]);
   const q = QUESTIONS[questions[i]];
   // True/false keeps its natural order (True, then False); other options are shuffled per question.
   const trueFalse = q.type === "true_false";
@@ -48,6 +57,7 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo, 
   const pick = (v: number | null) => setAnswers((a) => ({ ...a, [q.id]: v }));
   const next = () => {
     if (!answered) return;
+    if (last) clearDraft(learnerId, questions);
     if (last)
       onSubmit(
         questions.map((id) =>

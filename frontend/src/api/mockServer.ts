@@ -11,6 +11,7 @@ import type { ConceptId, DB, Escalation, Lang, LearnerState, Recommendation, Res
 import { CONCEPTS, MODULES, PLACEMENT, QUESTIONS, moduleById } from "../data/curriculum";
 import { ACTIVE_ID, DB_VERSION, EDUCATOR, seedDB } from "../data/seed";
 import { remoteGotIt, remoteMarkedAnswer, remoteOnboarding, remoteQuizResult, type EngineEvent, type EngineState } from "./engineClient";
+import { clearAllDrafts } from "../lib/draft";
 import { BKT, WEAK, bktUpdate, diagnostic, learnStep, masteryOf, pickContent, recommend } from "../engine/engine";
 
 const KEY = "circuit-coach.db";
@@ -523,6 +524,7 @@ const M3_SYMBOL_ROOT: Answer[] = [
 ];
 
 export function applyPreset(p: Preset) {
+  clearAllDrafts();
   const d = seedDB(Date.now());
   const steps: Record<Preset, number> = {
     fresh: 0,
