@@ -1,6 +1,11 @@
 import type { ConceptId, LearnerState } from "../api/types";
 import { CONCEPTS, CONCEPT_ORDER } from "../data/curriculum";
-import { band, masteryOf } from "../engine/engine";
+import { band, masteryOf, type Band } from "../engine/engine";
+
+/** Trainers see mastery as the engine's own bands (below 0.6, 0.6 to 0.8, above 0.8), not as a
+ *  precise percentage: the calibration check shows mid-range estimates run about 10 points high. */
+export const BAND_LABEL: Record<Band, string> = { practice: "Needs work", getting: "Getting there", strong: "Strong", new: "Not seen yet" };
+const BAND_FILL: Record<Band, number> = { practice: 0.34, getting: 0.67, strong: 1, new: 0 };
 
 export const SHORT: Record<ConceptId, string> = {
   safety: "Safety",
@@ -64,15 +69,15 @@ export function ConceptMap({ learner, focus, chain = [] }: { learner: LearnerSta
             transform={`translate(${x} ${y})`}
             className={`cm-node b-${b}` + (c === focus ? " focus" : "") + (chain.includes(c) ? " on-chain" : "")}
           >
-            <title>{`${CONCEPTS[c].name.en}: ${seen ? Math.round(p * 100) + "%" : "not observed"}`}</title>
+            <title>{`${CONCEPTS[c].name.en}: ${seen ? `${BAND_LABEL[b]} (estimate ${Math.round(p * 100)}%)` : "not observed"}`}</title>
             <rect width={W} height={H} rx={10} className="cm-box" />
-            <rect x={8} y={H - 11} width={W - 16} height={4} rx={2} className="cm-track" />
-            {seen && <rect x={8} y={H - 11} width={(W - 16) * p} height={4} rx={2} className="cm-fill" />}
-            <text x={10} y={19} className="cm-label">
+            <rect x={8} y={H - 8} width={W - 16} height={4} rx={2} className="cm-track" />
+            {seen && <rect x={8} y={H - 8} width={(W - 16) * BAND_FILL[b]} height={4} rx={2} className="cm-fill" />}
+            <text x={10} y={16} className="cm-label">
               {SHORT[c]}
             </text>
-            <text x={W - 10} y={19} textAnchor="end" className="cm-pct">
-              {seen ? Math.round(p * 100) + "%" : "n/a"}
+            <text x={10} y={29} className="cm-pct">
+              {seen ? BAND_LABEL[b] : "n/a"}
             </text>
           </g>
         );

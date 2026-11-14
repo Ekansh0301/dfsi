@@ -443,8 +443,8 @@
 }
 .cm-pct {
   font-family: var(--font-head);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 600;
   fill: var(--ink-2);
 }
 .cm-node.b-new .cm-label,

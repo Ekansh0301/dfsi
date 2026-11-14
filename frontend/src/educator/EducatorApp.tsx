@@ -21,14 +21,10 @@ import type { DB, Escalation, StuckReason } from "../api/types";
 import { CONCEPTS, QUESTIONS, moduleById } from "../data/curriculum";
 import { CONTENT, contentFor } from "../data/content";
 import { COHORT, EDUCATOR } from "../data/seed";
-import { band, confidence, masteryOf, rootCause, type Band } from "../engine/engine";
-import { ConceptMap, SHORT } from "../components/ConceptMap";
+import { band, confidence, masteryOf, rootCause } from "../engine/engine";
+import { BAND_LABEL, ConceptMap, SHORT } from "../components/ConceptMap";
 import { useDB } from "../lib/store";
 import { useMarkScreen } from "../shell/screenStore";
-
-/** Trainers see mastery as the engine's own bands (below 0.6, 0.6 to 0.8, above 0.8), not as a
- *  precise percentage: the calibration check shows mid-range estimates run about 10 points high. */
-const BAND_LABEL: Record<Band, string> = { practice: "Needs work", getting: "Getting there", strong: "Strong", new: "Not seen yet" };
 
 const REASON: Record<StuckReason, string> = {
   unclear: "The lesson wasn't clear",
@@ -636,7 +632,10 @@ function Case() {
         <div className="cmap-wrap">
           <ConceptMap learner={l} focus={e.concept_id} chain={chain} />
         </div>
-        <p className="small muted">Arrows point from a prerequisite to the concept that builds on it. Bars show estimated mastery.</p>
+        <p className="small muted">
+          Arrows point from a prerequisite to the concept that builds on it. Each box shows a band (Needs work, Getting there or Strong); hover for
+          the estimate.
+        </p>
       </section>
       {toast && (
         <div className="toast" role="status">
