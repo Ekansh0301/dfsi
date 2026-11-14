@@ -26,7 +26,7 @@ The course dates below are the originals from the sprint plan. Sprint 3 slipped,
 - **Barabari:** we adapt only what changes the algorithm (retakes, points, true/false, short-answer scores as partial credit). Their format is in the PDF they sent; they grade assignments themselves. Concept tags are missing in their data, so tag at the unit level as a fallback, checked by a trainer.
 - **Storage:** SQLite first, PostgreSQL by changing the connection URL (Barabari uses PostgreSQL).
 - **Feedback from Hackathon 1:** instructors said it was good and asked for voice support back, with a natural voice.
-- **Promotion rule:** the improved model becomes the default only if it beats the baseline on the made-up learners and narrows the EdNet gap, with all tests passing. The baseline stays selectable.
+- **Promotion rule:** the improved model becomes the default only if it beats the baseline on the made-up learners and narrows the EdNet gap, with all tests passing. The baseline stays selectable. **Outcome (Hackathon 2):** both conditions are met for the EdNet part and the improved model beats the baseline on 12 of 14 measures (the other 2 are not clearly different), so it was made the default.
 
 ## 4. Work packages
 
@@ -101,7 +101,7 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 | S4-3 | Done: `backend/results/calibration.md` (mastery estimates run about 10 points high in the middle range) |
 | S4-4, S4-5 | Done in Sprint 3 |
 | S4-6 | Done: `backend/docs/Technical_Design_Doc.md` (Sprint 4), `backend/docs/demo_plan.md`; earlier version archived |
-| S4-7 | Done: model frozen and tagged `v0.9`. The baseline stays the service default; the improved model stays selectable. Known limits at the freeze: missed gaps on the Sprint 2 simulator 3.5% (target 2.6%) |
+| S4-7 | Done: model frozen and tagged `v0.9`. The baseline stayed the service default at the freeze (the improved model became the default in Hackathon 2). Known limits at the freeze: missed gaps on the Sprint 2 simulator 3.5% (target 2.6%) |
 
 **Update (Hackathon 2):** the EdNet comparison for the improved model was run (download EdNet KT1 into `backend/data/raw/`, then `python scripts/compare_models.py`): AUC 0.729 against 0.627 for the baseline. The promotion decision is now the team's.
 
@@ -111,7 +111,7 @@ POC v1.0. Details: `backend/docs/Technical_Design_Doc.md` (final), `backend/docs
 
 | Task | State | Owner |
 |---|---|---|
-| Promotion decision, paired per-seed comparison with 95% intervals | Done: `results/paired_comparison.md`; EdNet run (AUC 0.729 against 0.627). Baseline stays the default until the team decides | Aman |
+| Promotion decision, paired per-seed comparison with 95% intervals | Done: `results/paired_comparison.md`; EdNet run (AUC 0.729 against 0.627). Improved model made the service default | Aman |
 | Shipped model parameters protected from re-runs | Done: `--write-service-params`, `tests/test_shipped_params.py` | Aman |
 | Backend fixes: repeat gap with storage, duplicate Barabari answers, concurrent resent requests | Done, with tests | Aman |
 | API key, CORS limited to known sites, size limits | Done, `tests/test_security.py` | Aman |
