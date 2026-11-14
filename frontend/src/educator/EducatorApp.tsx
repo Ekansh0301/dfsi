@@ -21,10 +21,14 @@ import type { DB, Escalation, StuckReason } from "../api/types";
 import { CONCEPTS, QUESTIONS, moduleById } from "../data/curriculum";
 import { CONTENT, contentFor } from "../data/content";
 import { COHORT, EDUCATOR } from "../data/seed";
-import { confidence, masteryOf, rootCause } from "../engine/engine";
+import { band, confidence, masteryOf, rootCause, type Band } from "../engine/engine";
 import { ConceptMap, SHORT } from "../components/ConceptMap";
 import { useDB } from "../lib/store";
 import { useMarkScreen } from "../shell/screenStore";
+
+/** Trainers see mastery as the engine's own bands (below 0.6, 0.6 to 0.8, above 0.8), not as a
+ *  precise percentage: the calibration check shows mid-range estimates run about 10 points high. */
+const BAND_LABEL: Record<Band, string> = { practice: "Needs work", getting: "Getting there", strong: "Strong", new: "Not seen yet" };
 
 const REASON: Record<StuckReason, string> = {
   unclear: "The lesson wasn't clear",
@@ -189,7 +193,14 @@ function MarkCard({ id }: { id: string }) {
           </button>
         ))}
       </div>
-      <textarea className="textarea" rows={2} placeholder="Optional note to the learner" value={comment} onChange={(e) => setComment(e.target.value)} aria-label="Note to the learner" />
+      <textarea
+        className="textarea"
+        rows={2}
+        placeholder="Optional note to the learner"
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        aria-label="Note to the learner"
+      />
       <button
         type="button"
         className="btn btn-primary"
@@ -416,7 +427,7 @@ function Case() {
               <div className="diag-meter">
                 <div className="dm-top">
                   <span className="small muted">Estimated mastery</span>
-                  <strong>{pct}%</strong>
+                  <strong title={`Estimate ${pct}%`}>{BAND_LABEL[band(l, e.concept_id)]}</strong>
                 </div>
                 <div className="gl-bar">
                   <span style={{ width: `${pct}%` }} className={pct < 60 ? "low" : ""} />
@@ -430,11 +441,11 @@ function Case() {
               <p className="small muted">Prerequisites</p>
               <ul>
                 {c.prereqs.map((pr) => {
-                  const v = Math.round(masteryOf(l, pr) * 100);
+                  const b = band(l, pr);
                   return (
-                    <li key={pr} className={v < 60 ? "weak" : ""}>
+                    <li key={pr} className={b === "practice" ? "weak" : ""}>
                       <span>{CONCEPTS[pr].name.en}</span>
-                      <strong>{l.observations[pr] ? v + "%" : "n/a"}</strong>
+                      <strong title={l.observations[pr] ? `Estimate ${Math.round(masteryOf(l, pr) * 100)}%` : undefined}>{BAND_LABEL[b]}</strong>
                     </li>
                   );
                 })}
