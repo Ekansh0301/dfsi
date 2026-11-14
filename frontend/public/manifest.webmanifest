@@ -1,0 +1,16 @@
+{
+  "name": "Circuit Coach",
+  "short_name": "Circuit Coach",
+  "description": "Short checks, one lesson at a time, for learners in electrician training.",
+  "start_url": "./#/learner",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1b2b",
+  "theme_color": "#0f1b2b",
+  "lang": "en",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

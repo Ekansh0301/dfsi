@@ -19,3 +19,19 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </StrictMode>,
 );
+
+// Offline support (public/sw.js): only in the built site, so development always loads fresh files.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then(() => navigator.serviceWorker.ready)
+      .then((reg) => {
+        const loaded = performance.getEntriesByType("resource").map((e) => e.name);
+        reg.active?.postMessage({ cache: [location.href.split("#")[0], ...loaded] });
+      })
+      .catch(() => {
+        /* not supported here (for example a file:// page): the app works online as before */
+      });
+  });
+}
