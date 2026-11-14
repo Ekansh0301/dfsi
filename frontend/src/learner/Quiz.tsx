@@ -95,7 +95,7 @@ export function Quiz({ questions, tag, recheckId, submitting, onSubmit, exitTo, 
         </div>
         {q.figure && (
           <div className="q-figure">
-            <Figure id={q.figure} closed={q.figureClosed} live={false} />
+            <Figure id={q.figure} closed={q.figureClosed} live={false} title={q.figureAlt ? tx(q.figureAlt) : t("figure_for_question")} />
           </div>
         )}
         {written && (

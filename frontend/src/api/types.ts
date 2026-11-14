@@ -59,6 +59,8 @@ export interface Question {
   figure?: FigureId;
   /** Switches drawn closed in the question figure. */
   figureClosed?: string[];
+  /** What a screen reader announces for the figure: what it shows, never the answer. */
+  figureAlt?: L;
   options: Option[];
   correct: number;
   /** Plain-language explanation shown after the quiz. */

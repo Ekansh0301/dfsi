@@ -231,6 +231,7 @@ const Q: Question[] = [
     id: "q_w1",
     concepts: ["symbols"],
     figure: "sym-switch",
+    figureAlt: { en: "Symbol: two dots joined by a short line that is lifted at one end, leaving a gap.", hi: "चिह्न: दो बिंदु, जिनके बीच की छोटी लाइन एक सिरे से उठी है और बीच में खाली जगह है।" },
     prompt: { en: "What does this symbol show?", hi: "यह चिह्न क्या दिखाता है?" },
     options: [{ text: { en: "A switch", hi: "स्विच" } }, { text: { en: "A lamp", hi: "बल्ब" } }, { text: { en: "A resistor", hi: "रेज़िस्टर" } }],
     correct: 0,
@@ -258,6 +259,7 @@ const Q: Question[] = [
     id: "q_w3",
     concepts: ["diagrams", "symbols"],
     figure: "circuit-simple",
+    figureAlt: { en: "Diagram: one loop with a cell, a switch drawn with its arm raised away from the contact, and a lamp.", hi: "डायग्राम: एक लूप में एक सेल, एक स्विच जिसकी भुजा संपर्क से ऊपर उठी है, और एक बल्ब।" },
     prompt: { en: "Look at the diagram. Is the lamp on or off?", hi: "डायग्राम देखें। बल्ब जल रहा है या बंद है?" },
     options: [
       { text: { en: "Off: the switch is open", hi: "बंद: स्विच खुला है" } },
@@ -271,6 +273,7 @@ const Q: Question[] = [
     id: "q_w4",
     concepts: ["diagrams"],
     figure: "circuit-two-switch",
+    figureAlt: { en: "Diagram: a cell feeds two branches. The top branch has switch S1 and lamp L1, the bottom branch has switch S2 and lamp L2. S1 is drawn closed and S2 open.", hi: "डायग्राम: एक सेल दो शाखाओं को जोड़ता है। ऊपर की शाखा में स्विच S1 और बल्ब L1, नीचे की शाखा में स्विच S2 और बल्ब L2 है। S1 बंद दिखाया गया है और S2 खुला।" },
     figureClosed: ["s1"],
     prompt: { en: "Only switch S1 is closed (ON). Which lamp lights?", hi: "सिर्फ़ स्विच S1 बंद (ON) है। कौन-सा बल्ब जलेगा?" },
     options: [
@@ -301,6 +304,7 @@ const Q: Question[] = [
     id: "q_p1",
     concepts: ["series_parallel", "diagrams"],
     figure: "circuit-series",
+    figureAlt: { en: "Diagram: a cell, a switch and two lamps placed one after the other on a single loop of wire.", hi: "डायग्राम: तार के एक ही लूप पर एक के बाद एक रखे सेल, स्विच और दो बल्ब।" },
     prompt: { en: "How are these two lamps connected?", hi: "ये दोनों बल्ब किस तरह जुड़े हैं?" },
     options: [
       { text: { en: "In series", hi: "सीरीज़ में" } },
@@ -338,6 +342,7 @@ const Q: Question[] = [
     id: "q_m1",
     concepts: ["multimeter"],
     figure: "meter-dial",
+    figureAlt: { en: "Multimeter dial with the settings V~, V⎓, Ω and A.", hi: "मल्टीमीटर का डायल, जिस पर V~, V⎓, Ω और A सेटिंग हैं।" },
     prompt: {
       en: "To check if a wall socket is live, where do you set the dial?",
       hi: "दीवार का सॉकेट चालू है या नहीं, यह जाँचने के लिए डायल कहाँ रखें?",
@@ -489,6 +494,7 @@ const Q: Question[] = [
     id: "q_x_sym2",
     concepts: ["symbols"],
     figure: "sym-cell",
+    figureAlt: { en: "Symbol: two parallel lines side by side, one long and one short.", hi: "चिह्न: पास-पास दो समानांतर लाइनें, एक लंबी और एक छोटी।" },
     prompt: { en: "What does this symbol show?", hi: "यह चिह्न क्या दिखाता है?" },
     options: [
       { text: { en: "A cell or battery", hi: "सेल या बैटरी" } },
@@ -502,6 +508,7 @@ const Q: Question[] = [
     id: "q_x_sym3",
     concepts: ["symbols"],
     figure: "sym-resistor",
+    figureAlt: { en: "Symbol: a small empty rectangle on a straight line.", hi: "चिह्न: सीधी लाइन पर एक छोटा खाली आयत।" },
     prompt: { en: "What does this symbol show?", hi: "यह चिह्न क्या दिखाता है?" },
     options: [{ text: { en: "A resistor", hi: "रेज़िस्टर" } }, { text: { en: "A lamp", hi: "बल्ब" } }, { text: { en: "A cell", hi: "सेल" } }],
     correct: 0,
@@ -538,6 +545,7 @@ const Q: Question[] = [
     id: "q_x_diag2",
     concepts: ["diagrams"],
     figure: "circuit-parallel",
+    figureAlt: { en: "Diagram: a cell and switch S. After them the wire splits into two paths, each with its own lamp, and the paths join again.", hi: "डायग्राम: एक सेल और स्विच S। उसके बाद तार दो रास्तों में बँटता है, हर रास्ते पर अपना बल्ब है, और फिर रास्ते मिल जाते हैं।" },
     prompt: { en: "If switch S is closed (ON), how many lamps light?", hi: "अगर स्विच S बंद (ON) हो, तो कितने बल्ब जलेंगे?" },
     options: [
       { text: { en: "Both lamps", hi: "दोनों बल्ब" } },
@@ -563,6 +571,7 @@ const Q: Question[] = [
     id: "q_x_sp2",
     concepts: ["series_parallel"],
     figure: "circuit-parallel",
+    figureAlt: { en: "Diagram: a cell and switch S. After them the wire splits into two paths, each with its own lamp, and the paths join again.", hi: "डायग्राम: एक सेल और स्विच S। उसके बाद तार दो रास्तों में बँटता है, हर रास्ते पर अपना बल्ब है, और फिर रास्ते मिल जाते हैं।" },
     prompt: { en: "How are these two lamps connected?", hi: "ये दोनों बल्ब किस तरह जुड़े हैं?" },
     options: [
       { text: { en: "In parallel", hi: "पैरेलल में" } },
