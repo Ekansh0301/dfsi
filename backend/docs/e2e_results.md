@@ -36,13 +36,13 @@ Without `VITE_API_URL` the top bar shows "Engine: in browser" and the same flow 
 
 ## Automated results
 
-Run on 2026-10-14 (Windows 11, Python 3.13.1, Node 22.13.1).
+Run on 2026-11-14 for POC v1.0 (Windows 11, Python 3.13.1, Node 22.13.1). The first run, on 2026-10-14, had 86 backend and 17 frontend tests.
 
 | Suite | Command | Result |
 |---|---|---|
-| Backend | `cd backend && pytest` | 86 passed |
-| Frontend unit and fallback | `cd frontend && npm test` | 17 passed, 8 skipped (the 8 need the service) |
-| Frontend end to end, service running | `E2E_API_URL=http://localhost:8000 npm run test:e2e` (or `npm test` with the variable set) | 25 passed |
+| Backend | `cd backend && pytest` | 216 passed |
+| Frontend unit and fallback | `cd frontend && npm test` | 42 passed, 8 skipped (the 8 need the service) |
+| Frontend end to end, service running | `E2E_API_URL=http://localhost:8000 npm run test:e2e` (or `npm test` with the variable set) | 50 passed (all frontend tests, including the 8 journey tests) |
 | Types and build | `npm run typecheck`, `npm run build` | passed |
 
 End-to-end cases (`journey.e2e.test.ts`):
@@ -57,7 +57,7 @@ End-to-end cases (`journey.e2e.test.ts`):
 | Service goes down mid-journey, falls back, returns to API mode on the next call | yes | passed |
 | Service down for the whole journey, scenario 1 and the follow-up flow | no | passed (2) |
 
-Other tests that cover the journey: `engineClient.test.ts` (requests sent in API mode, use of the service's answers, network error, error status, 4 second timeout, recovery), `presets.test.ts` (every demo preset lands where its label says), backend `test_api.py`, `test_engine.py`, `test_diagnosis.py`, `test_contract.py`.
+Other tests that cover the journey: `engineClient.test.ts` (requests sent in API mode, use of the service's answers, network error, error status, 4 second timeout, recovery, health check on start-up, quick checks while the service stays down), `presets.test.ts` (every demo preset lands where its label says), backend `test_api.py`, `test_engine.py`, `test_diagnosis.py`, `test_contract.py`.
 
 ## Manual run in the browser
 
@@ -70,6 +70,17 @@ The prototype was run in the built-in browser against a live service (`uvicorn` 
 | Service stopped, Module 1 quick check answered and submitted | top bar changed to "Engine: API unreachable, using browser"; the results screen appeared ("0 of 3 right") and the flow continued |
 
 The quick check answers in this run were entered by calling the on-screen buttons from the page's script, because clicking by coordinates did not line up in the resized pane. The click handlers that ran are the app's own.
+
+### Manual checks for POC v1.0 (2026-11-14, built-in browser)
+
+| Check | Result |
+|---|---|
+| Module 2 check, written answer, "See my answers" | The review lists the written answer with "Waiting for your trainer's mark"; no blank screen |
+| Escalation preset, trainer case view | Mastery shown as Needs work, Getting there, Strong |
+| Reload in the middle of a quick check | Returns to the same question with the earlier answers |
+| Listen button on a question | Speech starts, the button shows the stop state; hidden when the device has no voice for the language |
+| Built site: service worker and cache | Worker active; the app's script and styles cached after the first visit |
+| Top bar | Shows "Engine: API" once the service answers, and the version and build commit |
 
 ## Found and fixed
 

@@ -82,11 +82,11 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 | ID | State |
 |---|---|
 | S3-1 | Done. The Barabari simulator (true/false, short answers, points, difficulty, retakes) is the new default for the saved dataset; the Sprint 2 simulator is still reproduced byte for byte |
-| S3-2, S3-3, S3-5, S3-6 | Done as options of one improved model. On made-up learners it beats the baseline on 13 of 14 measures; missed gaps on the Sprint 2 simulator rose from 2.6% to 3.5% (target: not above 2.6%) |
+| S3-2, S3-3, S3-5, S3-6 | Done as options of one improved model. Compared run by run on made-up learners it is clearly better on 12 of 14 measures and not clearly different on missed gaps (3.5% against 2.6% on the Sprint 2 simulator, worse in 4 of 5 runs; target: not above 2.6%) |
 | S3-4 | Done: question types, partial credit, retake discount, Barabari quiz importer and adapter endpoint |
 | S3-7 | Model switch done (`?model=`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`). Promotion not decided: EdNet comparison still to run (raw files needed) and the missed-gaps target above |
 | S3-8 | Done: true/false questions and points in the quick checks; the top bar shows the model |
-| S3-9 | Open: voice service still to choose |
+| S3-9 | Done in Hackathon 2 with the device's own voices (no audio files, no outside service); pre-recorded natural audio is future work |
 | S3-10 | Done: `backend/docs/test_spec.md` |
 | S3-11 | Open: demo video |
 | S4-4 | Done: optional SQLite or PostgreSQL storage |
@@ -105,10 +105,32 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 
 **Future work:** rerun the EdNet comparison for the improved model (download EdNet KT1 into `backend/data/raw/`, then `python scripts/compare_models.py`) and decide the promotion with it.
 
+## 4d. Status of Hackathon 2 on 14 November 2026
+
+POC v1.0. Details: `backend/docs/Technical_Design_Doc.md` (final), `backend/docs/test_spec.md` (Hackathon 2 section), `HANDOFF.md`.
+
+| Task | State | Owner |
+|---|---|---|
+| Promotion decision, paired per-seed comparison with 95% intervals | Done: `results/paired_comparison.md`. Baseline stays the default; EdNet rerun is future work | Aman |
+| Shipped model parameters protected from re-runs | Done: `--write-service-params`, `tests/test_shipped_params.py` | Aman |
+| Backend fixes: repeat gap with storage, duplicate Barabari answers, concurrent resent requests | Done, with tests | Aman |
+| API key, CORS limited to known sites, size limits | Done, `tests/test_security.py` | Aman |
+| Accuracy baseline with the same prerequisite walk | Done: `results/accuracy_baseline.md` | Aman |
+| Continuous integration and Docker | Written; not yet run on GitHub (see section 6) | Aman |
+| Final technical design doc (v1.0) | Done; Sprint 4 version archived | Aman |
+| App fixes: answer review, error boundary, placement points, demo presets, tap targets, health check, progress text | Done | Ekansh's list, done in this session |
+| Voice, mastery bands, Hindi and accessibility fixes, offline use, saved quiz progress, build version | Done | Ekansh's list, done in this session |
+| Live prototype on the latest `main` | Done on 14 November; redeploy after every merge | Ekansh |
+| Out-of-date documents | Done: `HANDOFF.md`, `backend/docs/e2e_results.md`, this file | Praveen's list |
+| README results summary | Done: top of `README.md` | Divesh's list |
+| README check from a fresh clone | Open | Praveen |
+| Slides, poster, demo video | Open (poster numbers: 216 backend plus 42 frontend tests, "12 of 14 measures") | Praveen, Divesh |
+| Demo rehearsal, tag `v1.0` | Open | All, Aman |
+
 ## 5. How we work
 
 - **Branches:** one branch per task, named by its ID (for example `s3-2-first-tag-credit`), and a short review before merging into `main`.
-- **Checks before merging:** `cd backend && pytest`, `cd frontend && npm test && npm run typecheck && npm run build`. Frontend tests need `frontend/.env.local` moved aside, or one test fails.
+- **Checks before merging:** `cd backend && pytest`, `cd frontend && npm test && npm run typecheck && npm run build`. Frontend tests pass with or without `frontend/.env.local`.
 - **Results:** every model change adds a table in `backend/results/`, produced by a script anyone can rerun.
 - **Writing:** no em dashes or en dashes anywhere (the build checks the site and READMEs). Keep documents short and plain.
 - **Commits:** a short plain message, under your own name.
@@ -116,11 +138,11 @@ Branch `sprint3-barabari`, one commit per step. Details: `backend/docs/test_spec
 
 ## 6. Open items
 
-- Confirm the real dates and replace section 2.
+- Confirm the real dates and replace section 2 (Hackathon 2 and Sprint 5 are in progress as of 14 November 2026).
 - Barabari: the only optional request is an anonymised quiz-attempts export with scores only. We could also ask for view-only demo accounts to see their interface. Nothing else is needed.
 - Nirmaan: we have no format or data from them yet.
-- Who owns each task (the Owner column).
-- Which voice service to use (decide by listening to samples).
+- Owners of the Sprint 5 tasks (see 4d for Hackathon 2).
+- GitHub Actions did not run on the personal repository because of a billing lock on that account; fix it in the account's billing settings.
 
 ## 7. Risks
 
