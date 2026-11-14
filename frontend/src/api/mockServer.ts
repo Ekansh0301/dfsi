@@ -495,7 +495,7 @@ export function cohortGaps(d: DB = db) {
 
 // ─── Demo presets (jump straight to any point of any flow) ──────────────────
 
-export type Preset = "fresh" | "onboarded" | "gap" | "rootcause" | "escalated" | "resolved" | "recheck";
+export type Preset = "fresh" | "onboarded" | "m1check" | "m2check" | "gap" | "rootcause" | "escalated" | "resolved" | "recheck";
 
 const PLACEMENT_GOOD: Answer[] = PLACEMENT.map((id) => ({ question_id: id, chosen: QUESTIONS[id].correct }));
 /** Module 3 with diagram questions wrong → "diagrams seem tricky" (Sprint 1 story). */
@@ -517,7 +517,7 @@ const M3_SYMBOL_ROOT: Answer[] = [
 
 export function applyPreset(p: Preset) {
   const d = seedDB(Date.now());
-  const steps: Record<Preset, number> = { fresh: 0, onboarded: 1, gap: 2, rootcause: 2, escalated: 3, resolved: 4, recheck: 5 };
+  const steps: Record<Preset, number> = { fresh: 0, onboarded: 1, m1check: 1, m2check: 1, gap: 2, rootcause: 2, escalated: 3, resolved: 4, recheck: 5 };
   const n = steps[p];
   if (n >= 1)
     onboardSync(d, "some", p === "rootcause" ? PLACEMENT_GOOD.map((a) => (a.question_id === "q_x_sym2" ? { ...a, chosen: 2 } : a)) : PLACEMENT_GOOD);

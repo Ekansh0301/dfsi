@@ -45,7 +45,7 @@ describe("demo presets", () => {
   });
 
   it("every preset in the top bar exists", () => {
-    const ids: Preset[] = ["fresh", "onboarded", "gap", "rootcause", "escalated", "resolved", "recheck"];
+    const ids: Preset[] = ["fresh", "onboarded", "m1check", "m2check", "gap", "rootcause", "escalated", "resolved", "recheck"];
     expect(PRESETS.map((p) => p.id).sort()).toEqual([...ids].sort());
     for (const p of PRESETS) expect(() => applyPreset(p.id)).not.toThrow();
   });
