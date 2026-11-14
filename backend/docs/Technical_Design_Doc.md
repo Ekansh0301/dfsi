@@ -191,8 +191,8 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 | Part | State |
 |---|---|
 | Learner app and trainer console (English and Hindi) with true/false, short answers, marking, listen button, offline use | Working |
-| Engine service with two models, Barabari adapter, marked answers, optional storage, API key and size limits | Working; 216 backend tests |
-| Prototype with fallback to the browser engine | Working; 42 frontend tests, 8 more end-to-end with the service running |
+| Engine service with two models, Barabari adapter, marked answers, optional storage, API key and size limits | Working; 224 backend tests |
+| Prototype with fallback to the browser engine | Working; 44 frontend tests, 8 more end-to-end with the service running |
 | Made-up learners in two formats, Barabari sample, EdNet loader | Working |
 | Evaluation: model comparison (also paired), accuracy baseline, robustness, calibration, failure analysis | Reproducible, reports in `backend/results/` |
 | Continuous integration on every push | `.github/workflows/tests.yml` |

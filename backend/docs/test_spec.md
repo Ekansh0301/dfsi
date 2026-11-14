@@ -3,8 +3,8 @@
 What each Sprint 3 change does, which tests cover it, what it measurably changed, and what is still weak. Run everything with:
 
 ```bash
-cd backend && pytest                       # backend: 216 tests
-cd frontend && npm test && npm run typecheck && npm run build   # 42 tests, 8 more need the service
+cd backend && pytest                       # backend: 224 tests
+cd frontend && npm test && npm run typecheck && npm run build   # 44 tests, 8 more need the service
 cd frontend && E2E_API_URL=http://localhost:8000 npm run test:e2e   # with the service running
 ```
 

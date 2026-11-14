@@ -10,7 +10,7 @@ Live prototype: https://dfsi.vercel.app/
 | Part | Where | State |
 |---|---|---|
 | Clickable prototype (learner app, trainer console, side-by-side demo, flow map, English and Hindi, light and dark) with true/false and short-answer questions, points, trainer marking, a listen button, offline use and saved quiz progress | `frontend/` | Done |
-| Engine service (FastAPI, Bayesian Knowledge Tracing, prerequisite walk, one-lesson recommender; two models, improved by default and baseline selectable; Barabari adapter; optional SQLite or PostgreSQL storage; optional API key and size limits) | `backend/circuit_coach/` | Done, 216 tests pass |
+| Engine service (FastAPI, Bayesian Knowledge Tracing, prerequisite walk, one-lesson recommender; two models, improved by default and baseline selectable; Barabari adapter; optional SQLite or PostgreSQL storage; optional API key and size limits) | `backend/circuit_coach/` | Done, 224 tests pass |
 | Made-up learner generator with hidden mastery, in two formats (Sprint 2 and Barabari's quiz format) | `backend/circuit_coach/simulate.py` | Done |
 | Evaluation: model comparison (also paired by run), accuracy baseline, robustness, calibration, failure analysis, EdNet loader | `backend/scripts/`, results in `backend/results/` | Done, including the EdNet comparison for the improved model |
 | Prototype connected to the engine, with fallback to the in-browser engine | `frontend/src/api/engineClient.ts`, `mockServer.ts` | Done, tested, health check on start-up |
@@ -51,7 +51,7 @@ Settings of the service (all optional): `CIRCUIT_COACH_MODEL`, `CIRCUIT_COACH_DB
 
 Evaluation commands are in `backend/README.md` and `backend/docs/evaluation.md`. The EdNet raw files (1.2 GB) are not in the repo. Download KT1 from https://github.com/riiid/ednet into `backend/data/raw` (the exact files and the command are in `backend/README.md`).
 
-Test counts at the last check: 216 backend tests; 42 frontend tests plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). `npm test` works with or without a `frontend/.env.local`.
+Test counts at the last check: 224 backend tests; 44 frontend tests plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). `npm test` works with or without a `frontend/.env.local`.
 
 ## 3. Key results
 
