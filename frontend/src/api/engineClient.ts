@@ -13,6 +13,8 @@ import type { ConceptId, QuestionType, Recommendation } from "./types";
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
 /** Optional engine model on the service: "baseline" or "improved" (VITE_ENGINE_MODEL). */
 export const MODEL = (import.meta.env.VITE_ENGINE_MODEL as string | undefined) || undefined;
+/** Optional key for a service started with CIRCUIT_COACH_API_KEY (sent as X-API-Key). */
+const API_KEY = (import.meta.env.VITE_API_KEY as string | undefined) || undefined;
 
 export type EngineMode = "local" | "checking" | "api" | "fallback";
 /** With a service configured the mode starts as "checking" until a health check or a call answers. */
@@ -86,7 +88,7 @@ async function post<T>(path: string, body: unknown): Promise<T | null> {
   try {
     const res = await fetch(BASE + path + (MODEL ? `?model=${encodeURIComponent(MODEL)}` : ""), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(API_KEY ? { "X-API-Key": API_KEY } : {}) },
       body: JSON.stringify(body),
       signal: ctrl.signal,
     });

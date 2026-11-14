@@ -10,6 +10,7 @@ Run:  uvicorn circuit_coach.api:app --port 8000
 
 from __future__ import annotations
 
+import hmac
 import math
 import os
 from typing import Annotated, Literal
@@ -27,12 +28,37 @@ from .curriculum import CONCEPTS, CONTENT, MODULES
 from .engine import _PARAMS_FILE, MODELS, Engine, Event, LearnerState, load_params
 
 app = FastAPI(title="Circuit Coach engine", version=__version__)
+
+# Browsers may call the service only from these sites (comma-separated; "*" allows any).
+DEFAULT_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,https://dfsi.vercel.app"
+ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", DEFAULT_ORIGINS).split(",") if o.strip()]
+
+# Optional shared key: when CIRCUIT_COACH_API_KEY is set, every /v1/ call must send it in the
+# X-API-Key header (for server-to-server use, such as Barabari's LMS). /health and /docs stay open.
+API_KEY: str | None = os.environ.get("CIRCUIT_COACH_API_KEY") or None
+
+
+@app.middleware("http")
+async def require_api_key(request: Request, call_next):
+    if API_KEY and request.url.path.startswith("/v1/") and request.method != "OPTIONS":
+        sent = request.headers.get("x-api-key", "")
+        if not hmac.compare_digest(sent.encode(), API_KEY.encode()):
+            return JSONResponse(status_code=401, content={"detail": "Missing or wrong X-API-Key header"})
+    return await call_next(request)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("ALLOWED_ORIGINS", "*").split(","),
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "X-API-Key"],
 )
+
+# Request size limits: far above any real quiz, low enough that one request cannot tie up the service.
+MAX_EVENTS = 500
+MAX_TAGS = 10
+MAX_TRIED = 50
+MAX_QUESTIONS = 500
 ModelName = Literal["baseline", "improved"]
 # The service default. The improved model is selectable per request with ?model=improved and
 # becomes the default only through this setting, after the promotion check in PLAN.md (S3-7).
@@ -110,7 +136,9 @@ Count = Annotated[int, Field(ge=0)]
 class StateModel(BaseModel):
     mastery: dict[str, Probability] = Field(default_factory=dict, description="P(concept mastered), 0 to 1")
     observations: dict[str, Count] = Field(default_factory=dict, description="Answers seen per concept")
-    tried: dict[str, list[str]] = Field(default_factory=dict, description="Lessons already tried per concept")
+    tried: dict[str, Annotated[list[Annotated[str, Field(max_length=64)]], Field(max_length=MAX_TRIED)]] = Field(
+        default_factory=dict, description="Lessons already tried per concept"
+    )
 
     def to_state(self) -> LearnerState:
         unknown = (set(self.mastery) | set(self.observations) | set(self.tried)) - set(CONCEPTS)
@@ -124,7 +152,7 @@ class StateModel(BaseModel):
 
 
 class EventModel(BaseModel):
-    concept_tags: list[str] = Field(min_length=1)
+    concept_tags: list[str] = Field(min_length=1, max_length=MAX_TAGS)
     is_correct: bool
     unsure: bool = Field(default=False, description='The learner chose "I\'m not sure"')
     question_type: Literal["multiple_choice", "true_false", "short_answer"] = Field(
@@ -144,7 +172,7 @@ class EventModel(BaseModel):
 
 class OnboardingRequest(BaseModel):
     experience: Literal["new", "some", "experienced"]
-    events: list[EventModel] = Field(default_factory=list)
+    events: list[EventModel] = Field(default_factory=list, max_length=MAX_EVENTS)
     learner_id: str | None = LEARNER_ID
     request_id: str | None = REQUEST_ID
 
@@ -157,7 +185,7 @@ class OnboardingResponse(BaseModel):
 class QuizResultRequest(BaseModel):
     state: StateModel
     module_id: str
-    events: list[EventModel]
+    events: list[EventModel] = Field(max_length=MAX_EVENTS)
     recheck_concept: str | None = Field(default=None, description="Set when a spaced re-check was answered wrongly")
     now: int = Field(default=0, description="Timestamp (ms) stored on the recommendation")
     learner_id: str | None = LEARNER_ID
@@ -303,7 +331,7 @@ def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItRes
 
 class MarkedAnswerRequest(BaseModel):
     state: StateModel
-    concept_tags: list[str] = Field(min_length=1)
+    concept_tags: list[str] = Field(min_length=1, max_length=MAX_TAGS)
     score: float = Field(ge=0, le=1, description="The trainer's mark as a share of the question's points")
     attempt_number: int = Field(default=1, ge=1)
     now: int = 0
@@ -356,7 +384,7 @@ class BarabariQuiz(BaseModel):
     title: str = ""
     passing_score: float = 60
     max_score: float = 100
-    questions: list[BarabariQuestion] = Field(min_length=1)
+    questions: list[BarabariQuestion] = Field(min_length=1, max_length=MAX_QUESTIONS)
 
 
 class BarabariAnswer(BaseModel):
@@ -374,7 +402,7 @@ class BarabariAttempt(BaseModel):
     student_id: str
     attempt_number: int = Field(default=1, ge=1)
     submitted_at: str | None = None
-    answers: list[BarabariAnswer]
+    answers: list[BarabariAnswer] = Field(max_length=MAX_QUESTIONS)
 
 
 class BarabariTags(BaseModel):

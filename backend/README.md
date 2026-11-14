@@ -63,6 +63,15 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `POST /v1/quiz-result` | Update the model from a quick check, return one recommendation |
 | `POST /v1/got-it` | Apply a learning step after "Got it!" |
 
+Settings (environment variables, all optional):
+
+| Variable | Effect |
+|---|---|
+| `CIRCUIT_COACH_MODEL` | Default model, `baseline` (default) or `improved` |
+| `CIRCUIT_COACH_DB` | Database URL for learner storage, for example `sqlite:///coach.db` |
+| `CIRCUIT_COACH_API_KEY` | Require this value in the `X-API-Key` header on `/v1/` calls |
+| `ALLOWED_ORIGINS` | Sites allowed to call the service from a browser (default: local prototype and dfsi.vercel.app) |
+
 Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing. Request and response fields follow `frontend/src/api/types.ts`. The full schemas, with examples and error codes, are in [docs/api_contract.md](docs/api_contract.md). After changing a request or response model, run `python scripts/export_openapi.py`; `tests/test_contract.py` fails until the committed schema matches.
 
 ## Reproduce the evaluation

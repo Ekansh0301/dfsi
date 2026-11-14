@@ -484,6 +484,7 @@
               "$ref": "#/components/schemas/BarabariAnswer"
             },
             "type": "array",
+            "maxItems": 500,
             "title": "Answers"
           }
         },
@@ -693,6 +694,7 @@
               "$ref": "#/components/schemas/BarabariQuestion"
             },
             "type": "array",
+            "maxItems": 500,
             "minItems": 1,
             "title": "Questions"
           }
@@ -837,6 +839,7 @@
               "type": "string"
             },
             "type": "array",
+            "maxItems": 10,
             "minItems": 1,
             "title": "Concept Tags"
           },
@@ -1030,6 +1033,7 @@
               "type": "string"
             },
             "type": "array",
+            "maxItems": 10,
             "minItems": 1,
             "title": "Concept Tags"
           },
@@ -1123,6 +1127,7 @@
               "$ref": "#/components/schemas/EventModel"
             },
             "type": "array",
+            "maxItems": 500,
             "title": "Events"
           },
           "learner_id": {
@@ -1189,6 +1194,7 @@
               "$ref": "#/components/schemas/EventModel"
             },
             "type": "array",
+            "maxItems": 500,
             "title": "Events"
           },
           "recheck_concept": {
@@ -1355,9 +1361,11 @@
           "tried": {
             "additionalProperties": {
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 64
               },
-              "type": "array"
+              "type": "array",
+              "maxItems": 50
             },
             "type": "object",
             "title": "Tried",

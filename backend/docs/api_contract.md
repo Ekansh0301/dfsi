@@ -196,10 +196,17 @@ Request: `state`, `concept_tags`, `score` (the trainer's mark from 0 to 1), opti
 - With storage on, a POST may also carry `request_id`: sent again for the same learner, it returns the saved response and is not applied twice. A Barabari attempt uses its own attempt id. Without storage nothing is remembered, so the client must send each answer once.
 - With storage on (`CIRCUIT_COACH_DB`), every POST also accepts `learner_id`. An empty `state` then starts from the learner's saved state, and the result is saved. For `/v1/barabari/quiz-attempt` it defaults to the attempt's `student_id`.
 
+### Access and limits
+
+- **API key (optional).** When the service is started with `CIRCUIT_COACH_API_KEY`, every `/v1/` call must send the same value in the `X-API-Key` header, or it gets a 401. `GET /health` and `/docs` stay open. Meant for server-to-server use (for example Barabari's LMS); the prototype sends `VITE_API_KEY` if set, but a key built into a public site is not secret.
+- **Browser origins.** Browsers may call the service from `ALLOWED_ORIGINS` (comma-separated). The default is the local prototype (`http://localhost:5173`, `http://127.0.0.1:5173`) and `https://dfsi.vercel.app`; `*` allows any site.
+- **Size limits.** At most 500 events per request, 10 concept tags per answer, 50 tried lessons per concept (ids up to 64 characters), and 500 questions or answers in a Barabari quiz. Larger requests get a 422.
+
 ## Errors
 
 | Status | When | Body |
 |---|---|---|
+| 401 | `CIRCUIT_COACH_API_KEY` is set and the `X-API-Key` header is missing or wrong | `{ "detail": "Missing or wrong X-API-Key header" }` |
 | 404 | Unknown `module_id` | `{ "detail": "Unknown module m99" }` |
 | 422 | Unknown concept in `state`, `events`, `recheck_concept` or `concept_id` | `{ "detail": "Unknown concepts: ['nope']" }` |
 | 422 | Missing or badly typed field (FastAPI validation) | `{ "detail": [{ "type": "missing", "loc": ["body", "events"], "msg": "Field required" }] }` |
