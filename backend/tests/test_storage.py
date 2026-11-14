@@ -63,7 +63,7 @@ def test_every_step_is_logged(client):
     client.post("/v1/marked-answer", json={"state": {}, "concept_tags": ["ohm"], "score": 0.5, "learner_id": "ravi"})
     steps = api.store.history("ravi")
     assert [s["step"] for s in steps] == ["onboarding", "got-it", "marked-answer"]
-    assert [s["model"] for s in steps] == ["baseline", "improved", "baseline"]
+    assert [s["model"] for s in steps] == ["improved", "improved", "improved"]
 
 
 def test_barabari_attempts_are_stored_under_the_student_id(client):

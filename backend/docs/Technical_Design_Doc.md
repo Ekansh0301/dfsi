@@ -4,7 +4,7 @@
 **Prototype:** https://dfsi.vercel.app/ | **Code:** `backend/` and `frontend/` in the project repository
 **Document:** Final Technical Design Document (Hackathon 2, POC v1.0). Earlier versions: `docs/archive/Sprint4_Technical_Design_Doc.md` (Sprint 4, POC v0.9), `docs/archive/Sprint2_Technical_Design_Doc.md` (Sprint 2) and `docs/archive/Hack1_Technical_Design_Doc.md` (after Hackathon 1).
 
-Circuit Coach finds what a vocational learner is stuck on after each short quiz, traces it back to the real cause, and recommends one short lesson; a trainer steps in when the learner is still stuck. The engine reads Barabari's quiz format. Compared run by run on made-up learners, the improved model is clearly better than the baseline on 12 of 14 measures and not clearly different on the other 2. With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy. On real EdNet answers the improved model predicts the next answer clearly better than the baseline (AUC 0.729 against 0.627). POC v1.0 adds reading aloud in English and Hindi, offline use and a set of fixes from a full project review.
+Circuit Coach finds what a vocational learner is stuck on after each short quiz, traces it back to the real cause, and recommends one short lesson; a trainer steps in when the learner is still stuck. The engine reads Barabari's quiz format. Compared run by run on made-up learners, the improved model is clearly better than the baseline on 12 of 14 measures and not clearly different on the other 2. With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy. On real EdNet answers the improved model predicts the next answer clearly better than the baseline (AUC 0.729 against 0.627). POC v1.0 makes the improved model the service default, and adds reading aloud in English and Hindi, offline use and a set of fixes from a full project review.
 
 ## 1. Introduction
 
@@ -36,6 +36,7 @@ Our project, **Problem 3B: Identifying what a learner needs next**, works with B
 | The top bar said "Engine: API" before the service had answered | A health check on start-up; a down service costs a quick check per step instead of the full 4 second timeout |
 | Hindi learners got the trainer's mark, tips and some labels in English; screen-reader descriptions of quiz figures named the answer | Messages, tips and labels in the learner's language; neutral figure descriptions in both languages, checked by a test |
 | Trainers saw mastery as exact percentages, though mid-range estimates run high (6.5) | Bands at the engine's own thresholds: Needs work, Getting there, Strong |
+| The EdNet comparison for the improved model had never been run, so the model could not be promoted | Run on 40,000 sampled students: AUC 0.729 against 0.627 for the baseline (6.3). The improved model is now the service default |
 
 ## 3. Technical specification and architecture
 
@@ -84,7 +85,7 @@ Every POST accepts `?model=baseline|improved`. With storage on, it also accepts 
 | Prerequisite-aware learning | Learning runs slower (down to half) while observed prerequisites look weak |
 | More evidence before a lesson | A lesson needs 2 answers on the concept, unless its mastery is below 0.4 after one |
 
-The baseline stays the service default (section 7); either model is selectable per request, for the whole service (`CIRCUIT_COACH_MODEL`) or for the prototype (`VITE_ENGINE_MODEL`). The model has been frozen since tag `v0.9`: nothing in POC v1.0 changes how mastery is estimated.
+The improved model is the service default (section 7); the baseline stays selectable per request (`?model=baseline`), for the whole service (`CIRCUIT_COACH_MODEL=baseline`) or for the prototype (`VITE_ENGINE_MODEL=baseline`). The model has been frozen since tag `v0.9`: nothing in POC v1.0 changes how mastery is estimated; only which model answers by default changed.
 
 ## 5. Data and evaluation design
 
@@ -183,7 +184,7 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 2. Mastery estimates are over-confident in the middle range.
 3. Concept tags in Barabari's data do not exist yet; unit-level tags put several concepts on every question, the case first-tag credit handles worst.
 
-**Promotion decision.** The EdNet condition of the promotion rule is now met (6.3). What remains open is point 1, missed gaps. The baseline is still the service default in this release. The improved model is fully available and tested (`?model=improved`, `CIRCUIT_COACH_MODEL=improved`, `VITE_ENGINE_MODEL=improved`), and we recommend making it the default: with correct tags it misses about 1 to 2 points more gaps while sending far fewer learners to the wrong lesson and predicting real answers much better (more gaps are missed under heavy mis-tagging, 6.4). Making it the default is a one-line setting; the decision is recorded in `docs/evaluation.md`.
+**Promotion decision.** The EdNet condition of the promotion rule is met (6.3), and the improved model is now the service default. The one open point is point 1, missed gaps: the improved model misses about 1 to 2 points more in some runs (and more under heavy mis-tagging, 6.4), and we accept that because it finds about 9 points more true blockers, sends about 15 points fewer learners to a lesson they do not need, and predicts real answers far better. The baseline is still available for comparison (`?model=baseline`, `CIRCUIT_COACH_MODEL=baseline`). The decision is recorded in `docs/evaluation.md`.
 
 ## 8. POC v1.0 status
 
@@ -208,4 +209,4 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 - The improved model's settings were tuned on made-up learners.
 - Escalations and trainer replies live in the browser's storage, not in the service.
 - The listen button uses the voices installed on the device; many desktops have no Hindi voice, and voice quality varies. Pre-recorded natural audio is the next step.
-- Two copies of the engine (Python and the browser) are kept in step by tests; the browser copy has only the baseline model.
+- Two copies of the engine (Python and the browser) are kept in step by tests; the browser copy has only the baseline model. When the service is down, the app falls back to the baseline: the three demo scenarios give the same recommendation either way, but other cases can differ slightly.

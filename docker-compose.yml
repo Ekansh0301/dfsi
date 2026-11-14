@@ -10,7 +10,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      CIRCUIT_COACH_MODEL: ${CIRCUIT_COACH_MODEL:-baseline}
+      CIRCUIT_COACH_MODEL: ${CIRCUIT_COACH_MODEL:-improved}
       CIRCUIT_COACH_DB: sqlite:////data/circuit_coach.db
       # The browser opens the prototype at localhost:8080 and calls the engine from there.
       ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080

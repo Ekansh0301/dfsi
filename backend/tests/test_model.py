@@ -149,13 +149,15 @@ def client():
 
 def test_health_reports_the_default_and_available_models(client):
     body = client.get("/health").json()
-    assert body["model"] == "baseline" and body["models"] == ["baseline", "improved"]
+    assert body["model"] == "improved" and body["models"] == ["baseline", "improved"]
 
 
 def test_a_request_can_choose_the_model(client):
     body = {"state": {}, "module_id": "m3", "events": [{"concept_tags": ["diagrams", "symbols"], "is_correct": False}]}
-    base = client.post("/v1/quiz-result", json=body).json()
+    default = client.post("/v1/quiz-result", json=body).json()
+    base = client.post("/v1/quiz-result?model=baseline", json=body).json()
     imp = client.post("/v1/quiz-result?model=improved", json=body).json()
+    assert default == imp  # the improved model is the default
     assert set(base["state"]["observations"]) == {"diagrams", "symbols"}
     assert set(imp["state"]["observations"]) == {"diagrams"}
     assert client.post("/v1/quiz-result?model=other", json=body).status_code == 422

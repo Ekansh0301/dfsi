@@ -60,9 +60,10 @@ MAX_TAGS = 10
 MAX_TRIED = 50
 MAX_QUESTIONS = 500
 ModelName = Literal["baseline", "improved"]
-# The service default. The improved model is selectable per request with ?model=improved and
-# becomes the default only through this setting, after the promotion check in PLAN.md (S3-7).
-DEFAULT_MODEL: str = os.environ.get("CIRCUIT_COACH_MODEL", "baseline")
+# The service default is the improved model (promoted in Hackathon 2 after the EdNet check, see
+# docs/evaluation.md). The baseline stays selectable per request (?model=baseline) and through
+# this setting (CIRCUIT_COACH_MODEL=baseline).
+DEFAULT_MODEL: str = os.environ.get("CIRCUIT_COACH_MODEL", "improved")
 if DEFAULT_MODEL not in MODELS:
     raise RuntimeError(f"CIRCUIT_COACH_MODEL must be one of {sorted(MODELS)}")
 engines = {name: Engine(load_params(model=name), options=opt) for name, opt in MODELS.items()}

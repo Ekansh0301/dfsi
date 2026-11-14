@@ -2,7 +2,7 @@
 
 Knowledge tracing and recommendation service for Problem 3B. Given a learner's answers, it estimates how well they know each concept, finds the concept that is really holding them back, and picks one lesson. It is the same logic the prototype runs in the browser, as a Python service with a baseline evaluation.
 
-**Status (POC v1.0):** two models. The baseline (standard Bayesian Knowledge Tracing per concept, parameters fitted from data, plus a walk back through prerequisites) is the default; the improved model (first-tag credit, question difficulty, prerequisite-aware learning, more evidence before a lesson) is selectable per request. The model is frozen since tag `v0.9`.
+**Status (POC v1.0):** two models. The baseline (standard Bayesian Knowledge Tracing per concept, parameters fitted from data, plus a walk back through prerequisites) stays selectable; the improved model (first-tag credit, question difficulty, prerequisite-aware learning, more evidence before a lesson) is the default, as decided in Hackathon 2 after the real-data check. The model is frozen since tag `v0.9`.
 
 ## Run
 
@@ -68,7 +68,7 @@ Settings (environment variables, all optional):
 
 | Variable | Effect |
 |---|---|
-| `CIRCUIT_COACH_MODEL` | Default model, `baseline` (default) or `improved` |
+| `CIRCUIT_COACH_MODEL` | Default model, `improved` (default) or `baseline` |
 | `CIRCUIT_COACH_DB` | Database URL for learner storage, for example `sqlite:///coach.db` |
 | `CIRCUIT_COACH_API_KEY` | Require this value in the `X-API-Key` header on `/v1/` calls |
 | `ALLOWED_ORIGINS` | Sites allowed to call the service from a browser (default: local prototype and dfsi.vercel.app) |

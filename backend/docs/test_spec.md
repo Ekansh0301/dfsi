@@ -30,7 +30,7 @@ Measured effects come from `results/model_comparison.md` (5 evaluation seeds of 
 | S3-3 | Question difficulty (per-question slip and guess) | `test_harder_questions_slip_more...`, `test_difficulty_estimates_follow_correct_rates` | Higher next-answer AUC on the Barabari simulator | Needs answers per question; the service has none for our own questions yet |
 | S3-5 | Prerequisite-aware learning rate | `test_learning_is_slower_while_an_observed_prerequisite_is_weak`, `test_unobserved_prerequisites_do_not_slow_learning` | More hidden blockers found, fewer missed gaps | Raises false alarms on its own |
 | S3-6 | More evidence before a lesson | `test_one_borderline_answer_is_not_enough...`, `test_unobserved_concepts_are_never_a_gap...` | Fewer false alarms | Can delay a lesson by one quick check |
-| S3-7 | Model switch (`?model=`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`) and promotion check | `test_health_reports...`, `test_a_request_can_choose_the_model`, `scripts/compare_models.py` | Both models served side by side | EdNet comparison done in Hackathon 2 (AUC 0.729 against 0.627); the default stays `baseline` until the team accepts the missed-gaps trade |
+| S3-7 | Model switch (`?model=`, `CIRCUIT_COACH_MODEL`, `VITE_ENGINE_MODEL`) and promotion check | `test_health_reports...`, `test_a_request_can_choose_the_model`, `scripts/compare_models.py` | Both models served side by side | EdNet comparison done in Hackathon 2 (AUC 0.729 against 0.627); the improved model is now the service default |
 
 ## Storage
 
@@ -66,6 +66,7 @@ Measured effects come from `results/model_comparison.md` (5 evaluation seeds of 
 | Listen button | `src/components/__tests__/listen.test.ts` | Indian voice preferred; hidden when the device has no voice for the language |
 | Unfinished quiz answers kept | Checked in the browser | A reload returns to the same question with the answers given |
 | Offline install | Checked on the built site | Service worker active; the app's script and styles cached on the first visit |
+| Improved model as the service default | `tests/test_model.py` (`test_health_reports_the_default_and_available_models`, `test_a_request_can_choose_the_model`), `tests/test_storage.py` (`test_every_step_is_logged`), `engineClient.test.ts` (`shows the model the service uses by default`), `journey.e2e.test.ts` (service and browser engine agree) | A request without `?model=` is answered by the improved model; `?model=baseline` still works; the top bar shows the service's model; the demo scenarios give the same result as the browser fallback |
 | Paired comparison, accuracy baseline | `tests/test_paired.py`, `tests/test_accuracy_engine.py` | Reports reproduce from the committed results |
 | Continuous integration | `.github/workflows/tests.yml` | Engine, app and end-to-end tests on every push |
 
