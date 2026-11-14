@@ -538,7 +538,12 @@ export function applyPreset(p: Preset) {
     recheck: 5,
   };
   const n = steps[p];
-  if (n >= 1)
+  if (p === "m2check") {
+    // A new learner who got the Ohm's law placement question wrong. Ohm's law is then borderline, so the
+    // trainer's mark on the written answer decides whether a lesson appears (see docs/demo_plan.md).
+    const wrongOhm = PLACEMENT_GOOD.map((a) => (a.question_id === "q_x_ohm2" ? { ...a, chosen: QUESTIONS[a.question_id].correct === 0 ? 1 : 0 } : a));
+    onboardSync(d, "new", wrongOhm);
+  } else if (n >= 1)
     onboardSync(d, "some", p === "rootcause" ? PLACEMENT_GOOD.map((a) => (a.question_id === "q_x_sym2" ? { ...a, chosen: 2 } : a)) : PLACEMENT_GOOD);
   if (n >= 2) submitQuizSync(d, "m3", p === "rootcause" ? M3_SYMBOL_ROOT : M3_DIAGRAM_GAP);
   const rec = d.learners[ACTIVE_ID].recommendation;

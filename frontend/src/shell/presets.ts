@@ -4,7 +4,12 @@ export const PRESETS: { id: Preset; label: string; detail: string; route: string
   { id: "fresh", label: "New learner (cold start)", detail: "No history yet → onboarding", route: "/learner/welcome" },
   { id: "onboarded", label: "Onboarded, starting Module 3", detail: "Placement done, Modules 1 and 2 skipped", route: "/learner/home" },
   { id: "m1check", label: "Module 1 check (true/false)", detail: "Barabari's question types and points", route: "/learner/quiz/m1" },
-  { id: "m2check", label: "Module 2 check (short answer)", detail: "Written answer goes to the trainer to mark", route: "/learner/quiz/m2" },
+  {
+    id: "m2check",
+    label: "Module 2 check (short answer)",
+    detail: "Ohm's law is borderline: the trainer's mark decides the lesson",
+    route: "/learner/quiz/m2",
+  },
   { id: "gap", label: "Gap diagnosed: circuit diagrams", detail: "Module 3 check just submitted", route: "/learner/results" },
   { id: "rootcause", label: "Root cause is a prerequisite", detail: "Diagrams wrong because symbols are weak", route: "/learner/next" },
   { id: "escalated", label: "Learner escalated to trainer", detail: "“I'm still stuck” was tapped", route: "/educator" },

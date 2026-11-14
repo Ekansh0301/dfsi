@@ -1,6 +1,7 @@
 /** The demo presets must land where their labels say (HANDOFF.md section 5, Issue T7). */
 import { describe, expect, it } from "vitest";
-import { applyPreset, getDB, quizFor, type Preset } from "../mockServer";
+import { applyPreset, getDB, markAnswer, quizFor, submitQuiz, type Preset } from "../mockServer";
+import { QUESTIONS } from "../../data/curriculum";
 import { PRESETS } from "../../shell/presets";
 
 const me = () => getDB().learners[getDB().activeLearnerId];
@@ -42,6 +43,24 @@ describe("demo presets", () => {
     expect(me().onboarded).toBe(false);
     applyPreset("onboarded");
     expect(me().onboarded && me().currentModule).toBe("m3");
+  });
+
+  it("m2check: Ohm's law is borderline, so the written answer's mark decides the lesson", async () => {
+    applyPreset("m2check");
+    expect(me().onboarded).toBe(true);
+    expect(me().mastery.ohm!).toBeLessThan(0.3);
+    expect(me().recommendation).toBeUndefined();
+    const right = [
+      { question_id: "q_q1", chosen: QUESTIONS.q_q1.correct },
+      { question_id: "q_q2", chosen: QUESTIONS.q_q2.correct },
+      { question_id: "q_o1", chosen: QUESTIONS.q_o1.correct },
+      { question_id: "q_o2", chosen: 0, text: "the current goes down" },
+    ];
+    const res = await submitQuiz("m2", right);
+    expect(res.recommendation).toBeUndefined(); // the written answer is still with the trainer
+    const mark = getDB().marks.find((m) => m.question_id === "q_o2")!;
+    await markAnswer(mark.id, 0.25, "Look at I = V / R again.");
+    expect(me().recommendation).toMatchObject({ concept_id: "ohm", recommended_content_id: "ct_ohm_walk" });
   });
 
   it("every preset in the top bar exists", () => {
