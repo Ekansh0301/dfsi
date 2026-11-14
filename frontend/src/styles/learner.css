@@ -86,6 +86,12 @@
   color: var(--rust-ink);
   font-size: 0.84rem;
 }
+/* Learner buttons stay at least 44px tall, a comfortable tap target on phones */
+.quiz-top .btn-sm,
+.stuck-link {
+  min-height: 44px;
+  min-width: 44px;
+}
 
 /* Typography */
 .display {
@@ -280,7 +286,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 36px;
+  min-height: 44px;
   margin-bottom: -8px;
 }
 .quiz-top .muted {
