@@ -15,15 +15,23 @@ This repository holds the **UI prototype** (`frontend/`) and the **knowledge-tra
 
 ## Results at a glance
 
-![Baseline against the improved model on 3,000 simulated learners per run, Barabari's quiz format](backend/results/model_comparison.png)
+![Baseline against the improved model, on simulated learners in two formats](backend/results/model_comparison.png)
 
-The service now answers with the improved model by default. On simulated learners in Barabari's quiz format (hidden mastery known, 5 runs of 3,000 learners each), it finds the real root cause of a gap 58% of the time (baseline 49%), sends 27% of learners to a concept they already knew (baseline 42%) and raises 31% false alarms (baseline 38%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps), see [`paired_comparison.md`](backend/results/paired_comparison.md).
+The service answers with the improved model by default. On simulated learners (hidden knowledge known, 5 runs of 3,000 learners per simulator) it finds the real root cause more often (49% to 58% in Barabari's quiz format), sends far fewer learners to a lesson on something they already knew (42% to 27%) and raises fewer false alarms (38% to 31%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps).
 
-With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy ([`accuracy_baseline.md`](backend/results/accuracy_baseline.md)). The walk is what lifts both well above "study what you got wrong", which finds the hidden cause in under 8% of cases. On real student answers (EdNet, next-answer prediction), the improved model reaches AUC 0.729 against 0.627 for the baseline.
+![Knowledge tracing against plain accuracy, with the same prerequisite walk](backend/results/bkt_vs_accuracy.png)
+
+Is knowledge tracing needed? With the same prerequisite walk, it finds far more real blockers than plain accuracy (hidden cause found 62% against 43%, and 69% for the improved model). "Study what you got wrong" finds it in 7% of cases.
+
+![Next-answer prediction on real EdNet answers](backend/results/ednet_prediction.png)
+
+On real student answers (EdNet), the improved model predicts the next answer better than the baseline (AUC 0.729 against 0.627).
 
 ![Calibration of the predicted chance of a right answer and of the mastery estimate](backend/results/calibration.png)
 
-The predicted chance of a right answer is well calibrated. The mastery estimate runs about 10 points high between 0.2 and 0.7, so the trainer console shows bands (Needs work, Getting there, Strong) instead of percentages. Details in [`calibration.md`](backend/results/calibration.md).
+The predicted chance of a right answer is well calibrated. The mastery estimate runs about 10 points high between 0.2 and 0.7, so the trainer console shows bands (Needs work, Getting there, Strong) instead of percentages.
+
+More figures, each with a short reading and caveat, are in [`backend/results/overview.md`](backend/results/overview.md): run-by-run differences with 95% intervals, what each model change adds, robustness to wrong tags, the hardest cases, and what the tests protect.
 
 What these results do not show: they come from simulated learners and from EdNet (next-answer prediction only), not from learners at Barabari or Nirmaan, and nothing here shows that learners learn more. Full evidence, limits and the promotion decision: [technical design document](backend/docs/Technical_Design_Doc.md).
 

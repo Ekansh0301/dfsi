@@ -44,6 +44,7 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 - [Test spec](docs/test_spec.md): every change since Sprint 3, its tests, its measured effect and what is still weak
 - [Model comparison](results/model_comparison.md): the improved model against the baseline (`python scripts/compare_models.py`), and [paired by run](results/paired_comparison.md) with 95% intervals
 - [Accuracy baseline](results/accuracy_baseline.md): BKT against plain accuracy with the same prerequisite walk
+- [Evaluation at a glance](results/overview.md): nine figures with a short reading and caveat each (`python scripts/plot_results.py`)
 - [Barabari's quiz format](docs/barabari_format.md): question types, partial credit, retakes, concept tags and the adapter endpoint
 - [Technical design document (POC v1.0)](docs/Technical_Design_Doc.md): changes in response to feedback and review, architecture, the engine, results, robustness, calibration, POC v1.0 status
 - [Architecture and data flow](docs/architecture.md)
