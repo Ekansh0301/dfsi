@@ -23,7 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import __version__, barabari
-from .storage import Storage
+from .storage import KeyReused, Storage
 from .curriculum import CONCEPTS, CONTENT, MODULES
 from .engine import _PARAMS_FILE, MODELS, Engine, Event, LearnerState, load_params
 
@@ -115,15 +115,27 @@ def replay(req, step: str) -> dict | None:
     """The saved response if this request was already applied (storage on, same learner and key)."""
     learner_id, key = getattr(req, "learner_id", None), request_key(req)
     if store and learner_id and key:
-        return store.replay(learner_id, step, key)
+        try:
+            return store.replay(learner_id, step, key, req.model_dump(mode="json"))
+        except KeyReused:
+            raise HTTPException(409, f"request_id {key} was already used for a different {step} request")
     return None
 
 
-def remember(req, step: str, model: str | None, state: LearnerState, rec: dict | None, response: BaseModel) -> None:
+def remember(req, step: str, model: str | None, state: LearnerState, rec: dict | None, response: BaseModel):
+    """Save the state and log the step (storage on). Returns the response to send: the new one,
+    or the saved one if an identical request was applied a moment earlier."""
     learner_id = getattr(req, "learner_id", None)
     if store and learner_id:
-        store.save(learner_id, state)
-        store.log(learner_id, step, model or DEFAULT_MODEL, req.model_dump(mode="json"), rec, request_key(req), response.model_dump(mode="json"))
+        try:
+            earlier = store.record(
+                learner_id, state, step, model or DEFAULT_MODEL, req.model_dump(mode="json"), rec, request_key(req), response.model_dump(mode="json")
+            )
+        except KeyReused:
+            raise HTTPException(409, f"request_id {request_key(req)} was already used for a different {step} request")
+        if earlier is not None:
+            return earlier
+    return response
 
 
 MODEL_QUERY = Query(default=None, description="Engine model for this request: baseline or improved. Defaults to the service setting")
@@ -280,8 +292,7 @@ def onboarding(req: OnboardingRequest, model: ModelName | None = MODEL_QUERY) ->
         return hit
     state, start = engine.onboard(req.experience, [e.to_event() for e in req.events])
     out = OnboardingResponse(state=StateModel.of(state), start_module_id=start)
-    remember(req, "onboarding", model, state, None, out)
-    return out
+    return remember(req, "onboarding", model, state, None, out)
 
 
 @app.post("/v1/quiz-result", response_model=QuizResultResponse)
@@ -304,8 +315,7 @@ def quiz_result(req: QuizResultRequest, model: ModelName | None = MODEL_QUERY) -
     else:
         rec = engine.recommend(state, MODULES[req.module_id]["concepts"], req.now)
     out = QuizResultResponse(state=StateModel.of(state), recommendation=rec)
-    remember(req, "quiz-result", model, state, rec, out)
-    return out
+    return remember(req, "quiz-result", model, state, rec, out)
 
 
 @app.post("/v1/got-it", response_model=GotItResponse)
@@ -324,8 +334,7 @@ def got_it(req: GotItRequest, model: ModelName | None = MODEL_QUERY) -> GotItRes
         if req.content_id not in done:
             done.append(req.content_id)
     out = GotItResponse(state=StateModel.of(state))
-    remember(req, "got-it", model, state, None, out)
-    return out
+    return remember(req, "got-it", model, state, None, out)
 
 
 
@@ -353,8 +362,7 @@ def marked_answer(req: MarkedAnswerRequest, model: ModelName | None = MODEL_QUER
     state = engine.trace(start_state(req), [ev.to_event()])
     rec = engine.recommend(state, [c for c in CONCEPTS if c in req.concept_tags], req.now)
     out = QuizResultResponse(state=StateModel.of(state), recommendation=rec)
-    remember(req, "marked-answer", model, state, rec, out)
-    return out
+    return remember(req, "marked-answer", model, state, rec, out)
 
 # ---- Barabari adapter --------------------------------------------------------------------
 # Barabari's LMS can send a quiz attempt in its own format; the service tags it with concepts,
@@ -470,8 +478,7 @@ def barabari_quiz_attempt(req: BarabariAttemptRequest, model: ModelName | None =
     out = BarabariAttemptResponse(
         state=StateModel.of(state), recommendation=rec, score=barabari.attempt_score(quiz, attempt), assessed_concepts=assessed
     )
-    remember(req, "barabari-quiz-attempt", model, state, rec, out)
-    return out
+    return remember(req, "barabari-quiz-attempt", model, state, rec, out)
 
 
 

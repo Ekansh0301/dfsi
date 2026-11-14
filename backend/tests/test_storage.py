@@ -102,3 +102,22 @@ def test_a_repeat_gap_with_stored_state_gets_a_lesson_not_yet_tried(client):
 def test_got_it_rejects_a_lesson_from_another_concept(client):
     r = client.post("/v1/got-it", json={"state": {}, "concept_id": "ohm", "content_id": "ct_sym_cards"})
     assert r.status_code == 422
+
+
+def test_copies_of_one_request_sent_at_the_same_time_are_applied_once(client):
+    from concurrent.futures import ThreadPoolExecutor
+
+    body = {"state": {}, "module_id": "m3", "events": [{"concept_tags": ["diagrams"], "is_correct": False}], "learner_id": "meera", "request_id": "r-1"}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        replies = list(pool.map(lambda _: client.post("/v1/quiz-result", json=body), range(8)))
+    assert {r.status_code for r in replies} == {200}
+    assert len({json.dumps(r.json(), sort_keys=True) for r in replies}) == 1
+    assert client.get("/v1/learners/meera/state").json()["observations"]["diagrams"] == 1
+    assert len(api.store.history("meera")) == 1
+
+
+def test_a_request_id_reused_for_a_different_request_is_refused(client):
+    body = {"state": {}, "module_id": "m3", "events": [{"concept_tags": ["diagrams"], "is_correct": False}], "learner_id": "meera", "request_id": "r-2"}
+    assert client.post("/v1/quiz-result", json=body).status_code == 200
+    body["events"][0]["is_correct"] = True
+    assert client.post("/v1/quiz-result", json=body).status_code == 409

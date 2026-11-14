@@ -193,7 +193,7 @@ Request: `state`, `concept_tags`, `score` (the trainer's mark from 0 to 1), opti
 ### Choosing the model and storing learners
 
 - Every POST that changes the model accepts `?model=baseline` or `?model=improved` (default: the service's `CIRCUIT_COACH_MODEL`, `baseline` unless set). `GET /health` reports `model` and `models`.
-- With storage on, a POST may also carry `request_id`: sent again for the same learner, it returns the saved response and is not applied twice. A Barabari attempt uses its own attempt id. Without storage nothing is remembered, so the client must send each answer once.
+- With storage on, a POST may also carry `request_id`: sent again for the same learner, it returns the saved response and is not applied twice. This also holds for copies that arrive at the same moment (the key is unique in the database and the state is saved in the same transaction). Reusing a `request_id` for a different request gives a 409. A Barabari attempt uses its own attempt id. Without storage nothing is remembered, so the client must send each answer once.
 - With storage on (`CIRCUIT_COACH_DB`), every POST also accepts `learner_id`. An empty `state` then starts from the learner's saved state, and the result is saved. For `/v1/barabari/quiz-attempt` it defaults to the attempt's `student_id`.
 
 ### Access and limits
@@ -207,6 +207,7 @@ Request: `state`, `concept_tags`, `score` (the trainer's mark from 0 to 1), opti
 | Status | When | Body |
 |---|---|---|
 | 401 | `CIRCUIT_COACH_API_KEY` is set and the `X-API-Key` header is missing or wrong | `{ "detail": "Missing or wrong X-API-Key header" }` |
+| 409 | With storage on: a `request_id` already used by this learner for a different request | `{ "detail": "request_id r-2 was already used for a different quiz-result request" }` |
 | 404 | Unknown `module_id` | `{ "detail": "Unknown module m99" }` |
 | 422 | Unknown concept in `state`, `events`, `recheck_concept` or `concept_id` | `{ "detail": "Unknown concepts: ['nope']" }` |
 | 422 | Missing or badly typed field (FastAPI validation) | `{ "detail": [{ "type": "missing", "loc": ["body", "events"], "msg": "Field required" }] }` |
