@@ -11,8 +11,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const API: string | undefined = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.E2E_API_URL;
-/** The model the service is asked for (VITE_ENGINE_MODEL); the browser engine is always the baseline. */
-const MODEL: string | undefined = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.VITE_ENGINE_MODEL;
 const DEAD = "http://127.0.0.1:9"; // nothing listens here
 
 const PLACEMENT = ["q_x_saf4", "q_x_q3", "q_x_ohm2", "q_x_sym2", "q_x_wir2", "q_x_mm2"];
@@ -108,8 +106,10 @@ describe.skipIf(!API)("demo scenarios through the real service", () => {
   });
 });
 
-// The browser engine implements the baseline model only, so it is compared with a baseline service.
-describe.skipIf(!API || (MODEL && MODEL !== "baseline"))("service and browser engine agree", () => {
+// The browser engine implements the baseline model only. On the three demo scenarios the service
+// (the improved model by default, or whichever model VITE_ENGINE_MODEL asks for) must still give the
+// same recommendation, chain and lesson, and the same mastery to one decimal, so the fallback is invisible.
+describe.skipIf(!API)("service and browser engine agree", () => {
   for (const scenario of ["direct", "hidden", "clean"] as const) {
     it(`${scenario}: same recommendation and mastery`, async () => {
       const viaApi = await app(API);

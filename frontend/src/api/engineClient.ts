@@ -17,6 +17,8 @@ export const MODEL = (import.meta.env.VITE_ENGINE_MODEL as string | undefined) |
 const API_KEY = (import.meta.env.VITE_API_KEY as string | undefined) || undefined;
 
 export type EngineMode = "local" | "checking" | "api" | "fallback";
+/** The model the service answers with by default, learned from its health check. */
+let serviceModel: string | undefined;
 /** With a service configured the mode starts as "checking" until a health check or a call answers. */
 let mode: EngineMode = BASE ? "checking" : "local";
 const listeners = new Set<() => void>();
@@ -26,15 +28,13 @@ function setMode(m: EngineMode) {
   listeners.forEach((l) => l());
 }
 export const getEngineMode = () => mode;
-export const useEngineMode = () =>
-  useSyncExternalStore(
-    (fn) => {
-      listeners.add(fn);
-      return () => void listeners.delete(fn);
-    },
-    getEngineMode,
-    getEngineMode,
-  );
+export const getServiceModel = () => MODEL ?? serviceModel;
+const subscribe = (fn: () => void) => {
+  listeners.add(fn);
+  return () => void listeners.delete(fn);
+};
+export const useEngineMode = () => useSyncExternalStore(subscribe, getEngineMode, getEngineMode);
+export const useServiceModel = () => useSyncExternalStore(subscribe, getServiceModel, getServiceModel);
 
 export interface EngineState {
   mastery: Partial<Record<ConceptId, number>>;
@@ -59,6 +59,13 @@ async function healthy(timeoutMs: number): Promise<boolean> {
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const res = await fetch(BASE + "/health", { signal: ctrl.signal });
+    if (res.ok) {
+      const model = ((await res.json().catch(() => null)) as { model?: unknown } | null)?.model;
+      if (typeof model === "string" && model !== serviceModel) {
+        serviceModel = model;
+        listeners.forEach((l) => l());
+      }
+    }
     return res.ok;
   } catch {
     return false;

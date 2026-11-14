@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ChevronDown, FastForward, RotateCcw, Wand2 } from "lucide-react";
-import { MODEL, checkHealth, useEngineMode } from "../api/engineClient";
+import { checkHealth, useEngineMode, useServiceModel } from "../api/engineClient";
 import { fastForward } from "../api/mockServer";
 import { PRESETS, runPreset } from "./presets";
 
 export function TopBar() {
   const engine = useEngineMode();
+  const model = useServiceModel();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -63,7 +64,7 @@ export function TopBar() {
           : engine === "checking"
             ? "Engine: checking service…"
             : engine === "api"
-              ? `Engine: API${MODEL ? ` (${MODEL})` : ""}`
+              ? `Engine: API${model ? ` (${model})` : ""}`
               : "Engine: API unreachable, using browser"}
       </span>
       <div className="tb-demo" ref={ref}>

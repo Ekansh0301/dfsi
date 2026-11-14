@@ -16,7 +16,7 @@ npm run format
 
 To use the engine service in `../backend` instead of the in-browser engine, copy `.env.example` to `.env.local` and set `VITE_API_URL`. The top bar shows which engine is answering, and the prototype falls back to the in-browser engine if the service is unreachable, returns an error or takes longer than 4 seconds. `src/api/__tests__/engineClient.test.ts` checks the requests sent in API mode, the use of the service's answers, and every fallback case.
 
-Set `VITE_ENGINE_MODEL=improved` as well to ask the service for the Sprint 3 model; the top bar then shows "Engine: API (improved)". Module quick checks include true/false questions and show points, as in Barabari's quizzes.
+The service answers with its default model, the improved one, and the top bar shows it: "Engine: API (improved)". Set `VITE_ENGINE_MODEL=baseline` to ask for the baseline instead. Module quick checks include true/false questions and show points, as in Barabari's quizzes.
 
 The full demo script and the test results are in [`../backend/docs/e2e_results.md`](../backend/docs/e2e_results.md).
 

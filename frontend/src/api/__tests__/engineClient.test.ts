@@ -217,6 +217,14 @@ describe("fallback to the in-browser engine", () => {
     expect(await client.checkHealth()).toBe("fallback");
   });
 
+  it("shows the model the service uses by default", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ status: "ok", model: "improved" }), { status: 200 })));
+    const { client } = await load(API);
+    expect(client.getServiceModel()).toBeUndefined();
+    await client.checkHealth();
+    expect(client.getServiceModel()).toBe("improved");
+  });
+
   it("while the service stays down, later steps only make a quick health check", async () => {
     const fetch = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
     vi.stubGlobal("fetch", fetch);
