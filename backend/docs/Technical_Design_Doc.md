@@ -4,7 +4,7 @@
 **Prototype:** https://dfsi.vercel.app/ | **Code:** `backend/` and `frontend/` in the project repository
 **Document:** Final Technical Design Document (Hackathon 2, POC v1.0). Earlier versions: `docs/archive/Sprint4_Technical_Design_Doc.md` (Sprint 4, POC v0.9), `docs/archive/Sprint2_Technical_Design_Doc.md` (Sprint 2) and `docs/archive/Hack1_Technical_Design_Doc.md` (after Hackathon 1).
 
-Circuit Coach finds what a vocational learner is stuck on after each short quiz, traces it back to the real cause, and recommends one short lesson; a trainer steps in when the learner is still stuck. The engine reads Barabari's quiz format. Compared run by run on made-up learners, the improved model is clearly better than the baseline on 12 of 14 measures and not clearly different on the other 2. With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy. On real EdNet answers the improved model predicts the next answer clearly better than the baseline (AUC 0.729 against 0.627). POC v1.0 makes the improved model the service default, and adds reading aloud in English and Hindi, offline use and a set of fixes from a full project review.
+Circuit Coach finds what a vocational learner is stuck on after each short quiz, traces it back to the real cause, and recommends one short lesson; a trainer steps in when the learner is still stuck. The engine reads Barabari's quiz format. Compared run by run on made-up learners, the improved model is clearly better than the baseline on 12 of 14 measures and not clearly different on the other 2; as the service runs it (no per-question difficulty table until it has answers for its own questions), it is clearly better on 10 of the 12 diagnosis measures and not clearly different on the other 2 (section 6.1). With the same prerequisite walk, knowledge tracing finds 12 to 24 points more true blockers than plain accuracy. On real EdNet answers the improved model predicts the next answer clearly better than the baseline (AUC 0.729 against 0.627). POC v1.0 makes the improved model the service default, runs the same engine in the browser so the live site, the fallback and the service give the same answers, and adds reading aloud in English and Hindi, offline use and a set of fixes from a full project review.
 
 ## 1. Introduction
 
@@ -36,6 +36,8 @@ Our project, **Problem 3B: Identifying what a learner needs next**, works with B
 | The top bar said "Engine: API" before the service had answered | A health check on start-up; a down service costs a quick check per step instead of the full 4 second timeout |
 | Hindi learners got the trainer's mark, tips and some labels in English; screen-reader descriptions of quiz figures named the answer | Messages, tips and labels in the learner's language; neutral figure descriptions in both languages, checked by a test |
 | Trainers saw mastery as exact percentages, though mid-range estimates run high (6.5) | Bands at the engine's own thresholds: Needs work, Getting there, Strong |
+| The browser engine was the baseline with hand-set parameters, so the live site and the fallback answered differently from the service (on the Module 2 demo the browser showed a lesson before the trainer had marked the written answer; in simulated quick checks the two disagreed on about a third of them) | The browser runs the same engine, ported step for step: the fitted parameters, both models (improved by default, following the service's default), question types, partial credit, retakes and difficulty. 120 journeys recorded from the service are replayed on it, and a test fails if either copy or a shared data file drifts | `frontend/src/engine/engine.ts`, `engine/__tests__/parity.test.ts`, `tests/test_parity.py` |
+| The service never applied per-question difficulty, and the app never sent the attempt number | Events carry the question id and the attempt number. The service and the browser read one difficulty table (`item_difficulty.json`), filled from stored answers by `scripts/estimate_item_difficulty.py`; the results in 6.1 are measured with the table as it ships | `engine.py`, `api.py`, `scripts/estimate_item_difficulty.py`, `scripts/served_model_check.py` |
 | The EdNet comparison for the improved model had never been run, so the model could not be promoted | Run on 40,000 sampled students: AUC 0.729 against 0.627 for the baseline (6.3). The improved model is now the service default |
 
 ## 3. Technical specification and architecture
@@ -50,6 +52,7 @@ Our project, **Problem 3B: Identifying what a learner needs next**, works with B
 | Learner app and trainer console (React, `frontend/`) | Onboarding, quick checks with multiple choice, true/false and short answers; one recommended lesson; listen button; "Got it!" and "I'm still stuck"; escalation queue, cohort gaps, short answers to mark |
 | Learner store (`mockServer.ts`) | Learner records and escalations in the browser's `localStorage`, shared across tabs and the side-by-side demo; unfinished quiz answers are kept across a reload |
 | Offline support (`public/sw.js`, `manifest.webmanifest`) | The prototype installs on a phone and opens with no signal; the in-browser engine needs no network |
+| Browser engine (`engine/engine.ts`) | The same engine as the service, with the same fitted parameters (`data/fittedParams.json`) and difficulty table (`data/itemDifficulty.json`); improved by default, and it follows the service's default model |
 | Engine client (`engineClient.ts`) | Checks the service on start-up, sends the model steps, falls back to the in-browser engine on any failure or after 4 seconds |
 | Engine service (FastAPI, `backend/circuit_coach/`) | Trace, root cause, recommend; two models (baseline, improved); optional storage, API key and size limits |
 | Barabari adapter (`barabari.py`) | Reads Barabari's quiz and attempt JSON, tags questions with concepts, turns attempts into events |
@@ -81,11 +84,11 @@ Every POST accepts `?model=baseline|improved`. With storage on, it also accepts 
 | Option | What it does |
 |---|---|
 | First-tag credit | A question tagged with several concepts updates only its first, main concept |
-| Question difficulty | Slip and guess shift per question by its difficulty, estimated from training answers |
+| Question difficulty | Slip and guess shift per question by its difficulty, estimated from stored answers (`item_difficulty.json`, read by the service and the browser; a question not in the table counts as average) |
 | Prerequisite-aware learning | Learning runs slower (down to half) while observed prerequisites look weak |
 | More evidence before a lesson | A lesson needs 2 answers on the concept, unless its mastery is below 0.4 after one |
 
-The improved model is the service default (section 7); the baseline stays selectable per request (`?model=baseline`), for the whole service (`CIRCUIT_COACH_MODEL=baseline`) or for the prototype (`VITE_ENGINE_MODEL=baseline`). The model has been frozen since tag `v0.9`: nothing in POC v1.0 changes how mastery is estimated; only which model answers by default changed.
+The improved model is the service default (section 7); the baseline stays selectable per request (`?model=baseline`), for the whole service (`CIRCUIT_COACH_MODEL=baseline`) or for the prototype (`VITE_ENGINE_MODEL=baseline`). The model has been frozen since tag `v0.9`: nothing in POC v1.0 changes how mastery is estimated; only which model answers by default changed, and the browser now runs the same engine.
 
 ## 5. Data and evaluation design
 
@@ -110,6 +113,19 @@ Splits are by learner (70:30 for made-up learners, 80:20 for EdNet). Measures: A
 | Lesson on a concept the learner knew | 33.9% | 18.0% | -15.9 pts (-19.9 to -11.8) | 41.9% | 26.6% | -15.2 pts (-22.8 to -7.6) |
 | Missed gaps | 2.6% | 3.5% | +0.9 pts (-1.6 to +3.3) | 6.4% | 6.3% | -0.1 pts (-1.5 to +1.3) |
 | False alarms | 31.9% | 24.2% | -7.7 pts (-12.2 to -3.2) | 38.2% | 30.7% | -7.5 pts (-10.8 to -4.3) |
+
+As the service runs it, with the difficulty table as it ships (every question average), the same learners and seeds give (`results/served_model.md`):
+
+| Measure (paired difference to the baseline, 95% interval) | Sprint 2 simulator | Barabari simulator |
+|---|---|---|
+| Gap F1 | +0.9 pts (+0.4 to +1.4) | +2.0 pts (+1.5 to +2.6) |
+| Recommendation is a true blocker | +8.9 pts (+7.1 to +10.7) | +7.7 pts (+4.6 to +10.7) |
+| Hidden-prerequisite blocker found | +7.5 pts (+4.9 to +10.2) | +9.0 pts (+5.1 to +12.9) |
+| Lesson on a concept the learner knew | -15.8 pts (-19.8 to -11.7) | -14.0 pts (-21.1 to -7.0) |
+| Missed gaps | +1.0 pts (-1.5 to +3.5), not clear | -0.1 pts (-1.5 to +1.3), not clear |
+| False alarms | -7.5 pts (-12.0 to -3.0) | -6.7 pts (-9.8 to -3.5) |
+
+That is 10 of 12 diagnosis measures clearly better and the 2 missed-gap measures not clear. A difficulty table estimated from the simulator's own answers would add about 1 point on Barabari's format (1.2 fewer lessons on a known concept, 0.8 fewer false alarms) and nothing measurable on the Sprint 2 simulator. Next-answer AUC is an offline measure (the service does not predict answers), so it appears only in the 14-measure comparison above.
 
 Gap F1 is also clearly better on both (+0.9 and +2.2 points). Missed gaps are within the noise overall, but on the Sprint 2 simulator the improved model misses more in 4 of the 5 runs (median +1.5 points): the baseline's 2.6% average comes from one run at 6.4%, and in the other four it misses 1.3% to 2.1%. First-tag credit gives the largest gain; question difficulty lifts prediction where questions differ; prerequisite-aware learning wins back missed gaps; the evidence rule cuts false alarms. Full ablation: `results/model_comparison.md`; paired tables: `results/paired_comparison.md`.
 
@@ -174,9 +190,10 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 **Worked**
 
 - Reading Barabari's format changed the evidence the model uses without changing the product's flow.
-- The improved model is clearly better on 12 of 14 measures on both simulators, paired by run.
+- The improved model is clearly better on 12 of 14 measures on both simulators, paired by run; as the service runs it, on 10 of the 12 diagnosis measures.
 - Knowledge tracing adds clear value over plain accuracy with the same walk (6.2).
 - The engine handles edge cases with a defined behaviour (empty quiz, all "I'm not sure", impossible values, duplicate and concurrent requests), and the browser engine follows the same rules.
+- The browser engine gives the same answers as the service on 120 journeys recorded from it, under both models, so the live site, the offline fallback and the demo agree.
 
 **Did not work, or not yet**
 
@@ -191,8 +208,8 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 | Part | State |
 |---|---|
 | Learner app and trainer console (English and Hindi) with true/false, short answers, marking, listen button, offline use | Working |
-| Engine service with two models, Barabari adapter, marked answers, optional storage, API key and size limits | Working; 224 backend tests |
-| Prototype with fallback to the browser engine | Working; 44 frontend tests, 8 more end-to-end with the service running |
+| Engine service with two models, Barabari adapter, marked answers, optional storage, API key and size limits | Working; 239 backend tests |
+| Prototype with fallback to the browser engine | Working; 174 frontend tests (121 of them replay journeys recorded from the service), 8 more end-to-end with the service running |
 | Made-up learners in two formats, Barabari sample, EdNet loader | Working |
 | Evaluation: model comparison (also paired), accuracy baseline, robustness, calibration, failure analysis | Reproducible, reports in `backend/results/` |
 | Continuous integration on every push | `.github/workflows/tests.yml` |
@@ -209,4 +226,3 @@ First-tag credit stops a wrong answer on a two-concept question from blaming bot
 - The improved model's settings were tuned on made-up learners.
 - Escalations and trainer replies live in the browser's storage, not in the service.
 - The listen button uses the voices installed on the device; many desktops have no Hindi voice, and voice quality varies. Pre-recorded natural audio is the next step.
-- Two copies of the engine (Python and the browser) are kept in step by tests; the browser copy has only the baseline model. When the service is down, the app falls back to the baseline: the three demo scenarios give the same recommendation either way, but other cases can differ slightly.

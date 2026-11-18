@@ -1,6 +1,6 @@
 # API contract
 
-The engine service exposes five endpoints. All bodies are JSON. The machine-readable contract is [openapi.json](openapi.json), generated from the code by `python scripts/export_openapi.py`; `tests/test_contract.py` fails if the two disagree. When the service is running, the same schema is browsable at `/docs`.
+The engine service exposes eight endpoints. All bodies are JSON. The machine-readable contract is [openapi.json](openapi.json), generated from the code by `python scripts/export_openapi.py`; `tests/test_contract.py` fails if the two disagree. When the service is running, the same schema is browsable at `/docs`.
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -39,6 +39,7 @@ One answered question.
 | `question_type` | `"multiple_choice"` (default), `"true_false"` or `"short_answer"` | Barabari's question types; sets the chance of a lucky guess (0.5 for true/false, 0.05 for a short answer) |
 | `score` | number 0 to 1 or `null` (default) | Partial credit, such as points earned on a marked short answer. Replaces `is_correct` when set |
 | `attempt_number` | integer, at least 1 (default 1) | Retakes count for less: attempt k has weight 0.5 to the power k minus 1 |
+| `item_id` | string or `null` (default) | The question's id. The improved model shifts slip and guess by the question's difficulty from `item_difficulty.json`; a question that is not in the table counts as average |
 
 ### `Recommendation`
 

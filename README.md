@@ -17,7 +17,7 @@ This repository holds the **UI prototype** (`frontend/`) and the **knowledge-tra
 
 ![Baseline against the improved model, on simulated learners in two formats](backend/results/model_comparison.png)
 
-The service answers with the improved model by default. On simulated learners (hidden knowledge known, 5 runs of 3,000 learners per simulator) it finds the real root cause more often (49% to 58% in Barabari's quiz format), sends far fewer learners to a lesson on something they already knew (42% to 27%) and raises fewer false alarms (38% to 31%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps).
+The service answers with the improved model by default. On simulated learners (hidden knowledge known, 5 runs of 3,000 learners per simulator) it finds the real root cause more often (49% to 58% in Barabari's quiz format), sends far fewer learners to a lesson on something they already knew (42% to 27%) and raises fewer false alarms (38% to 31%). Compared run by run, it is clearly better on 12 of 14 measures and not clearly different on the other two (missed gaps); in the form the service runs it, on 10 of the 12 diagnosis measures. The app runs the same engine in the browser, so the deployed site, the offline fallback and the service give the same answers.
 
 ![Knowledge tracing against plain accuracy, with the same prerequisite walk](backend/results/bkt_vs_accuracy.png)
 

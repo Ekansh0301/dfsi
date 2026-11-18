@@ -42,6 +42,7 @@ python scripts/failure_analysis.py
 python scripts/compare_models.py                               # both models on both simulators
 python scripts/paired_comparison.py                            # seconds: reads model_comparison.json
 python scripts/accuracy_baseline.py                            # under a minute
+PYTHONPATH=scripts python scripts/served_model_check.py        # the model as the service runs it, about 15 minutes
 python scripts/run_ednet.py --users 40000                      # needs the EdNet files, see README
 ```
 
@@ -108,7 +109,7 @@ Why:
 - **EdNet (real answers).** The promotion rule asks the improved model to narrow the EdNet gap to per-question accuracy. It does more than that: next-answer AUC 0.729 against 0.627 for the baseline and 0.721 for per-question accuracy (40,000 sampled students; first-tag credit and question difficulty only, since EdNet has no prerequisite graph). Table in `results/model_comparison.md`.
 - **The cost, accepted.** Missed gaps on the Sprint 2 simulator: the averages are 2.6% (baseline) and 3.5%, and the 95% interval of the paired difference (-1.6 to +3.3 points) includes zero, but the improved model misses more in 4 of the 5 runs (median +1.5 points). The baseline's average comes from one run at 6.4%; in the other four it misses 1.3% to 2.1%. The plan's target was no more than the baseline. Against this the improved model finds about 9 points more true blockers, sends about 15 points fewer learners to a lesson they do not need, and predicts real answers far better. Missed gaps also grow under heavy mis-tagging (`results/robustness.md`), which is one more reason a trainer checks the tags.
 
-What the default means in practice: a request without `?model=` is answered by the improved model, `GET /health` reports `"model": "improved"`, and the top bar of the prototype shows "Engine: API (improved)". The in-browser fallback engine is still the baseline model, so when the service is down the app uses the baseline; on the three demo scenarios both give the same recommendation, chain and lesson (`journey.e2e.test.ts`). The model itself has been frozen since tag `v0.9`: promoting it changed one setting, not the model. To repeat the EdNet check: download EdNet into `backend/data/raw/` (see README) and run `python scripts/compare_models.py` (about 15 minutes), which adds the EdNet table.
+What the default means in practice: a request without `?model=` is answered by the improved model, `GET /health` reports `"model": "improved"`, and the top bar of the prototype shows "Engine: API (improved)". The in-browser engine is the same engine and follows the service's default model, so when the service is down, or on the deployed site that has none, the app answers exactly like the service (120 recorded journeys under both models, `parity.test.ts`; the three demo scenarios, `journey.e2e.test.ts`). The model itself has been frozen since tag `v0.9`: promoting it changed one setting, not the model. To repeat the EdNet check: download EdNet into `backend/data/raw/` (see README) and run `python scripts/compare_models.py` (about 15 minutes), which adds the EdNet table.
 
 ## Sprint 4: robustness, calibration and failure analysis
 
@@ -140,6 +141,7 @@ In hidden-prerequisite cases the improved model cuts lessons on a concept the le
 
 - **Paired comparison** (`scripts/paired_comparison.py`, `results/paired_comparison.md`): differences improved minus baseline within each seed, with a 95% interval over the 5 runs and the number of runs each model won. 12 of 14 measures are clearly better; missed gaps are not clearly different overall but worse in 4 of 5 Sprint 2 runs.
 - **Accuracy baseline** (`scripts/accuracy_baseline.py`, `results/accuracy_baseline.md`): the same threshold, prerequisite walk and lesson choice on top of the learner's smoothed accuracy ((right + 1) / (answers + 2)), on the same learners as the model comparison. BKT finds 12 to 24 points more true blockers and recommends 18 to 34 points fewer lessons on known concepts; accuracy misses 0 to 3 points fewer gaps. The walk on plain accuracy recovers part of the gain over "study what you got wrong", BKT the rest.
+- **The model as served** (`scripts/served_model_check.py`, `results/served_model.md`): the same learners and seeds with the service's own configuration, which has no per-question difficulty table until it has answers for its questions (`scripts/estimate_item_difficulty.py` builds it from stored answers). Against the baseline it is clearly better on 10 of 12 diagnosis measures and not clearly different on missed gaps. A table estimated from the simulator's answers would add about 1 point on Barabari's format and nothing measurable on the Sprint 2 simulator.
 - **Shipped parameters:** the evaluation scripts no longer touch `circuit_coach/fitted_params.json` unless run with `--write-service-params`; `tests/test_shipped_params.py` checks the file against the frozen version.
 
 ## Limits

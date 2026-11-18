@@ -86,7 +86,7 @@ Simulated learners come in two kinds. The **older simulator** gives multiple-cho
 
 ![Automated tests by area](test_coverage.png)
 
-**Takeaway.** 224 engine tests and 52 app tests (8 of the app tests also need the service running). The most heavily tested areas are the ones that went wrong in the project review: edge cases, Barabari's format, and the gap and root-cause logic.
+**Takeaway.** 239 engine tests and 182 app tests (8 of the app tests also need the service running). The most heavily tested areas are the ones that went wrong in the project review: edge cases, Barabari's format, and the gap and root-cause logic.
 
 ## What these results do not show
 

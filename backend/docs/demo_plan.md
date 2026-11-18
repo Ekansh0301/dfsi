@@ -24,7 +24,7 @@ Checklist:
 - [ ] http://localhost:5173 shows **Engine: API** in the top bar.
 - [ ] http://localhost:8000/docs opens (the API page).
 - [ ] Demo scenarios, then **Reset all demo data**.
-- [ ] Optional: to show the improved model, also set `$env:VITE_ENGINE_MODEL = "improved"` before `npm run dev`; the top bar then says **Engine: API (improved)**.
+- [ ] The top bar says **Engine: API (improved)**: the improved model is the default. To show the baseline for comparison, set `$env:VITE_ENGINE_MODEL = "baseline"` before `npm run dev`.
 
 Quiz options are shuffled, so pick answers by their text, never by letter.
 
@@ -54,7 +54,7 @@ Quiz options are shuffled, so pick answers by their text, never by letter.
 
 | Problem | Fix |
 |---|---|
-| Top bar says "Engine: in browser" | `VITE_API_URL` was not set: stop the site, set it, restart `npm run dev` |
+| Top bar says "Engine: in browser (improved)" | `VITE_API_URL` was not set: stop the site, set it, restart `npm run dev` |
 | Port 8000 busy | Start the service on another port and set `VITE_API_URL` to match |
 | The service crashes mid-demo | Carry on: the browser engine takes over (that is the fallback step) |
 | No network or laptop problem | Use https://dfsi.vercel.app/ (browser engine only) and the presets in Demo scenarios |

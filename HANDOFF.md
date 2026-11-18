@@ -10,7 +10,7 @@ Live prototype: https://dfsi.vercel.app/
 | Part | Where | State |
 |---|---|---|
 | Clickable prototype (learner app, trainer console, side-by-side demo, flow map, English and Hindi, light and dark) with true/false and short-answer questions, points, trainer marking, a listen button, offline use and saved quiz progress | `frontend/` | Done |
-| Engine service (FastAPI, Bayesian Knowledge Tracing, prerequisite walk, one-lesson recommender; two models, improved by default and baseline selectable; Barabari adapter; optional SQLite or PostgreSQL storage; optional API key and size limits) | `backend/circuit_coach/` | Done, 224 tests pass |
+| Engine service (FastAPI, Bayesian Knowledge Tracing, prerequisite walk, one-lesson recommender; two models, improved by default and baseline selectable; Barabari adapter; optional SQLite or PostgreSQL storage; optional API key and size limits) | `backend/circuit_coach/` | Done, 239 tests pass |
 | Made-up learner generator with hidden mastery, in two formats (Sprint 2 and Barabari's quiz format) | `backend/circuit_coach/simulate.py` | Done |
 | Evaluation: model comparison (also paired by run), accuracy baseline, robustness, calibration, failure analysis, EdNet loader | `backend/scripts/`, results in `backend/results/` | Done, including the EdNet comparison for the improved model |
 | Prototype connected to the engine, with fallback to the in-browser engine | `frontend/src/api/engineClient.ts`, `mockServer.ts` | Done, tested, health check on start-up |
@@ -51,13 +51,13 @@ Settings of the service (all optional): `CIRCUIT_COACH_MODEL`, `CIRCUIT_COACH_DB
 
 Evaluation commands are in `backend/README.md` and `backend/docs/evaluation.md`. The EdNet raw files (1.2 GB) are not in the repo. Download KT1 from https://github.com/riiid/ednet into `backend/data/raw` (the exact files and the command are in `backend/README.md`).
 
-Test counts at the last check: 224 backend tests; 44 frontend tests plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). `npm test` works with or without a `frontend/.env.local`.
+Test counts at the last check: 239 backend tests; 174 frontend tests (121 replay journeys recorded from the service) plus 8 end-to-end tests that need the service running (`E2E_API_URL=http://localhost:8000 npm run test:e2e`). `npm test` works with or without a `frontend/.env.local`.
 
 ## 3. Key results
 
 Details and tables are in the technical design document; every figure comes from a script in `backend/scripts/` that anyone can rerun.
 
-- **Improved model against the baseline** (5 runs of 3,000 made-up learners, paired by run): clearly better on 12 of 14 measures, not clearly different on missed gaps. On learners in Barabari's quiz format it finds the hidden root cause 58.3% of the time (baseline 49.0%) and cuts false alarms from 38.2% to 30.7%. On the Sprint 2 simulator it misses more gaps in 4 of 5 runs (median +1.5 points). `results/paired_comparison.md`.
+- **Improved model against the baseline** (5 runs of 3,000 made-up learners, paired by run): clearly better on 12 of 14 measures, not clearly different on missed gaps (as the service runs it, 10 of the 12 diagnosis measures: `results/served_model.md`). On learners in Barabari's quiz format it finds the hidden root cause 58.3% of the time (baseline 49.0%) and cuts false alarms from 38.2% to 30.7%. On the Sprint 2 simulator it misses more gaps in 4 of 5 runs (median +1.5 points). `results/paired_comparison.md`.
 - **Does BKT earn its place?** With the same prerequisite walk, BKT finds 12 to 24 points more true blockers than plain accuracy. `results/accuracy_baseline.md`.
 - **Real data (EdNet, Sprint 2 result):** per-question accuracy AUC 0.721 beats fitted BKT 0.627, because BKT ignores question difficulty.
 - **Calibration:** next-answer probabilities are well calibrated; mastery estimates run about 10 points high in the middle range, so trainers see bands, not percentages.
@@ -83,7 +83,6 @@ Details and tables are in the technical design document; every figure comes from
 ## 5. Open
 
 - **Demo video:** not recorded. Steps are in `backend/docs/demo_plan.md`.
-- **Browser fallback:** when the service is down the app uses its in-browser engine, which is the baseline model only. Porting the improved model to the browser is future work.
 - **Live site:** redeploy after every merge; the top bar shows which build is running.
 - **Voice:** the listen button uses the voices installed on the device. Pre-recorded natural English and Hindi audio is the next step.
 - **Nirmaan:** we have no format or data from them yet. **Barabari:** their real attempt records (columns) would replace our assumed shape (`backend/docs/barabari_format.md`).

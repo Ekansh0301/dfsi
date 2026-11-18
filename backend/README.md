@@ -32,8 +32,9 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `circuit_coach/dataset.py` | Save, load, split (70:30) and validate a made-up dataset |
 | `circuit_coach/diagnosis_eval.py` | Does the engine find the right gap and the right lesson? |
 | `circuit_coach/ednet.py` | Loader for the real EdNet dataset |
-| `circuit_coach/fitted_params.json` | BKT parameters used by the service (fitted on made-up learners) |
-| `scripts/` | `run_synthetic.py`, `run_ednet.py`, `ablation_multitag.py`, `export_openapi.py`, `generate_dataset.py` |
+| `circuit_coach/fitted_params.json` | BKT parameters used by the service (fitted on made-up learners); the browser carries a copy |
+| `circuit_coach/item_difficulty.json` | Per-question difficulty read by the improved model; the browser carries a copy |
+| `scripts/` | `run_synthetic.py`, `run_ednet.py`, `compare_models.py`, `served_model_check.py`, `estimate_item_difficulty.py`, `export_parity_cases.py`, `export_openapi.py`, `generate_dataset.py` and more |
 | `results/` | Evaluation output (Markdown tables and raw JSON) |
 | `datasets/` | Saved made-up dataset (seed 0, 500 learners) with ground truth |
 | `docs/` | Architecture, API contract (`openapi.json`) and notes per component |
@@ -63,7 +64,10 @@ To use the service from the prototype, set `VITE_API_URL=http://localhost:8000` 
 | `GET /v1/concepts` | Concept graph, modules, lesson ids |
 | `POST /v1/onboarding` | Seed a new learner from experience and the placement quiz |
 | `POST /v1/quiz-result` | Update the model from a quick check, return one recommendation |
-| `POST /v1/got-it` | Apply a learning step after "Got it!" |
+| `POST /v1/got-it` | Apply a learning step after "Got it!" and record the finished lesson |
+| `POST /v1/marked-answer` | A trainer's mark for a short answer, as partial credit |
+| `POST /v1/barabari/quiz-attempt` | One attempt in Barabari's own quiz format |
+| `GET /v1/learners/{learner_id}/state` | A saved learner state (storage on) |
 
 Settings (environment variables, all optional):
 
@@ -74,7 +78,7 @@ Settings (environment variables, all optional):
 | `CIRCUIT_COACH_API_KEY` | Require this value in the `X-API-Key` header on `/v1/` calls |
 | `ALLOWED_ORIGINS` | Sites allowed to call the service from a browser (default: local prototype and dfsi.vercel.app) |
 
-Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing. Request and response fields follow `frontend/src/api/types.ts`. The full schemas, with examples and error codes, are in [docs/api_contract.md](docs/api_contract.md). After changing a request or response model, run `python scripts/export_openapi.py`; `tests/test_contract.py` fails until the committed schema matches.
+Requests carry the learner state (`mastery`, `observations`, `tried`) and return the updated state, so the service stores nothing unless storage is on. Request and response fields follow `frontend/src/api/types.ts`. The full schemas, with examples and error codes, are in [docs/api_contract.md](docs/api_contract.md). After changing a request or response model, run `python scripts/export_openapi.py`; `tests/test_contract.py` fails until the committed schema matches.
 
 ## Reproduce the evaluation
 

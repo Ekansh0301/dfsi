@@ -3,8 +3,8 @@
 What each Sprint 3 change does, which tests cover it, what it measurably changed, and what is still weak. Run everything with:
 
 ```bash
-cd backend && pytest                       # backend: 224 tests
-cd frontend && npm test && npm run typecheck && npm run build   # 44 tests, 8 more need the service
+cd backend && pytest                       # backend: 239 tests
+cd frontend && npm test && npm run typecheck && npm run build   # 174 tests, 8 more need the service
 cd frontend && E2E_API_URL=http://localhost:8000 npm run test:e2e   # with the service running
 ```
 
@@ -67,6 +67,9 @@ Measured effects come from `results/model_comparison.md` (5 evaluation seeds of 
 | Unfinished quiz answers kept | Checked in the browser | A reload returns to the same question with the answers given |
 | Offline install | Checked on the built site | Service worker active; the app's script and styles cached on the first visit |
 | Improved model as the service default | `tests/test_model.py` (`test_health_reports_the_default_and_available_models`, `test_a_request_can_choose_the_model`), `tests/test_storage.py` (`test_every_step_is_logged`), `engineClient.test.ts` (`shows the model the service uses by default`), `journey.e2e.test.ts` (service and browser engine agree) | A request without `?model=` is answered by the improved model; `?model=baseline` still works; the top bar shows the service's model; the demo scenarios give the same result as the browser fallback |
+| Browser engine ported from the service: fitted parameters, both models, retakes, difficulty, evidence rule | `src/engine/__tests__/parity.test.ts` (120 journeys recorded from the service), `engine.test.ts`, `tests/test_parity.py` (the recording, the shared data files and the curriculum are current) | The live site, the fallback and the service answer alike; the Module 2 demo behaves as scripted with no service |
+| Question id and attempt number sent by the app; one shared difficulty table | `tests/test_item_difficulty.py`, `engineClient.test.ts` | Difficulty reaches the served model; the table can be estimated from stored answers |
+| The model as served, measured | `scripts/served_model_check.py`, `results/served_model.md` | 10 of 12 diagnosis measures clearly better than the baseline |
 | Paired comparison, accuracy baseline | `tests/test_paired.py`, `tests/test_accuracy_engine.py` | Reports reproduce from the committed results |
 | Continuous integration | `.github/workflows/tests.yml` | Engine, app and end-to-end tests on every push |
 

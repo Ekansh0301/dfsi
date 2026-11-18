@@ -16,7 +16,7 @@ npm run format
 
 To use the engine service in `../backend` instead of the in-browser engine, copy `.env.example` to `.env.local` and set `VITE_API_URL`. The top bar shows which engine is answering, and the prototype falls back to the in-browser engine if the service is unreachable, returns an error or takes longer than 4 seconds. `src/api/__tests__/engineClient.test.ts` checks the requests sent in API mode, the use of the service's answers, and every fallback case.
 
-The service answers with its default model, the improved one, and the top bar shows it: "Engine: API (improved)". Set `VITE_ENGINE_MODEL=baseline` to ask for the baseline instead. Module quick checks include true/false questions and show points, as in Barabari's quizzes.
+The service answers with its default model, the improved one, and the top bar shows it: "Engine: API (improved)". Set `VITE_ENGINE_MODEL=baseline` to ask for the baseline instead; the in-browser engine then runs the baseline too. Without it the browser runs the improved model and follows the service's default, so the app answers the same with the service up, down or absent. Module quick checks include true/false questions and show points, as in Barabari's quizzes.
 
 The full demo script and the test results are in [`../backend/docs/e2e_results.md`](../backend/docs/e2e_results.md).
 
@@ -33,7 +33,7 @@ To deploy on Vercel, import the repo with Root Directory `frontend`, build comma
 | `src/shell/` | Prototype-only shell: overview, phone frame + design notes, side-by-side demo, flow map, demo scenarios |
 | `src/api/types.ts` | Data contract (Design Doc §5 shapes) shared with the future backend |
 | `src/api/mockServer.ts` | In-browser mock backend (localStorage). One function per planned endpoint |
-| `src/engine/engine.ts` | Stand-in knowledge-tracing engine: BKT, root-cause search, single recommendation |
+| `src/engine/engine.ts` | The knowledge-tracing engine, the same as the service's: BKT with the fitted parameters, both models, root-cause search, single recommendation |
 | `src/data/` | Demo curriculum (concept DAG, modules, bilingual questions), remedial content, fictional seed data |
 | `src/components/` | Circuit `Figure` (SVG, highlightable parts) and trainer `ConceptMap` |
 | `src/lib/` | Store hook, i18n (English/Hindi) |

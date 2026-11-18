@@ -51,8 +51,8 @@ flowchart LR
 | Trainer console | `frontend/src/educator/` | Escalation queue, repeat gaps, cohort gaps, replies to learners |
 | Learner store | `frontend/src/api/mockServer.ts` | Holds every learner record (answers, mastery, tried lessons, re-checks, escalations) in `localStorage` |
 | Engine client | `frontend/src/api/engineClient.ts` | Sends the three model steps to the service, reports the engine mode, falls back on any failure |
-| In-browser engine | `frontend/src/engine/engine.ts` | Same logic as the service, used when there is no service or it is unreachable |
-| HTTP layer | `backend/circuit_coach/api.py` | Request validation, the five endpoints, CORS |
+| In-browser engine | `frontend/src/engine/engine.ts` | The same engine as the service (same fitted parameters, both models, same rules), used when there is no service or it is unreachable. `engine/__tests__/parity.test.ts` replays journeys recorded from the service |
+| HTTP layer | `backend/circuit_coach/api.py` | Request validation, the eight endpoints, CORS, optional API key and size limits |
 | Engine | `backend/circuit_coach/engine.py` | Tracing, root-cause walk, one recommendation, onboarding |
 | BKT | `backend/circuit_coach/bkt.py` | Per-concept Bayesian Knowledge Tracing and EM fitting |
 | Curriculum | `backend/circuit_coach/curriculum.py` | Concept graph, modules and lesson ids; must match `frontend/src/data/` (checked by `tests/test_parity.py`) |
@@ -123,5 +123,5 @@ Details and tests: [bkt.md](bkt.md) and [diagnosis.md](diagnosis.md).
 | Piece | How it runs |
 |---|---|
 | Frontend | Static build (`npm run build`), deployed on Vercel with root directory `frontend` |
-| Service | `uvicorn circuit_coach.api:app --port 8000`; `ALLOWED_ORIGINS` sets CORS (comma separated, default `*`) |
+| Service | `uvicorn circuit_coach.api:app --port 8000`; `ALLOWED_ORIGINS` sets CORS (comma separated; default: the local prototype and `https://dfsi.vercel.app`) |
 | Connection | `VITE_API_URL` in `frontend/.env.local`; unset means the in-browser engine only |

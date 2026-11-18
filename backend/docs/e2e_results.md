@@ -32,7 +32,7 @@ Use **Demo scenarios** in the top bar to jump to any step, and **Reset all demo 
 | 5. API failure | Stop uvicorn (Ctrl+C) and finish any quick check | The top bar changes to "Engine: API unreachable, using browser"; the recommendation still appears |
 | 6. Recovery | Start uvicorn again and finish another step | The top bar returns to "Engine: API" |
 
-Without `VITE_API_URL` the top bar shows "Engine: in browser" and the same flow runs fully offline.
+Without `VITE_API_URL` the top bar shows "Engine: in browser (improved)" and the same flow runs fully offline, with the same answers as the service.
 
 ## Automated results
 
@@ -40,9 +40,9 @@ Run on 2026-11-14 for POC v1.0 (Windows 11, Python 3.13.1, Node 22.13.1). The fi
 
 | Suite | Command | Result |
 |---|---|---|
-| Backend | `cd backend && pytest` | 224 passed |
-| Frontend unit and fallback | `cd frontend && npm test` | 44 passed, 8 skipped (the 8 need the service) |
-| Frontend end to end, service running | `E2E_API_URL=http://localhost:8000 npm run test:e2e` (or `npm test` with the variable set) | 52 passed (all frontend tests, including the 8 journey tests) |
+| Backend | `cd backend && pytest` | 239 passed |
+| Frontend unit and fallback | `cd frontend && npm test` | 174 passed, 8 skipped (the 8 need the service) |
+| Frontend end to end, service running | `E2E_API_URL=http://localhost:8000 npm run test:e2e` (or `npm test` with the variable set) | 182 passed (all frontend tests, including the 8 journey tests) |
 | Types and build | `npm run typecheck`, `npm run build` | passed |
 
 End-to-end cases (`journey.e2e.test.ts`):
