@@ -371,7 +371,7 @@ def fig_failure(out: Path) -> None:
 # ------------------------------------------------------------------------------------------
 BACKEND_AREAS = [
     ("test_bkt", "Knowledge tracing"), ("test_model", "Models and question types"), ("test_diagnosis", "Gap and root cause"), ("test_engine", "Gap and root cause"),
-    ("test_edge_cases", "Edge cases"), ("test_api", "API and contract"), ("test_contract", "API and contract"), ("test_parity", "API and contract"),
+    ("test_edge_cases", "Edge cases"), ("test_api", "API and contract"), ("test_contract", "API and contract"), ("test_parity", "Browser matches service"), ("test_item_difficulty", "Question difficulty"),
     ("test_storage", "Storage and safe retries"), ("test_security", "Security and limits"), ("test_barabari", "Barabari format"),
     ("test_simulate", "Simulator and data"), ("test_dataset", "Simulator and data"), ("test_evaluation", "Evaluation reports"), ("test_paired", "Evaluation reports"),
     ("test_accuracy_engine", "Evaluation reports"), ("test_shipped_params", "Evaluation reports"), ("test_plots", "Evaluation reports"),
@@ -404,7 +404,7 @@ def frontend_counts() -> Counter:
     except Exception:
         return Counter()
     names = {"engineClient": "Service connection and fallback", "journey": "Whole learner journey", "presets": "Demo scenarios", "marking": "Trainer marking",
-             "engine": "Browser engine", "figures": "Accessibility", "listen": "Listen button"}
+             "engine": "Browser engine", "parity": "Browser matches service", "figures": "Accessibility", "listen": "Listen button"}
     counts: Counter = Counter()
     for f in data.get("testResults", []):
         stem = Path(f["name"]).name.split(".")[0]
