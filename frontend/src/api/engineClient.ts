@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
-import type { ConceptId, QuestionType, Recommendation } from "./types";
+import type { ConceptId, Recommendation } from "./types";
+import { setModel, type EngineEvent } from "../engine/engine";
 
 /**
  * Optional connection to the engine service in `backend/`.
@@ -41,12 +42,7 @@ export interface EngineState {
   observations: Partial<Record<ConceptId, number>>;
   tried: Partial<Record<ConceptId, string[]>>;
 }
-export interface EngineEvent {
-  concept_tags: ConceptId[];
-  is_correct: boolean;
-  unsure: boolean;
-  question_type: QuestionType;
-}
+export type { EngineEvent };
 
 /** After a failed call, a quick health check runs first, so a service that is down costs about a
  *  second per step instead of the full 4 second timeout. */
@@ -63,6 +59,7 @@ async function healthy(timeoutMs: number): Promise<boolean> {
       const model = ((await res.json().catch(() => null)) as { model?: unknown } | null)?.model;
       if (typeof model === "string" && model !== serviceModel) {
         serviceModel = model;
+        setModel(model); // the in-browser fallback answers with the model the service uses
         listeners.forEach((l) => l());
       }
     }
@@ -121,10 +118,10 @@ export const remoteQuizResult = (req: { state: EngineState; module_id: string; e
     req,
   );
 
-export const remoteMarkedAnswer = (state: EngineState, concept_tags: ConceptId[], score: number, now: number) =>
+export const remoteMarkedAnswer = (state: EngineState, concept_tags: ConceptId[], score: number, now: number, attempt_number = 1, item_id?: string) =>
   post<{ state: EngineState; recommendation: (Omit<Recommendation, "strong_concept_id"> & { strong_concept_id: ConceptId | null }) | null }>(
     "/v1/marked-answer",
-    { state, concept_tags, score, now },
+    { state, concept_tags, score, now, attempt_number, item_id },
   );
 
 export const remoteGotIt = (state: EngineState, concept_id: ConceptId, content_id?: string) =>

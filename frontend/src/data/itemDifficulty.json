@@ -1,0 +1,4 @@
+{
+  "source": "Per-question difficulty on the logit scale, estimated from stored answers by scripts/estimate_item_difficulty.py. Questions not listed count as average (0).",
+  "items": {}
+}

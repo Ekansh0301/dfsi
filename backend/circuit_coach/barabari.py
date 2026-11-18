@@ -235,6 +235,7 @@ def attempt_events(quiz: Quiz, attempt: Attempt, tags: TagMap) -> list[Event]:
                 question_type=q.question_type,
                 score=g if partial else None,
                 attempt_number=attempt.attempt_number,
+                item_id=f"{quiz.id}/{q.id}",
             )
         )
     return out

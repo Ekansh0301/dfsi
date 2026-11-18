@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field
 from . import __version__, barabari
 from .storage import KeyReused, Storage
 from .curriculum import CONCEPTS, CONTENT, MODULES
-from .engine import _PARAMS_FILE, MODELS, Engine, Event, LearnerState, load_params
+from .engine import _PARAMS_FILE, MODELS, Engine, Event, LearnerState, load_item_difficulty, load_params
 
 app = FastAPI(title="Circuit Coach engine", version=__version__)
 
@@ -66,7 +66,8 @@ ModelName = Literal["baseline", "improved"]
 DEFAULT_MODEL: str = os.environ.get("CIRCUIT_COACH_MODEL", "improved")
 if DEFAULT_MODEL not in MODELS:
     raise RuntimeError(f"CIRCUIT_COACH_MODEL must be one of {sorted(MODELS)}")
-engines = {name: Engine(load_params(model=name), options=opt) for name, opt in MODELS.items()}
+ITEM_DIFFICULTY = load_item_difficulty()
+engines = {name: Engine(load_params(model=name), options=opt, item_difficulty=ITEM_DIFFICULTY) for name, opt in MODELS.items()}
 engine = engines[DEFAULT_MODEL]
 
 
@@ -175,12 +176,15 @@ class EventModel(BaseModel):
         default=None, ge=0, le=1, description="Partial credit from 0 to 1 (points earned / points). Overrides is_correct"
     )
     attempt_number: int = Field(default=1, ge=1, description="1 for the first try at this quiz; retakes count for less")
+    item_id: str | None = Field(
+        default=None, max_length=128, description="The question's id, for its difficulty (`item_difficulty.json`); unknown questions count as average"
+    )
 
     def to_event(self) -> Event:
         unknown = set(self.concept_tags) - set(CONCEPTS)
         if unknown:
             raise HTTPException(422, f"Unknown concepts: {sorted(unknown)}")
-        return Event(tuple(self.concept_tags), self.is_correct, self.unsure, self.question_type, self.score, self.attempt_number)
+        return Event(tuple(self.concept_tags), self.is_correct, self.unsure, self.question_type, self.score, self.attempt_number, self.item_id)
 
 
 class OnboardingRequest(BaseModel):
@@ -344,6 +348,7 @@ class MarkedAnswerRequest(BaseModel):
     concept_tags: list[str] = Field(min_length=1, max_length=MAX_TAGS)
     score: float = Field(ge=0, le=1, description="The trainer's mark as a share of the question's points")
     attempt_number: int = Field(default=1, ge=1)
+    item_id: str | None = Field(default=None, max_length=128, description="The marked question's id, for its difficulty")
     now: int = 0
     learner_id: str | None = LEARNER_ID
     request_id: str | None = REQUEST_ID
@@ -356,7 +361,7 @@ def marked_answer(req: MarkedAnswerRequest, model: ModelName | None = MODEL_QUER
     Short answers wait for a trainer, so they reach the model after the quick check. The
     recommendation covers only the marked answer's concepts (null when they look fine).
     """
-    ev = EventModel(concept_tags=req.concept_tags, is_correct=req.score >= 0.5, question_type="short_answer", score=req.score, attempt_number=req.attempt_number)
+    ev = EventModel(concept_tags=req.concept_tags, is_correct=req.score >= 0.5, question_type="short_answer", score=req.score, attempt_number=req.attempt_number, item_id=req.item_id)
     if (hit := replay(req, "marked-answer")) is not None:
         return hit
     engine = pick(model)

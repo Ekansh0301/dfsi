@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { ChevronDown, FastForward, RotateCcw, Wand2 } from "lucide-react";
 import { checkHealth, useEngineMode, useServiceModel } from "../api/engineClient";
 import { fastForward } from "../api/mockServer";
+import { modelName } from "../engine/engine";
 import { PRESETS, runPreset } from "./presets";
 
 export function TopBar() {
@@ -60,12 +61,12 @@ export function TopBar() {
       </nav>
       <span className={"tb-engine tb-engine-" + engine} title="Where the knowledge-tracing steps run">
         {engine === "local"
-          ? "Engine: in browser"
+          ? `Engine: in browser (${modelName()})`
           : engine === "checking"
             ? "Engine: checking service…"
             : engine === "api"
               ? `Engine: API${model ? ` (${model})` : ""}`
-              : "Engine: API unreachable, using browser"}
+              : `Engine: API unreachable, using browser (${modelName()})`}
       </span>
       <div className="tb-demo" ref={ref}>
         <button type="button" className="btn btn-secondary btn-sm" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>

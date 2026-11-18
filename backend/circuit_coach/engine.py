@@ -27,6 +27,7 @@ STRONG = 0.8  # at or above: strong
 WEAK = 0.6  # below: a gap
 
 _PARAMS_FILE = Path(__file__).with_name("fitted_params.json")
+_DIFFICULTY_FILE = Path(__file__).with_name("item_difficulty.json")
 
 
 def load_params(path: Path | None = None, model: str = "baseline") -> dict[str, BKTParams]:
@@ -44,6 +45,19 @@ def load_params(path: Path | None = None, model: str = "baseline") -> dict[str, 
             if c in params:
                 params[c] = BKTParams.from_dict(d)
     return params
+
+
+def load_item_difficulty(path: Path | None = None) -> dict[str, float]:
+    """Per-question difficulty on the logit scale (question id to shift), shipped with the service.
+
+    Questions that are not listed count as average (0). The table is estimated from stored
+    answers by `scripts/estimate_item_difficulty.py`; the browser engine carries the same file
+    (`frontend/src/data/itemDifficulty.json`) and `tests/test_parity.py` checks they match.
+    """
+    path = path or _DIFFICULTY_FILE
+    if not path.exists():
+        return {}
+    return {str(k): float(v) for k, v in json.loads(path.read_text(encoding="utf8")).get("items", {}).items()}
 
 
 @dataclass(frozen=True)

@@ -884,6 +884,19 @@
             "title": "Attempt Number",
             "description": "1 for the first try at this quiz; retakes count for less",
             "default": 1
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id",
+            "description": "The question's id, for its difficulty (`item_difficulty.json`); unknown questions count as average"
           }
         },
         "type": "object",
@@ -1049,6 +1062,19 @@
             "minimum": 1.0,
             "title": "Attempt Number",
             "default": 1
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id",
+            "description": "The marked question's id, for its difficulty"
           },
           "now": {
             "type": "integer",

@@ -8,11 +8,11 @@
  * Sprint 2 leaves the UI unchanged.
  */
 import type { ConceptId, DB, Escalation, Lang, LearnerState, Recommendation, Resolution, StuckReason } from "./types";
-import { CONCEPTS, MODULES, PLACEMENT, QUESTIONS, moduleById } from "../data/curriculum";
+import { CONCEPTS, CONCEPT_ORDER, MODULES, PLACEMENT, QUESTIONS, moduleById } from "../data/curriculum";
 import { ACTIVE_ID, DB_VERSION, EDUCATOR, seedDB } from "../data/seed";
 import { remoteGotIt, remoteMarkedAnswer, remoteOnboarding, remoteQuizResult, type EngineEvent, type EngineState } from "./engineClient";
 import { clearAllDrafts } from "../lib/draft";
-import { BKT, WEAK, bktUpdate, diagnostic, learnStep, masteryOf, pickContent, recommend } from "../engine/engine";
+import { WEAK, learnStep, masteryOf, onboardingPrior, pickContent, recommend, recommendRepeat, trace } from "../engine/engine";
 
 const KEY = "circuit-coach.db";
 const listeners = new Set<() => void>();
@@ -96,29 +96,24 @@ function record(d: DB, l: LearnerState, moduleId: string, a: Answer) {
     });
     return false;
   }
-  const correct = a.chosen === q.correct;
-  const unsure = a.chosen === null;
-  const attempt = l.responses.filter((r) => r.question_id === q.id).length + 1;
+  const ev = toEvent(a, l);
   l.responses.push({
     learner_id: l.id,
     module_id: moduleId,
     question_id: q.id,
     concept_tags: q.concepts,
-    is_correct: correct,
-    unsure,
-    attempt_number: attempt,
+    is_correct: ev.is_correct,
+    unsure: ev.unsure,
+    attempt_number: ev.attempt_number ?? 1,
     timestamp: now(d),
   });
-  for (const c of new Set(q.concepts)) {
-    l.mastery[c] = bktUpdate(masteryOf(l, c), correct, unsure, q.type);
-    l.observations[c] = (l.observations[c] ?? 0) + 1;
-  }
-  return correct;
+  trace(l, [ev]);
+  return ev.is_correct;
 }
 
 function onboardSync(d: DB, experience: LearnerState["experience"], answers: Answer[], remote?: { state: EngineState; start_module_id: string }) {
   const l = me(d);
-  const prior = experience === "new" ? 0.12 : experience === "experienced" ? 0.45 : BKT.pInit + 0.05;
+  const prior = onboardingPrior(experience);
   for (const c of Object.keys(CONCEPTS) as ConceptId[]) l.mastery[c] = prior;
   for (const a of answers) record(d, l, "placement", a);
   l.onboarded = true;
@@ -194,15 +189,7 @@ function submitQuizSync(d: DB, moduleId: string, answers: Answer[], remote?: Rem
   if (recheck && !recheck.passed) {
     // Repeat gap: automation has already failed once. Re-route with different content AND tell the trainer.
     const c = recheck.concept;
-    rec = recommend(l, [c], t, true) ?? {
-      concept_id: c,
-      observed_concept_id: c,
-      chain: [c],
-      diagnostic_text: diagnostic(c, c, undefined, true),
-      recommended_content_id: pickContent(l, c),
-      repeat_gap: true,
-      created_at: t,
-    };
+    rec = recommendRepeat(l, c, t);
     escalate(d, l, c, { outcome: "recheck_failed", repeat: true });
   } else {
     rec = recommend(l, m.concepts, t);
@@ -228,7 +215,7 @@ function gotItSync(d: DB, remote?: EngineState) {
   const rec = l.recommendation;
   if (!rec) return;
   const c = rec.concept_id;
-  l.mastery[c] = remote?.mastery[c] ?? learnStep(masteryOf(l, c));
+  l.mastery[c] = remote?.mastery[c] ?? learnStep(masteryOf(l, c), c);
   // Don't trust the self-report: schedule a spaced check on a question not seen yet.
   // Prefer an unseen item whose main concept is `c` and that no module quiz uses.
   const seen = new Set(l.responses.map((r) => r.question_id));
@@ -323,9 +310,19 @@ function resolveSync(d: DB, escId: string, r: Omit<Resolution, "resolved_by" | "
 /** What the engine service needs to know about the learner. */
 const engineState = (l: LearnerState): EngineState => ({ mastery: l.mastery, observations: l.observations, tried: l.tried });
 
-const toEvent = (a: Answer): EngineEvent => {
+/** Which try at this question the next answer is: retakes count for less in the model. */
+const attemptOf = (l: LearnerState, questionId: string) => l.responses.filter((r) => r.question_id === questionId).length + 1;
+
+const toEvent = (a: Answer, l: LearnerState): EngineEvent => {
   const q = QUESTIONS[a.question_id];
-  return { concept_tags: q.concepts, is_correct: a.chosen === q.correct, unsure: a.chosen === null, question_type: q.type ?? "multiple_choice" };
+  return {
+    concept_tags: q.concepts,
+    is_correct: a.chosen === q.correct,
+    unsure: a.chosen === null,
+    question_type: q.type ?? "multiple_choice",
+    attempt_number: attemptOf(l, q.id),
+    item_id: q.id,
+  };
 };
 
 // ─── Public API (one function per planned endpoint) ──────────────────────────
@@ -335,7 +332,7 @@ export const setLang = (lang: Lang) => mutate((d) => void (me(d).lang = lang));
 
 /** POST /learners/{id}/onboarding → { start_module_id } */
 export async function finishOnboarding(experience: LearnerState["experience"], answers: Answer[]) {
-  const remote = await remoteOnboarding(experience ?? "some", answers.filter((a) => !isWritten(a.question_id)).map(toEvent));
+  const remote = await remoteOnboarding(experience ?? "some", answers.filter((a) => !isWritten(a.question_id)).map((a) => toEvent(a, me(db))));
   if (!remote) await latency(900);
   return mutate((d) => onboardSync(d, experience, answers, remote ?? undefined));
 }
@@ -347,13 +344,13 @@ export async function submitQuiz(moduleId: string, answers: Answer[]) {
   const quizIds = moduleById(moduleId).quiz;
   const failed = answers.find((a) => {
     const rc = before.rechecks.find((r) => r.status === "scheduled" && r.question_id === a.question_id);
-    return !quizIds.includes(a.question_id) && rc && toEvent(a).is_correct === false;
+    return !quizIds.includes(a.question_id) && rc && toEvent(a, before).is_correct === false;
   });
   const failedConcept = failed && before.rechecks.find((r) => r.question_id === failed.question_id)?.concept_id;
   const remote = await remoteQuizResult({
     state: engineState(before),
     module_id: moduleId,
-    events: answers.filter((a) => !isWritten(a.question_id) || a.chosen === null || !a.text?.trim()).map(toEvent),
+    events: answers.filter((a) => !isWritten(a.question_id) || a.chosen === null || !a.text?.trim()).map((a) => toEvent(a, before)),
     recheck_concept: failedConcept || undefined,
     now: now(),
   });
@@ -368,6 +365,7 @@ function markSync(d: DB, markId: string, score: number, comment: string, remote?
   const l = d.learners[mark.learner_id];
   const q = QUESTIONS[mark.question_id];
   const t = now(d);
+  const attempt = attemptOf(l, q.id);
   l.responses.push({
     learner_id: l.id,
     module_id: mark.module_id,
@@ -375,14 +373,11 @@ function markSync(d: DB, markId: string, score: number, comment: string, remote?
     concept_tags: q.concepts,
     is_correct: score >= 0.5,
     unsure: false,
-    attempt_number: l.responses.filter((r) => r.question_id === q.id).length + 1,
+    attempt_number: attempt,
     timestamp: t,
   });
-  for (const c of new Set(q.concepts)) {
-    l.mastery[c] = bktUpdate(masteryOf(l, c), score >= 0.5, false, "short_answer", score);
-    l.observations[c] = (l.observations[c] ?? 0) + 1;
-  }
-  let rec = recommend(l, q.concepts, t);
+  trace(l, [{ concept_tags: q.concepts, is_correct: score >= 0.5, unsure: false, question_type: "short_answer", score, attempt_number: attempt, item_id: q.id }]);
+  let rec = recommend(l, CONCEPT_ORDER.filter((c) => q.concepts.includes(c)), t);
   if (remote) {
     l.mastery = remote.state.mastery;
     l.observations = remote.state.observations;
@@ -408,7 +403,7 @@ export async function markAnswer(markId: string, score: number, comment = "") {
   const mark = db.marks.find((m) => m.id === markId);
   if (!mark) return;
   const l = db.learners[mark.learner_id];
-  const remote = await remoteMarkedAnswer(engineState(l), mark.concepts, score, now());
+  const remote = await remoteMarkedAnswer(engineState(l), mark.concepts, score, now(), attemptOf(l, mark.question_id), mark.question_id);
   if (!remote) await latency(300);
   mutate((d) => markSync(d, markId, score, comment, remote ?? undefined));
 }

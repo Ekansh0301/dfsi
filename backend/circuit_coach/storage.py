@@ -197,6 +197,12 @@ class Storage:
             raise KeyReused(request_key)
         return row[0]
 
+    def steps(self) -> list[dict]:
+        """Every logged model step, oldest first (used to estimate question difficulty)."""
+        with self.db.connect() as c:
+            rows = c.execute(select(model_steps).order_by(model_steps.c.id)).mappings().all()
+        return [dict(r) for r in rows]
+
     def history(self, learner_id: str) -> list[dict]:
         with self.db.connect() as c:
             rows = c.execute(select(model_steps).where(model_steps.c.learner_id == learner_id).order_by(model_steps.c.id)).mappings().all()

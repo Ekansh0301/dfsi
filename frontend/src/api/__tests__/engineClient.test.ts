@@ -84,14 +84,14 @@ describe("with VITE_API_URL", () => {
 
     await store.finishOnboarding("new", [{ question_id: "q_x_sym2", chosen: null }]);
     expect(calls[0].url).toBe(API + "/v1/onboarding");
-    expect(calls[0].body).toEqual({ experience: "new", events: [{ concept_tags: ["symbols"], is_correct: false, unsure: true, question_type: "multiple_choice" }] });
+    expect(calls[0].body).toEqual({ experience: "new", events: [{ concept_tags: ["symbols"], is_correct: false, unsure: true, question_type: "multiple_choice", attempt_number: 1, item_id: "q_x_sym2" }] });
     expect(me().currentModule).toBe("m3");
     expect(me().mastery).toEqual(state.mastery);
     expect(client.getEngineMode()).toBe("api");
 
     const res = await store.submitQuiz("m3", [{ question_id: "q_w3", chosen: null }]);
     expect(calls[1].url).toBe(API + "/v1/quiz-result");
-    expect(calls[1].body).toMatchObject({ module_id: "m3", events: [{ concept_tags: ["diagrams", "symbols"], is_correct: false, unsure: true, question_type: "multiple_choice" }] });
+    expect(calls[1].body).toMatchObject({ module_id: "m3", events: [{ concept_tags: ["diagrams", "symbols"], is_correct: false, unsure: true, question_type: "multiple_choice", attempt_number: 1, item_id: "q_w3" }] });
     expect(calls[1].body.state).toHaveProperty("mastery");
     expect(calls[1].body.recheck_concept).toBeUndefined();
     expect(res.recommendation?.diagnostic_text.en).toBe("from the service");
@@ -125,7 +125,7 @@ describe("Barabari question types", () => {
     store.applyPreset("onboarded");
     await store.submitQuiz("m1", [{ question_id: "q_s4", chosen: 1 }]);
     const quiz = calls.find((c) => c.url.endsWith("/v1/quiz-result"))!;
-    expect(quiz.body.events).toEqual([{ concept_tags: ["safety"], is_correct: true, unsure: false, question_type: "true_false" }]);
+    expect(quiz.body.events).toEqual([{ concept_tags: ["safety"], is_correct: true, unsure: false, question_type: "true_false", attempt_number: 1, item_id: "q_s4" }]);
   });
 
   it("asks the service for the model in VITE_ENGINE_MODEL", async () => {
@@ -223,6 +223,24 @@ describe("fallback to the in-browser engine", () => {
     expect(client.getServiceModel()).toBeUndefined();
     await client.checkHealth();
     expect(client.getServiceModel()).toBe("improved");
+  });
+
+  it("the browser engine follows the model the service uses, so the fallback answers alike", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ status: "ok", model: "baseline" }), { status: 200 })));
+    const { client } = await load(API);
+    const engine = await import("../../engine/engine");
+    expect(engine.modelName()).toBe("improved"); // the default, as in the service
+    await client.checkHealth();
+    expect(engine.modelName()).toBe("baseline");
+  });
+
+  it("a build that pins the model keeps it, whatever the service says", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ status: "ok", model: "improved" }), { status: 200 })));
+    vi.stubEnv("VITE_ENGINE_MODEL", "baseline");
+    const { client } = await load(API);
+    const engine = await import("../../engine/engine");
+    await client.checkHealth();
+    expect(engine.modelName()).toBe("baseline");
   });
 
   it("while the service stays down, later steps only make a quick health check", async () => {

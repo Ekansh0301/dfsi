@@ -106,7 +106,7 @@ describe.skipIf(!API)("demo scenarios through the real service", () => {
   });
 });
 
-// The browser engine implements the baseline model only. On the three demo scenarios the service
+// The browser engine is the same engine as the service (parity.test.ts replays recorded journeys). On the three demo scenarios the service
 // (the improved model by default, or whichever model VITE_ENGINE_MODEL asks for) must still give the
 // same recommendation, chain and lesson, and the same mastery to one decimal, so the fallback is invisible.
 describe.skipIf(!API)("service and browser engine agree", () => {
