@@ -7,11 +7,16 @@ import { SideBySide } from "./shell/SideBySide";
 import { FlowMap } from "./shell/FlowMap";
 import { TopBar } from "./shell/TopBar";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { WebApp } from "./webapp/WebApp";
 
+const params = new URLSearchParams(window.location.search);
 /** `?embed=1` renders an app bare (used by the side-by-side demo iframes). */
-const embedded = new URLSearchParams(window.location.search).has("embed");
+const embedded = params.has("embed");
+/** `?app=1` opens the responsive web app (no prototype top bar, phone frame or design notes). */
+const webapp = params.has("app");
 
 export default function App() {
+  if (webapp) return <WebApp />;
   if (embedded)
     return (
       <HashRouter>

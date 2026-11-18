@@ -58,6 +58,9 @@ export function TopBar() {
             {t.label}
           </NavLink>
         ))}
+        <a className="tb-tab" href={`${window.location.pathname}?app=1#/learner`} target="_blank" rel="noopener" title="Open the responsive web app in a new tab">
+          Web app ↗
+        </a>
       </nav>
       <span className={"tb-engine tb-engine-" + engine} title="Where the knowledge-tracing steps run">
         {engine === "local"
